@@ -5,6 +5,8 @@ import "./globals.css";
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 
+import { BOOT_SCRIPT } from "@/components/theme/theme-config";
+import { ThemeWatcher } from "@/components/theme/theme-watcher";
 import { env } from "@/env";
 
 export const metadata: Metadata = {
@@ -27,8 +29,15 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    // The boot script sets data-theme before hydration, so the attribute differs from the server HTML.
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: BOOT_SCRIPT }} />
+      </head>
+      <body>
+        {children}
+        <ThemeWatcher />
+      </body>
     </html>
   );
 }

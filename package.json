@@ -22,6 +22,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "npm run test:e2e --workspace @medos/web --",
+    "test:e2e:install": "npm run test:e2e:install --workspace @medos/web",
     "validate": "npm run typecheck && npm run lint && npm run format:check && npm run test && npm run test:e2e"
   },
   "devDependencies": {

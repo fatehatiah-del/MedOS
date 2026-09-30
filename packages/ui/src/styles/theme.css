@@ -7,8 +7,12 @@
  */
 
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
-/* Desktop sidebar collapsed to an icon rail (`data-sidebar` on <html>). */
-@custom-variant rail (&:where([data-sidebar="collapsed"] *));
+/*
+ * Desktop sidebar collapsed to an icon rail. `data-sidebar` is set on <html>;
+ * only elements marked `data-collapsible` (and their descendants) respond, so
+ * the mobile drawer keeps its labels.
+ */
+@custom-variant rail (&:where([data-sidebar="collapsed"] [data-collapsible], [data-sidebar="collapsed"] [data-collapsible] *));
 
 :root {
   color-scheme: light;
@@ -29,7 +33,7 @@
   --accent-fg: #ffffff;
   --accent-soft: #e6ecfa;
 
-  --success: #2c7a57;
+  --success: #276e4e;
   --success-soft: #e2f1ea;
   --warning: #8f5a12;
   --warning-soft: #f8eedc;
@@ -136,6 +140,30 @@
   --font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-serif: "Source Serif 4 Variable", ui-serif, Georgia, "Times New Roman", serif;
   --font-mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, monospace;
+
+  /* Motion is short and quiet; it is disabled entirely under reduced motion. */
+  --animate-fade-in: fade-in 140ms ease-out;
+  --animate-pop-in: pop-in 160ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  --animate-slide-in-left: slide-in-left 200ms cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @keyframes pop-in {
+    from {
+      opacity: 0;
+      transform: translateY(4px) scale(0.985);
+    }
+  }
+
+  @keyframes slide-in-left {
+    from {
+      transform: translateX(-100%);
+    }
+  }
 }
 
 @layer base {
