@@ -6,6 +6,7 @@ import {
   DEFAULT_STUDY_AVAILABILITY,
   FALL_2026,
   academicPeriods,
+  addDays,
   availableMinutesFor,
   daysBetween,
   findCourse,
@@ -16,6 +17,7 @@ import {
   isWeekend,
   periodStatus,
   semesterWeekFor,
+  semesterWeekRange,
 } from "./index";
 
 describe("courses", () => {
@@ -115,5 +117,31 @@ describe("study time", () => {
   it("rejects invalid durations", () => {
     expect(() => formatMinutes(-5)).toThrow();
     expect(() => formatMinutes(Number.NaN)).toThrow();
+  });
+});
+
+describe("teaching weeks as date ranges", () => {
+  it("adds days across month and year boundaries", () => {
+    expect(addDays("2026-09-28", 6)).toBe("2026-10-04");
+    expect(addDays("2026-12-28", 7)).toBe("2027-01-04");
+    expect(addDays("2026-10-01", -1)).toBe("2026-09-30");
+  });
+
+  it("gives each teaching week its seven days", () => {
+    expect(semesterWeekRange(1)).toEqual({ start: "2026-09-28", end: "2026-10-04" });
+    expect(semesterWeekRange(4)).toEqual({ start: "2026-10-19", end: "2026-10-25" });
+  });
+
+  it("agrees with semesterWeekFor", () => {
+    for (const week of [1, 2, 7, 12]) {
+      const range = semesterWeekRange(week);
+      expect(semesterWeekFor(range.start)).toBe(week);
+      expect(semesterWeekFor(range.end)).toBe(week);
+    }
+  });
+
+  it("rejects week numbers that are not positive integers", () => {
+    expect(() => semesterWeekRange(0)).toThrow();
+    expect(() => semesterWeekRange(1.5)).toThrow();
   });
 });

@@ -1,12 +1,31 @@
 import type { ReactNode } from "react";
 
+import type { NavCourse } from "@/config/navigation";
+import { getOptionalWorkspace } from "@/server/workspace";
+
 import { DesktopSidebar } from "./desktop-sidebar";
 import { TopBar } from "./top-bar";
 
 const MAIN_ID = "main-content";
 
+/**
+ * Course shortcuts come from the signed-in user's own courses, so the sidebar
+ * and the course pages can never disagree. Display only: access is decided by
+ * each page.
+ */
+async function navigationCourses(): Promise<NavCourse[]> {
+  const workspace = await getOptionalWorkspace();
+  if (!workspace) return [];
+  const courses = await workspace.scope.courses.list();
+  return courses
+    .filter((course) => course.semesterId === workspace.semester.id)
+    .map(({ slug, shortName, colorToken }) => ({ slug, shortName, colorToken }));
+}
+
 /** The signed-in application frame: sidebar, top bar and the page workspace. */
-export function AppShell({ children }: { children: ReactNode }) {
+export async function AppShell({ children }: { children: ReactNode }) {
+  const courses = await navigationCourses();
+
   return (
     <div className="flex min-h-dvh">
       <a
@@ -16,10 +35,10 @@ export function AppShell({ children }: { children: ReactNode }) {
         Skip to content
       </a>
 
-      <DesktopSidebar />
+      <DesktopSidebar courses={courses} />
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <TopBar />
+        <TopBar courses={courses} />
         <main
           id={MAIN_ID}
           tabIndex={-1}

@@ -141,16 +141,18 @@ queries, `study_sessions (user_id, started_at)`, and the foreign-key columns of 
 
 1. a placeholder user (`student@medos.invalid`);
 2. the Fall 2026 semester and the six courses, from the definitions in `@medos/shared`;
-3. three structural weeks for Pharmacology, with one, two and no lectures.
+3. placeholder weeks 1–4 for every course, with one, one, no and two lectures.
 
-It is **development data**. Lecture titles are generic ("Development fixture: week 4, lecture 1");
+It is **development data**. Lecture titles are generic ("Sample lecture 4.2 (development data)");
 no medical content is invented. The seed matches rows on their natural keys and rewrites a row
 only if it differs from the definition, so running it again changes nothing. It refuses to run
 when `NODE_ENV=production`.
 
-`seedSemester(db, userId)` is exported separately, so a real account's semester can be created
-without the fixtures. Nothing calls it for new accounts yet: that belongs to the phase that
-connects the course screens to the database.
+Accounts do not depend on the seed. `ensureWorkspace(db, userId)` runs whenever a signed-in user
+opens the workspace: it creates their semester and six courses on first use (through
+`seedSemester`) and otherwise costs one indexed lookup. With the `fixtureLectures` option (the
+`DEV_FIXTURE_LECTURES` setting) it also adds the placeholder weeks, but only to an account with no
+weeks at all. See [`academic-hierarchy.md`](academic-hierarchy.md).
 
 ## Left for later phases
 
@@ -160,6 +162,5 @@ connects the course screens to the database.
 - **One open study session per user** is a timer rule (Phase 13) and is not constrained yet.
 - **Row-level security.** Ownership is enforced by constraints and by the user-scoped data access
   layer. Database-level policies are not used.
-- **The workspace screens do not query study data yet.** The web app uses the database for
-  authentication only; screens move from fixtures to real data in the phases that build them,
-  starting with Phase 4.
+- **Removing placeholders.** Placeholder lectures are identified by their title prefix. The sync
+  tool (Phase 5) must remove them before the first real import.

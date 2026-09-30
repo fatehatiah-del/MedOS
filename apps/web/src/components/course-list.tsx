@@ -16,7 +16,7 @@ export function CourseList({ renderStatus }: CourseListProps) {
       <ul className="divide-y divide-border">
         {COURSES.map((course) => (
           <li key={course.id} className="flex items-center gap-3 px-5 py-3.5">
-            <CourseMark courseId={course.id} />
+            <CourseMark token={course.id} />
             <p className="min-w-0 flex-1 truncate text-sm font-medium text-fg">{course.name}</p>
             <div className="shrink-0 text-[13px] text-fg-subtle">{renderStatus(course)}</div>
           </li>

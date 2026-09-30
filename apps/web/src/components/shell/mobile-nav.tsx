@@ -4,11 +4,13 @@ import { Button, Dialog, DialogContent, DialogTitle, DialogTrigger } from "@medo
 import { Menu } from "lucide-react";
 import { useState } from "react";
 
+import type { NavCourse } from "@/config/navigation";
+
 import { Brand } from "./brand";
 import { SidebarNav } from "./sidebar-nav";
 
 /** Navigation drawer for tablet and mobile widths. */
-export function MobileNav() {
+export function MobileNav({ courses }: { courses: readonly NavCourse[] }) {
   const [open, setOpen] = useState(false);
   const close = () => setOpen(false);
 
@@ -34,7 +36,7 @@ export function MobileNav() {
         <div className="flex h-14 shrink-0 items-center px-5">
           <Brand onNavigate={close} />
         </div>
-        <SidebarNav label="Main (menu)" onNavigate={close} />
+        <SidebarNav courses={courses} label="Main (menu)" onNavigate={close} />
       </DialogContent>
     </Dialog>
   );

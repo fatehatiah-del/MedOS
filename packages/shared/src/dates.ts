@@ -81,3 +81,8 @@ export function formatDateRange(range: DateRange, locale = "en-GB"): string {
   }
   return `${formatDate(range.start, { year: true, locale })} – ${formatDate(range.end, { year: true, locale })}`;
 }
+
+/** The calendar day `days` after `date` (or before it, when negative). */
+export function addDays(date: IsoDate, days: number): IsoDate {
+  return new Date(toUtcMs(date) + days * MS_PER_DAY).toISOString().slice(0, 10) as IsoDate;
+}

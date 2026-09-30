@@ -1,10 +1,10 @@
-import { COURSES, formatDateRange, formatMinutes, getCourse } from "@medos/shared";
+import { formatDateRange, formatMinutes, getCourse } from "@medos/shared";
 import { Badge, EmptyState, Progress, Section, Surface, cn, progressPercent } from "@medos/ui";
 import { ChevronRight, MapPin, RotateCcw } from "lucide-react";
 import Link from "next/link";
 
 import { CourseMark } from "@/components/course-mark";
-import { courseHref } from "@/config/navigation";
+import { type NavCourse, courseHref } from "@/config/navigation";
 
 import { type ExamPeriodSummary, describePeriodStatus } from "./summary";
 import {
@@ -46,7 +46,7 @@ export function ScheduleSection({
                   </p>
                   <div className="min-w-0 flex-1">
                     <p className="flex items-center gap-2.5 text-[15px] font-medium text-fg">
-                      <CourseMark courseId={course.id} />
+                      <CourseMark token={course.id} />
                       <span className="truncate">{course.name}</span>
                     </p>
                     <p className="mt-0.5 pl-5 text-[13px] text-fg-subtle">
@@ -104,7 +104,7 @@ export function PlanSection({
                   </span>
                   <div className="min-w-0 flex-1">
                     <p className="flex items-center gap-2.5 text-[15px] font-medium text-fg">
-                      <CourseMark courseId={course.id} />
+                      <CourseMark token={course.id} />
                       <span className="truncate">{course.shortName}</span>
                     </p>
                     {/* On narrow screens the activity joins this line instead of a badge. */}
@@ -187,17 +187,20 @@ export function DueReviewSection({ className }: SectionProps) {
   );
 }
 
-export function CoursesSection({ className }: SectionProps) {
+export function CoursesSection({
+  courses,
+  className,
+}: SectionProps & { courses: readonly NavCourse[] }) {
   return (
     <Section title="Courses" className={className}>
       <ul className="-mx-2.5">
-        {COURSES.map((course) => (
-          <li key={course.id}>
+        {courses.map((course) => (
+          <li key={course.slug}>
             <Link
-              href={courseHref(course.id)}
+              href={courseHref(course.slug)}
               className="group flex h-10 items-center gap-3 rounded-lg px-2.5 text-sm text-fg transition-colors duration-150 hover:bg-hover/60"
             >
-              <CourseMark courseId={course.id} />
+              <CourseMark token={course.colorToken} />
               <span className="min-w-0 flex-1 truncate">{course.shortName}</span>
               <ChevronRight
                 aria-hidden="true"

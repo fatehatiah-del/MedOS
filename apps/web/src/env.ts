@@ -13,6 +13,14 @@ const envSchema = z.object({
   AI_PROVIDER: z.enum(["none"]).default("none"),
   /** Public base URL of the deployment. */
   APP_URL: z.url().optional(),
+  /**
+   * Development aid: give an account with no weeks a set of placeholder weeks
+   * and lectures. Leave it off wherever real material will be imported.
+   */
+  DEV_FIXTURE_LECTURES: z
+    .enum(["true", "false"])
+    .default("false")
+    .transform((value) => value === "true"),
 });
 
 export type Env = z.infer<typeof envSchema>;

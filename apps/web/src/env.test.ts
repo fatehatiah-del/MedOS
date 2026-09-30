@@ -21,7 +21,14 @@ describe("parseEnv", () => {
       NODE_ENV: "production",
       AI_PROVIDER: "none",
       APP_URL: "https://medos.example",
+      DEV_FIXTURE_LECTURES: false,
     });
+  });
+
+  it("keeps fixture lectures off unless explicitly enabled", () => {
+    expect(parseEnv({}).DEV_FIXTURE_LECTURES).toBe(false);
+    expect(parseEnv({ DEV_FIXTURE_LECTURES: "true" }).DEV_FIXTURE_LECTURES).toBe(true);
+    expect(() => parseEnv({ DEV_FIXTURE_LECTURES: "yes" })).toThrowError(/DEV_FIXTURE_LECTURES/);
   });
 
   it("rejects an unsupported AI provider with an actionable message", () => {

@@ -61,8 +61,8 @@ describe("a user's own data", () => {
     expect((await a.scope.courses.get(a.course.id))?.id).toBe(a.course.id);
     expect((await a.scope.lectures.get(a.lecture.id))?.id).toBe(a.lecture.id);
 
-    const weeks = await a.scope.courses.weeks(a.course.id);
-    expect(weeks?.map((week) => [week.number, week.lectures.length])).toEqual([[4, 1]]);
+    const outline = await a.scope.courses.outline(a.course.id);
+    expect(outline?.map((week) => [week.number, week.lectures.length])).toEqual([[4, 1]]);
   });
 
   it("can be marked complete and incomplete again, only by explicit request", async () => {
@@ -89,7 +89,10 @@ describe("user B cannot read user A's data", () => {
 
   it("gets nothing when asking for A's records by id", async () => {
     expect(await b.scope.courses.get(a.course.id)).toBeNull();
-    expect(await b.scope.courses.weeks(a.course.id)).toBeNull();
+    expect(await b.scope.courses.outline(a.course.id)).toBeNull();
+    expect(await b.scope.courses.getBySlug(a.semester.id, a.course.slug)).toBeNull();
+    expect(await b.scope.courses.overview(a.semester.id)).toEqual([]);
+    expect(await b.scope.lectures.detail(a.lecture.id)).toBeNull();
     expect(await b.scope.lectures.get(a.lecture.id)).toBeNull();
     expect(await b.scope.resources.get(a.resource.id)).toBeNull();
     expect(await b.scope.resources.listForLecture(a.lecture.id)).toEqual([]);

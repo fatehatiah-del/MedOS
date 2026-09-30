@@ -1,4 +1,5 @@
-import { and, eq } from "drizzle-orm";
+import { type IsoDate, addDays } from "@medos/shared";
+import { eq, inArray } from "drizzle-orm";
 
 import type { Database } from "../client";
 import { type Course, type User, lectures, users, weeks } from "../schema";
@@ -9,10 +10,10 @@ import { overwriteWhenChanged } from "./upsert";
 /*
  * DEVELOPMENT DATA — not real university content.
  *
- * A placeholder user and a handful of structural weeks and lectures, so the
- * application has something to read before authentication (Phase 3) and sync
- * (Phase 5) exist. Lecture titles are deliberately generic: MedOS never
- * invents medical content.
+ * Placeholder weeks and lectures that give the course and lecture screens
+ * something to show before the sync tool (Phase 5) imports real material.
+ * Titles are deliberately generic and say what they are: MedOS never invents
+ * medical content.
  */
 
 export const DEVELOPMENT_USER = {
@@ -21,19 +22,35 @@ export const DEVELOPMENT_USER = {
   displayName: "Fateh",
 } as const;
 
-export const DEVELOPMENT_COURSE_SLUG = "pharmacology";
-
-/** Weeks with one lecture, several lectures and no lectures. */
-export const DEVELOPMENT_WEEKS: readonly { number: number; lectures: number }[] = [
-  { number: 3, lectures: 1 },
+/**
+ * The same shape for every course: weeks with one lecture, a week with none,
+ * and a week with two. It exists to exercise "a week holds 0..n lectures".
+ */
+export const FIXTURE_WEEKS: readonly { number: number; lectures: number }[] = [
+  { number: 1, lectures: 1 },
+  { number: 2, lectures: 1 },
+  { number: 3, lectures: 0 },
   { number: 4, lectures: 2 },
-  { number: 5, lectures: 0 },
 ];
 
-export interface DevelopmentSeedResult extends SeededSemester {
-  user: User;
+/** Every fixture lecture title starts with this, so fixtures can be told apart from real lectures. */
+export const FIXTURE_LECTURE_PREFIX = "Sample lecture";
+
+export function fixtureLectureTitle(week: number, lecture: number): string {
+  return `${FIXTURE_LECTURE_PREFIX} ${week}.${lecture} (development data)`;
+}
+
+export function isFixtureLecture(lecture: { title: string }): boolean {
+  return lecture.title.startsWith(FIXTURE_LECTURE_PREFIX);
+}
+
+export interface FixtureSeedResult {
   weekCount: number;
   lectureCount: number;
+}
+
+export interface DevelopmentSeedResult extends SeededSemester, FixtureSeedResult {
+  user: User;
 }
 
 export async function seedDevelopmentUser(db: Database): Promise<User> {
@@ -50,59 +67,82 @@ export async function seedDevelopmentUser(db: Database): Promise<User> {
   return user;
 }
 
-async function seedDevelopmentLectures(
+/**
+ * Creates the fixture weeks and lectures for the given courses. Idempotent,
+ * and done in three statements however many courses there are.
+ *
+ * `termStart` dates each week: week 1 begins on the first day of term.
+ */
+export async function seedFixtureLectures(
   db: Database,
-  course: Course,
-): Promise<{ weekCount: number; lectureCount: number }> {
-  let lectureCount = 0;
+  courses: readonly Course[],
+  termStart: string,
+): Promise<FixtureSeedResult> {
+  if (courses.length === 0) return { weekCount: 0, lectureCount: 0 };
 
-  for (const fixture of DEVELOPMENT_WEEKS) {
+  await db
+    .insert(weeks)
+    .values(
+      courses.flatMap((course) =>
+        FIXTURE_WEEKS.map(({ number }) => {
+          const startsOn = addDays(termStart as IsoDate, (number - 1) * 7);
+          return {
+            userId: course.userId,
+            courseId: course.id,
+            number,
+            startsOn,
+            endsOn: addDays(startsOn, 6),
+          };
+        }),
+      ),
+    )
+    .onConflictDoNothing({ target: [weeks.courseId, weeks.number] });
+
+  const seededWeeks = await db
+    .select()
+    .from(weeks)
+    .where(
+      inArray(
+        weeks.courseId,
+        courses.map((course) => course.id),
+      ),
+    );
+
+  const lectureCounts = new Map(FIXTURE_WEEKS.map((week) => [week.number, week.lectures]));
+  const fixtureLectures = seededWeeks.flatMap((week) =>
+    Array.from({ length: lectureCounts.get(week.number) ?? 0 }, (_, index) => ({
+      userId: week.userId,
+      courseId: week.courseId,
+      weekId: week.id,
+      number: index + 1,
+      title: fixtureLectureTitle(week.number, index + 1),
+    })),
+  );
+
+  if (fixtureLectures.length > 0) {
     await db
-      .insert(weeks)
-      .values({ userId: course.userId, courseId: course.id, number: fixture.number })
-      .onConflictDoNothing({ target: [weeks.courseId, weeks.number] });
-
-    const [week] = await db
-      .select()
-      .from(weeks)
-      .where(and(eq(weeks.courseId, course.id), eq(weeks.number, fixture.number)));
-    if (!week) throw new Error(`Failed to seed week ${fixture.number}.`);
-
-    for (let number = 1; number <= fixture.lectures; number += 1) {
-      await db
-        .insert(lectures)
-        .values({
-          userId: course.userId,
-          courseId: course.id,
-          weekId: week.id,
-          number,
-          title: `Development fixture: week ${fixture.number}, lecture ${number}`,
-        })
-        .onConflictDoUpdate({
-          target: [lectures.weekId, lectures.number],
-          ...overwriteWhenChanged({ title: lectures.title }),
-        });
-      lectureCount += 1;
-    }
+      .insert(lectures)
+      .values(fixtureLectures)
+      // A lecture already in that position is left alone: real lectures are never overwritten.
+      .onConflictDoNothing({ target: [lectures.weekId, lectures.number] });
   }
 
-  return { weekCount: DEVELOPMENT_WEEKS.length, lectureCount };
+  return {
+    weekCount: courses.length * FIXTURE_WEEKS.length,
+    lectureCount: fixtureLectures.length,
+  };
 }
 
 /**
  * Seeds everything a development database needs, in one transaction: the
  * placeholder user, the Fall 2026 semester with its six courses, and the
- * structural fixture weeks. Safe to run repeatedly.
+ * fixture weeks and lectures. Safe to run repeatedly.
  */
 export async function seedDevelopment(db: Database): Promise<DevelopmentSeedResult> {
   return db.transaction(async (tx) => {
     const user = await seedDevelopmentUser(tx);
     const seeded = await seedSemester(tx, user.id);
-
-    const course = seeded.courses.find((candidate) => candidate.slug === DEVELOPMENT_COURSE_SLUG);
-    if (!course) throw new Error(`Course "${DEVELOPMENT_COURSE_SLUG}" was not seeded.`);
-    const counts = await seedDevelopmentLectures(tx, course);
-
+    const counts = await seedFixtureLectures(tx, seeded.courses, seeded.semester.startsOn);
     return { user, ...seeded, ...counts };
   });
 }

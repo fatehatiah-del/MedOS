@@ -1,4 +1,3 @@
-import type { CourseId } from "@medos/shared";
 import {
   CalendarDays,
   ChartNoAxesColumn,
@@ -35,8 +34,16 @@ export const SETTINGS_NAV: NavItem = { href: "/settings", label: "Settings", ico
 
 export const HOME_HREF = "/today";
 
-export function courseHref(courseId: CourseId): string {
-  return `/courses/${courseId}`;
+/** A course as navigation needs it. Built from the signed-in user's courses. */
+export interface NavCourse {
+  slug: string;
+  shortName: string;
+  colorToken: string | null;
+}
+
+/** Courses are addressed by their slug, which is stable and URL-safe. */
+export function courseHref(courseSlug: string): string {
+  return `/courses/${courseSlug}`;
 }
 
 /**

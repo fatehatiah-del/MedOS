@@ -35,9 +35,16 @@ describe("the private boundary", () => {
     "%s verifies the session before rendering",
     (_name, file) => {
       const source = readFileSync(file, "utf8");
-      expect(source).toMatch(/await (requireUser|getUserScope)\(\)/);
+      // getWorkspace() calls requireUser() first; see the test below.
+      expect(source).toMatch(/await (requireUser|getUserScope|getWorkspace)\(\)/);
     },
   );
+
+  it("counts getWorkspace() as a session check only because it calls requireUser()", () => {
+    const workspace = readFileSync(path.join(appDir, "..", "server", "workspace.ts"), "utf8");
+    const body = workspace.slice(workspace.indexOf("export async function getWorkspace"));
+    expect(body.slice(0, body.indexOf("\n}"))).toContain("await requireUser()");
+  });
 
   it("verifies the session in every API route outside /api/auth", () => {
     const handlers = files(path.join(appDir, "api"), "route.ts").filter(

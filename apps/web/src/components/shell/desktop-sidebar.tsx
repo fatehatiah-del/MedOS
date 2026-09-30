@@ -2,6 +2,8 @@
 
 import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
 
+import type { NavCourse } from "@/config/navigation";
+
 import { Brand } from "./brand";
 import { SidebarNav } from "./sidebar-nav";
 import { sidebarStore, useSidebarState } from "./sidebar-store";
@@ -9,7 +11,7 @@ import { sidebarStore, useSidebarState } from "./sidebar-store";
 const SIDEBAR_ID = "app-sidebar";
 
 /** Persistent navigation for large screens. Collapses to an icon rail. */
-export function DesktopSidebar() {
+export function DesktopSidebar({ courses }: { courses: readonly NavCourse[] }) {
   const collapsed = useSidebarState() === "collapsed";
   const toggleLabel = collapsed ? "Expand sidebar" : "Collapse sidebar";
 
@@ -24,6 +26,7 @@ export function DesktopSidebar() {
       </div>
 
       <SidebarNav
+        courses={courses}
         collapsed={collapsed}
         footerAction={
           <button

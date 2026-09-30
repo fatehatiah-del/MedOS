@@ -14,7 +14,7 @@ import {
   ScheduleSection,
 } from "@/features/today/sections";
 import { summariseToday } from "@/features/today/summary";
-import { requireUser } from "@/server/session";
+import { getWorkspace } from "@/server/workspace";
 
 export const metadata: Metadata = { title: "Today" };
 
@@ -27,8 +27,9 @@ export const metadata: Metadata = { title: "Today" };
 const column = "contents @4xl:block @4xl:space-y-10";
 
 export default async function TodayPage() {
-  // Who is asking comes from the session. The schedule and plan below are still fixtures.
-  const user = await requireUser();
+  // Who is asking, and their courses, come from the session. Schedule and plan are still fixtures.
+  const { user, semester, scope } = await getWorkspace();
+  const courses = (await scope.courses.overview(semester.id)).map(({ course }) => course);
   const today = await getTodayOverview();
   const summary = summariseToday(today);
   const dateLabel = formatDate(today.date, { weekday: true });
@@ -58,7 +59,7 @@ export default async function TodayPage() {
             availableMinutes={summary.availableMinutes}
             className="order-3"
           />
-          <CoursesSection className="order-5" />
+          <CoursesSection courses={courses} className="order-5" />
           <ExamPeriodsSection periods={summary.examPeriods} className="order-6" />
         </div>
       </div>

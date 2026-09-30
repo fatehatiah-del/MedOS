@@ -1,4 +1,4 @@
-import { type DateRange, type IsoDate, daysBetween, isWithinRange } from "./dates";
+import { type DateRange, type IsoDate, addDays, daysBetween, isWithinRange } from "./dates";
 
 export interface SemesterDefinition {
   id: string;
@@ -8,6 +8,8 @@ export interface SemesterDefinition {
   label: string;
   academicYear: string;
   institution: string;
+  /** IANA time zone of the campus. University times and dates are in this zone. */
+  timeZone: string;
   programme: string;
   /** Lab group of the user. Only this group's labs belong in the timetable. */
   group: string;
@@ -26,6 +28,7 @@ export const FALL_2026: SemesterDefinition = {
   label: "Semester 5",
   academicYear: "Year 3",
   institution: "European University Cyprus — Frankfurt Campus",
+  timeZone: "Europe/Berlin",
   programme: "Medicine / MD",
   group: "A",
   term: { start: "2026-09-28", end: "2027-01-29" },
@@ -75,4 +78,19 @@ export function periodStatus(date: IsoDate, range: DateRange): PeriodStatus {
   const daysRemaining = daysBetween(date, range.end);
   if (daysRemaining >= 0) return { state: "active", daysRemaining };
   return { state: "past" };
+}
+
+/**
+ * The seven days of teaching week `week` (1-based), counted from the first
+ * day of term. The inverse of `semesterWeekFor`.
+ */
+export function semesterWeekRange(
+  week: number,
+  semester: SemesterDefinition = CURRENT_SEMESTER,
+): DateRange {
+  if (!Number.isInteger(week) || week < 1) {
+    throw new Error(`Invalid teaching week: ${week}`);
+  }
+  const start = addDays(semester.term.start, (week - 1) * 7);
+  return { start, end: addDays(start, 6) };
 }

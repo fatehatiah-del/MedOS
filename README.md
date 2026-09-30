@@ -9,14 +9,15 @@ and spaced review to exam preparation.
 MedOS is a private, single-user application. It is not a generic LMS, document manager or SaaS
 dashboard.
 
-| Document                                                 | Purpose                                                  |
-| -------------------------------------------------------- | -------------------------------------------------------- |
-| [`CLAUDE.md`](CLAUDE.md)                                 | Product and engineering specification (source of truth). |
-| [`BUILD_PLAN.md`](BUILD_PLAN.md)                         | Staged implementation roadmap with acceptance gates.     |
-| [`docs/architecture.md`](docs/architecture.md)           | Architecture decisions and assumptions made so far.      |
-| [`docs/database.md`](docs/database.md)                   | Data model, integrity rules and database workflow.       |
-| [`docs/authentication.md`](docs/authentication.md)       | Sign-in, sessions and the private boundary.              |
-| [`docs/google-auth-setup.md`](docs/google-auth-setup.md) | Manual steps to enable Google sign-in.                   |
+| Document                                                   | Purpose                                                  |
+| ---------------------------------------------------------- | -------------------------------------------------------- |
+| [`CLAUDE.md`](CLAUDE.md)                                   | Product and engineering specification (source of truth). |
+| [`BUILD_PLAN.md`](BUILD_PLAN.md)                           | Staged implementation roadmap with acceptance gates.     |
+| [`docs/architecture.md`](docs/architecture.md)             | Architecture decisions and assumptions made so far.      |
+| [`docs/database.md`](docs/database.md)                     | Data model, integrity rules and database workflow.       |
+| [`docs/academic-hierarchy.md`](docs/academic-hierarchy.md) | Courses, weeks, lectures, routes and completion.         |
+| [`docs/authentication.md`](docs/authentication.md)         | Sign-in, sessions and the private boundary.              |
+| [`docs/google-auth-setup.md`](docs/google-auth-setup.md)   | Manual steps to enable Google sign-in.                   |
 
 ## Current status
 
@@ -26,8 +27,9 @@ dashboard.
 | 1     | Design system and application shell   | Complete    |
 | 2     | Database foundation                   | Complete    |
 | 3     | Authentication and privacy            | Complete    |
-| 4     | Course / week / lecture system        | Next        |
-| 5–22  | See `BUILD_PLAN.md`                   | Not started |
+| 4     | Course / week / lecture system        | Complete    |
+| 5     | Local MedOS sync CLI                  | Next        |
+| 6–22  | See `BUILD_PLAN.md`                   | Not started |
 
 What exists today:
 
@@ -35,10 +37,13 @@ What exists today:
   states;
 - the database foundation: schema, migrations, client and development seed;
 - authentication and the private boundary: sign-in with email and password or Google, server-side
-  sessions, and user-scoped data access.
+  sessions, and user-scoped data access;
+- the academic structure: courses, weeks and lectures from the database, lecture pages with their
+  five kinds of material, and manual lecture completion with course and week progress.
 
-The workspace screens still render fixtures and empty states; only the signed-in identity is real.
-The Today screen is a clearly labelled development fixture. There is **no sync, parsing, question
+No real study material has been imported yet, so lectures are development placeholders when
+enabled (see [`docs/academic-hierarchy.md`](docs/academic-hierarchy.md)). The Today screen's
+schedule and plan are a clearly labelled development fixture. There is **no sync, parsing, question
 engine, flashcard scheduling or AI**.
 
 ## Architecture
@@ -183,8 +188,13 @@ Schema changes always go through a migration: edit `packages/database/src/schema
 `db:generate`, review and commit the generated SQL. A test fails if the schema and the migrations
 disagree.
 
-`db:seed` creates a placeholder user, the Fall 2026 semester, the six courses and three structural
-weeks (with one, two and no lectures). It is development data, not imported university material.
+`db:seed` creates a placeholder user, the Fall 2026 semester, the six courses and placeholder weeks
+and lectures for each course. It is development data, not imported university material.
+
+You do not need `db:seed` to use the app: signing in creates your semester and six courses. To see
+placeholder weeks and lectures in your own account, set `DEV_FIXTURE_LECTURES=true` in
+`apps/web/.env.local` and restart the dev server. They are added once, to an account with no weeks
+yet, and are labelled as development data.
 
 ## Authentication
 
@@ -221,15 +231,16 @@ Invalid values stop the affected feature with a clear message. The database comm
 cp .env.example apps/web/.env.local
 ```
 
-| Variable                    | Required      | Default | Notes                                                                 |
-| --------------------------- | ------------- | ------- | --------------------------------------------------------------------- |
-| `DATABASE_URL`              | Yes           | —       | See [Database](#database).                                            |
-| `AUTH_SECRET`               | Yes           | —       | Signs session cookies. At least 32 characters; `npm run auth:secret`. |
-| `APP_URL`                   | In production | —       | Public address of the app, e.g. `https://medos.example`.              |
-| `AUTH_GOOGLE_CLIENT_ID`     | No            | —       | Set together with the secret to enable Google sign-in.                |
-| `AUTH_GOOGLE_CLIENT_SECRET` | No            | —       | Server-only.                                                          |
-| `AUTH_ALLOWED_EMAILS`       | No            | —       | Comma-separated addresses allowed to create an account.               |
-| `AI_PROVIDER`               | No            | `none`  | `none` is the only supported value.                                   |
+| Variable                    | Required      | Default | Notes                                                                          |
+| --------------------------- | ------------- | ------- | ------------------------------------------------------------------------------ |
+| `DATABASE_URL`              | Yes           | —       | See [Database](#database).                                                     |
+| `AUTH_SECRET`               | Yes           | —       | Signs session cookies. At least 32 characters; `npm run auth:secret`.          |
+| `APP_URL`                   | In production | —       | Public address of the app, e.g. `https://medos.example`.                       |
+| `AUTH_GOOGLE_CLIENT_ID`     | No            | —       | Set together with the secret to enable Google sign-in.                         |
+| `AUTH_GOOGLE_CLIENT_SECRET` | No            | —       | Server-only.                                                                   |
+| `AUTH_ALLOWED_EMAILS`       | No            | —       | Comma-separated addresses allowed to create an account.                        |
+| `DEV_FIXTURE_LECTURES`      | No            | `false` | `true` adds placeholder weeks and lectures to a new account. Development only. |
+| `AI_PROVIDER`               | No            | `none`  | `none` is the only supported value.                                            |
 
 None of these is exposed to the browser. Variables for storage are listed in `.env.example` as
 reserved and are not read yet. Real `.env` files are git-ignored; never commit secrets.

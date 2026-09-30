@@ -59,6 +59,8 @@ export default defineConfig({
       AUTH_GOOGLE_CLIENT_ID: "",
       AUTH_GOOGLE_CLIENT_SECRET: "",
       AUTH_ALLOWED_EMAILS: "",
+      // Every new test account gets the placeholder weeks: 1, 1, 0 and 2 lectures per course.
+      DEV_FIXTURE_LECTURES: "true",
     },
   },
 });

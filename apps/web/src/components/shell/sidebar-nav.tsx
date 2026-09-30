@@ -1,19 +1,18 @@
 "use client";
 
-import { COURSES } from "@medos/shared";
 import { cn } from "@medos/ui";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { type ReactNode, useId } from "react";
 
 import { CourseMark } from "@/components/course-mark";
-import { PRIMARY_NAV, SETTINGS_NAV, activeHref, courseHref } from "@/config/navigation";
-
-const ALL_HREFS = [
-  ...PRIMARY_NAV.map((item) => item.href),
-  ...COURSES.map((course) => courseHref(course.id)),
-  SETTINGS_NAV.href,
-];
+import {
+  type NavCourse,
+  PRIMARY_NAV,
+  SETTINGS_NAV,
+  activeHref,
+  courseHref,
+} from "@/config/navigation";
 
 interface NavLinkProps {
   href: string;
@@ -46,6 +45,8 @@ function NavLink({ href, label, icon, active, showTitle, onNavigate }: NavLinkPr
 }
 
 export interface SidebarNavProps {
+  /** The signed-in user's courses, in display order. */
+  courses: readonly NavCourse[];
   /** True when labels are collapsed to an icon rail. */
   collapsed?: boolean;
   /** Called after a link is activated, e.g. to close the mobile drawer. */
@@ -61,6 +62,7 @@ export interface SidebarNavProps {
  * Settings stays pinned at the bottom.
  */
 export function SidebarNav({
+  courses,
   collapsed = false,
   onNavigate,
   label = "Main",
@@ -68,7 +70,11 @@ export function SidebarNav({
 }: SidebarNavProps) {
   const pathname = usePathname();
   const coursesLabelId = useId();
-  const current = activeHref(pathname, ALL_HREFS);
+  const current = activeHref(pathname, [
+    ...PRIMARY_NAV.map((item) => item.href),
+    ...courses.map((course) => courseHref(course.slug)),
+    SETTINGS_NAV.href,
+  ]);
   const shared = { showTitle: collapsed, onNavigate };
 
   return (
@@ -97,14 +103,14 @@ export function SidebarNav({
           </p>
           <div aria-hidden="true" className="mx-2 mb-3 hidden h-px bg-border rail:block" />
           <ul aria-labelledby={coursesLabelId} className="space-y-0.5">
-            {COURSES.map((course) => {
-              const href = courseHref(course.id);
+            {courses.map((course) => {
+              const href = courseHref(course.slug);
               return (
-                <li key={course.id}>
+                <li key={course.slug}>
                   <NavLink
                     href={href}
                     label={course.shortName}
-                    icon={<CourseMark courseId={course.id} />}
+                    icon={<CourseMark token={course.colorToken} />}
                     active={current === href}
                     {...shared}
                   />

@@ -15,7 +15,5 @@ await runCommand("db:seed", async (connection) => {
   console.log(`  user      ${result.user.email} (placeholder)`);
   console.log(`  semester  ${result.semester.label} · ${result.semester.name}`);
   console.log(`  courses   ${result.courses.map((course) => course.shortName).join(", ")}`);
-  console.log(
-    `  fixtures  ${result.weekCount} weeks, ${result.lectureCount} lectures (structure only)`,
-  );
+  console.log(`  fixtures  ${result.weekCount} weeks, ${result.lectureCount} placeholder lectures`);
 });

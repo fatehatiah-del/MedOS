@@ -7,8 +7,14 @@ import { courses, lectures, semesters, users, weeks } from "../schema";
 import { createUser } from "../test-support";
 import { createTestDatabase } from "../testing";
 
-import { DEVELOPMENT_USER, seedDevelopment } from "./development";
+import {
+  DEVELOPMENT_USER,
+  fixtureLectureTitle,
+  isFixtureLecture,
+  seedDevelopment,
+} from "./development";
 import { seedSemester } from "./semester";
+import { ensureWorkspace } from "./workspace";
 
 let connection: DatabaseConnection;
 
@@ -26,8 +32,8 @@ async function snapshot() {
     users: await db.select().from(users).orderBy(asc(users.email)),
     semesters: await db.select().from(semesters).orderBy(asc(semesters.slug)),
     courses: await db.select().from(courses).orderBy(asc(courses.position)),
-    weeks: await db.select().from(weeks).orderBy(asc(weeks.number)),
-    lectures: await db.select().from(lectures).orderBy(asc(lectures.title)),
+    weeks: await db.select().from(weeks).orderBy(asc(weeks.id)),
+    lectures: await db.select().from(lectures).orderBy(asc(lectures.id)),
   };
 }
 
@@ -74,26 +80,68 @@ describe("development seed", () => {
     expect(publicHealth?.id).not.toBe(communication?.id);
   });
 
-  it("includes weeks with one lecture, several lectures and no lectures", async () => {
-    const pharmacology = await connection.db.query.courses.findFirst({
-      where: eq(courses.slug, "pharmacology"),
+  it("gives every course weeks with one lecture, two lectures and no lectures", async () => {
+    const seeded = await connection.db.query.courses.findMany({
+      orderBy: asc(courses.position),
       with: { weeks: { with: { lectures: true }, orderBy: asc(weeks.number) } },
     });
 
-    expect(pharmacology?.weeks.map((week) => [week.number, week.lectures.length])).toEqual([
-      [3, 1],
-      [4, 2],
-      [5, 0],
+    expect(seeded).toHaveLength(6);
+    for (const course of seeded) {
+      expect(
+        course.weeks.map((week) => [week.number, week.lectures.length]),
+        course.slug,
+      ).toEqual([
+        [1, 1],
+        [2, 1],
+        [3, 0],
+        [4, 2],
+      ]);
+    }
+  });
+
+  it("dates each fixture week from the start of term", async () => {
+    const pharmacology = await connection.db.query.courses.findFirst({
+      where: eq(courses.slug, "pharmacology"),
+      with: { weeks: { orderBy: asc(weeks.number) } },
+    });
+
+    expect(pharmacology?.weeks.map((week) => [week.startsOn, week.endsOn])).toEqual([
+      ["2026-09-28", "2026-10-04"],
+      ["2026-10-05", "2026-10-11"],
+      ["2026-10-12", "2026-10-18"],
+      ["2026-10-19", "2026-10-25"],
     ]);
   });
 
   it("marks fixture lectures as development data and completes none of them", async () => {
     const rows = await connection.db.query.lectures.findMany({ with: { progress: true } });
-    expect(rows).toHaveLength(3);
+    expect(rows).toHaveLength(24);
     for (const lecture of rows) {
-      expect(lecture.title).toMatch(/^Development fixture/);
+      expect(isFixtureLecture(lecture)).toBe(true);
+      expect(lecture.title).toContain("development data");
       expect(lecture.progress).toBeNull();
     }
+  });
+
+  it("never overwrites a lecture that already occupies a fixture position", async () => {
+    const [existing] = await connection.db.select().from(lectures).limit(1);
+    if (!existing) throw new Error("expected a seeded lecture");
+    await connection.db
+      .update(lectures)
+      .set({ title: "A real lecture title" })
+      .where(eq(lectures.id, existing.id));
+
+    await seedDevelopment(connection.db);
+
+    const [after] = await connection.db.select().from(lectures).where(eq(lectures.id, existing.id));
+    expect(after?.title).toBe("A real lecture title");
+
+    // Put it back so the following tests see the pristine fixture set.
+    await connection.db
+      .update(lectures)
+      .set({ title: fixtureLectureTitle(1, 1) })
+      .where(eq(lectures.id, existing.id));
   });
 
   it("is idempotent: a second run changes nothing", async () => {
@@ -132,5 +180,81 @@ describe("seedSemester", () => {
     expect(seeded.courses.every((course) => course.userId === other.id)).toBe(true);
     // Two users now each have their own six courses.
     expect(await connection.db.select().from(courses)).toHaveLength(12);
+  });
+});
+
+describe("ensureWorkspace", () => {
+  const ownedBy = (userId: string) => ({
+    semesters: () => connection.db.select().from(semesters).where(eq(semesters.userId, userId)),
+    courses: () => connection.db.select().from(courses).where(eq(courses.userId, userId)),
+    weeks: () => connection.db.select().from(weeks).where(eq(weeks.userId, userId)),
+    lectures: () => connection.db.select().from(lectures).where(eq(lectures.userId, userId)),
+  });
+
+  it("gives a new account its semester and six courses, and no lectures", async () => {
+    const user = await createUser(connection.db);
+    const owned = ownedBy(user.id);
+
+    const semester = await ensureWorkspace(connection.db, user.id);
+
+    expect(semester).toMatchObject({ userId: user.id, slug: FALL_2026.id });
+    expect(await owned.courses()).toHaveLength(6);
+    // Nothing is invented: without the development option there are no weeks or lectures.
+    expect(await owned.weeks()).toHaveLength(0);
+    expect(await owned.lectures()).toHaveLength(0);
+  });
+
+  it("changes nothing when the workspace already exists", async () => {
+    const user = await createUser(connection.db);
+    const owned = ownedBy(user.id);
+    const first = await ensureWorkspace(connection.db, user.id);
+    const coursesBefore = await owned.courses();
+
+    const second = await ensureWorkspace(connection.db, user.id);
+
+    expect(second).toEqual(first);
+    expect(await owned.semesters()).toHaveLength(1);
+    expect(await owned.courses()).toEqual(coursesBefore);
+  });
+
+  it("adds fixture lectures only when asked, and only once", async () => {
+    const user = await createUser(connection.db);
+    const owned = ownedBy(user.id);
+
+    await ensureWorkspace(connection.db, user.id, { fixtureLectures: true });
+    const lecturesBefore = await owned.lectures();
+    expect(await owned.weeks()).toHaveLength(24);
+    expect(lecturesBefore).toHaveLength(24);
+
+    await ensureWorkspace(connection.db, user.id, { fixtureLectures: true });
+    expect(await owned.lectures()).toEqual(lecturesBefore);
+  });
+
+  it("leaves an account that already has weeks alone", async () => {
+    const user = await createUser(connection.db);
+    const owned = ownedBy(user.id);
+    await ensureWorkspace(connection.db, user.id);
+    const [course] = await owned.courses();
+    if (!course) throw new Error("expected a course");
+    await connection.db.insert(weeks).values({ userId: user.id, courseId: course.id, number: 1 });
+
+    await ensureWorkspace(connection.db, user.id, { fixtureLectures: true });
+
+    // Real structure exists, so no fixtures are mixed into it.
+    expect(await owned.weeks()).toHaveLength(1);
+    expect(await owned.lectures()).toHaveLength(0);
+  });
+
+  it("is safe when two first requests arrive together", async () => {
+    const user = await createUser(connection.db);
+    const owned = ownedBy(user.id);
+
+    await Promise.all([
+      ensureWorkspace(connection.db, user.id),
+      ensureWorkspace(connection.db, user.id),
+    ]);
+
+    expect(await owned.semesters()).toHaveLength(1);
+    expect(await owned.courses()).toHaveLength(6);
   });
 });
