@@ -8,6 +8,20 @@
       "when": 1790776916491,
       "tag": "0000_initial_schema",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1790778672633,
+      "tag": "0001_authentication",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790778685455,
+      "tag": "0002_drop_auth_subject",
+      "breakpoints": true
     }
   ]
 }

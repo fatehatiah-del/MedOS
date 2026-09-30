@@ -46,13 +46,14 @@ export interface StudyPlanItem {
 /**
  * Everything the Today screen needs. `source` records where the data came
  * from so fixture data can never be mistaken for the user's real schedule.
+ *
+ * It holds academic data only. Who the user is comes from the session.
  */
 export interface TodayOverview {
   source: "fixture";
   date: IsoDate;
   /** Local time of the snapshot, used for the greeting. */
   time: ClockTime;
-  studentName: string;
   schedule: ScheduleEntry[];
   plan: StudyPlanItem[];
   studiedMinutes: number;

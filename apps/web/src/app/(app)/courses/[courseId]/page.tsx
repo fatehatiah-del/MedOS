@@ -1,4 +1,4 @@
-import { COURSES, CURRENT_SEMESTER, findCourse } from "@medos/shared";
+import { CURRENT_SEMESTER, findCourse } from "@medos/shared";
 import { EmptyState, PageHeader, Section, Surface } from "@medos/ui";
 import { ChevronRight, FolderSync } from "lucide-react";
 import type { Metadata } from "next";
@@ -7,18 +7,14 @@ import { notFound } from "next/navigation";
 
 import { CourseMark } from "@/components/course-mark";
 import { HierarchyPreview } from "@/features/courses/hierarchy-preview";
+import { requireUser } from "@/server/session";
 
 interface CoursePageProps {
   params: Promise<{ courseId: string }>;
 }
 
-// Only the six known courses exist. Rejecting other ids at the routing layer
-// returns a real 404 status; rendering them on demand would stream a 200.
-export const dynamicParams = false;
-
-export function generateStaticParams() {
-  return COURSES.map((course) => ({ courseId: course.id }));
-}
+// Private pages are rendered per request, never prerendered, so there are no static params.
+// An unknown course shows the not-found page below.
 
 export async function generateMetadata({ params }: CoursePageProps): Promise<Metadata> {
   const { courseId } = await params;
@@ -26,6 +22,8 @@ export async function generateMetadata({ params }: CoursePageProps): Promise<Met
 }
 
 export default async function CoursePage({ params }: CoursePageProps) {
+  await requireUser();
+
   const { courseId } = await params;
   const course = findCourse(courseId);
   if (!course) notFound();

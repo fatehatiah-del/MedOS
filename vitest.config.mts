@@ -44,6 +44,9 @@ export default defineConfig({
           environment: "jsdom",
           include: ["apps/web/src/**/*.test.{ts,tsx}"],
           setupFiles: [fromRoot("./vitest.setup.ts")],
+          // The authentication and privacy tests start an embedded PostgreSQL instance.
+          testTimeout: 30_000,
+          hookTimeout: 60_000,
         },
       },
     ],

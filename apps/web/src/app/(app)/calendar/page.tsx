@@ -18,6 +18,7 @@ import {
   CALENDAR_VIEWS,
   type CalendarEventOrigin,
 } from "@/features/calendar/event-types";
+import { requireUser } from "@/server/session";
 
 export const metadata: Metadata = { title: "Calendar" };
 
@@ -27,7 +28,9 @@ const ORIGINS: readonly { origin: CalendarEventOrigin; title: string; marker: st
   { origin: "personal", title: "Your sessions", marker: "border-accent border-2" },
 ];
 
-export default function CalendarPage() {
+export default async function CalendarPage() {
+  await requireUser();
+
   return (
     <div className="space-y-10">
       <PageHeader

@@ -2,6 +2,7 @@ import { sql } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import type { DatabaseConnection } from "./client";
+import { migrate } from "./migrate";
 import { createTestDatabase } from "./testing";
 
 let connection: DatabaseConnection;
@@ -23,12 +24,16 @@ async function names(query: ReturnType<typeof sql>): Promise<string[]> {
 }
 
 describe("migrations", () => {
-  it("create every Phase 2 table from an empty database", async () => {
+  it("create every table from an empty database", async () => {
     const tables = await names(
       sql`select table_name as name from information_schema.tables
           where table_schema = 'public' and table_type = 'BASE TABLE'`,
     );
     expect(tables).toEqual([
+      "auth_accounts",
+      "auth_rate_limits",
+      "auth_sessions",
+      "auth_verifications",
       "calendar_events",
       "courses",
       "exam_events",
@@ -50,29 +55,34 @@ describe("migrations", () => {
     expect(views).toEqual(["course_progress"]);
   });
 
-  it("give every table an owner and audit timestamps", async () => {
+  it("give every study-data table an owner and audit timestamps", async () => {
     const owned = await names(
       sql`select table_name as name from information_schema.columns
-          where table_schema = 'public' and column_name = 'user_id'`,
+          where table_schema = 'public' and column_name = 'user_id'
+            and left(table_name, 5) <> 'auth_'`,
     );
-    // Everything except `users` itself (the view exposes user_id too).
+    // Every domain table except `users` itself (the view exposes user_id too).
     expect(owned).toHaveLength(11);
     expect(owned).not.toContain("users");
 
     const audited = await names(
       sql`select table_name as name from information_schema.columns
           where table_schema = 'public' and column_name = 'updated_at'
-            and data_type = 'timestamp with time zone'`,
+            and data_type = 'timestamp with time zone' and left(table_name, 5) <> 'auth_'`,
     );
     expect(audited).toHaveLength(11);
   });
 
-  it("never delete dependent rows as a side effect", async () => {
+  it("never delete study data as a side effect", async () => {
     const cascading = await names(
       sql`select conname as name from pg_constraint
           where contype = 'f' and confdeltype <> 'r'`,
     );
-    expect(cascading).toEqual([]);
+    // Only sign-in records follow their user. Every study-data key is RESTRICT.
+    expect(cascading).toEqual([
+      "auth_accounts_user_id_users_id_fk",
+      "auth_sessions_user_id_users_id_fk",
+    ]);
   });
 
   it("are recorded, so applying them again changes nothing", async () => {
@@ -81,7 +91,7 @@ describe("migrations", () => {
     const before = await applied();
     expect(before.length).toBeGreaterThan(0);
 
-    await connection.migrate();
+    await migrate(connection);
 
     expect(await applied()).toEqual(before);
   });

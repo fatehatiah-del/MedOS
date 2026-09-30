@@ -1,4 +1,9 @@
+import { randomBytes } from "node:crypto";
+import path from "node:path";
+
 import { defineConfig, devices } from "@playwright/test";
+
+import { STORAGE_STATE } from "./e2e/support/users";
 
 const port = Number(process.env.E2E_PORT ?? 3100);
 const baseURL = `http://localhost:${port}`;
@@ -6,7 +11,12 @@ const isCI = Boolean(process.env.CI);
 
 /**
  * E2E tests run against the production build (`npm run test:e2e` builds
- * first), so they exercise what would actually be deployed.
+ * first), so they exercise what would actually be deployed, including real
+ * authentication: there is no test-only way in.
+ *
+ * Each run gets an empty scratch database and a throwaway signing secret. The
+ * `setup` project creates an account through the sign-up screen and saves its
+ * session; the browser projects start from that signed-in state.
  */
 export default defineConfig({
   testDir: "./e2e",
@@ -19,19 +29,36 @@ export default defineConfig({
     trace: "on-first-retry",
   },
   projects: [
+    { name: "setup", testMatch: /.*\.setup\.ts/ },
     {
       name: "desktop",
-      use: { ...devices["Desktop Chrome"], viewport: { width: 1440, height: 900 } },
+      dependencies: ["setup"],
+      use: {
+        ...devices["Desktop Chrome"],
+        viewport: { width: 1440, height: 900 },
+        storageState: STORAGE_STATE,
+      },
     },
     {
       name: "mobile",
-      use: { ...devices["Pixel 7"] },
+      dependencies: ["setup"],
+      use: { ...devices["Pixel 7"], storageState: STORAGE_STATE },
     },
   ],
   webServer: {
-    command: `npm run start -- --port ${port}`,
-    url: baseURL,
+    command: `npm run e2e:serve -- --port ${port}`,
+    url: `${baseURL}/login`,
     reuseExistingServer: false,
     timeout: 120_000,
+    env: {
+      DATABASE_URL: `pglite:${path.join(__dirname, ".e2e", "pgdata")}`,
+      // Generated per run and never written anywhere.
+      AUTH_SECRET: randomBytes(32).toString("base64url"),
+      APP_URL: baseURL,
+      // Google is deliberately left unconfigured: it cannot be exercised without real credentials.
+      AUTH_GOOGLE_CLIENT_ID: "",
+      AUTH_GOOGLE_CLIENT_SECRET: "",
+      AUTH_ALLOWED_EMAILS: "",
+    },
   },
 });

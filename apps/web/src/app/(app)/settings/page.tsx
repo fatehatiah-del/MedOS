@@ -5,7 +5,9 @@ import { type ReactNode, useId } from "react";
 
 import { ThemeSetting } from "@/components/theme/theme-setting";
 import { env } from "@/env";
+import { SignOutButton } from "@/features/auth/sign-out-button";
 import { ShortcutsDialog } from "@/features/settings/shortcuts-dialog";
+import { requireUser } from "@/server/session";
 
 export const metadata: Metadata = { title: "Settings" };
 
@@ -50,7 +52,8 @@ function SettingsSection({ title, description, status, children }: SettingsSecti
 
 const notAvailable = <Badge tone="outline">Not yet available</Badge>;
 
-export default function SettingsPage() {
+export default async function SettingsPage() {
+  const user = await requireUser();
   const { weekdayMinutes, weekendMinutes } = DEFAULT_STUDY_AVAILABILITY;
 
   return (
@@ -118,10 +121,19 @@ export default function SettingsPage() {
 
         <SettingsSection
           title="Account"
-          description="Sign-in protects your private study data."
-          status={notAvailable}
+          description="Your study data is private to this account. Signing out ends the session on this device."
         >
           <dl className="space-y-2.5 text-sm">
+            {user.displayName ? (
+              <div className="flex gap-3">
+                <dt className="w-24 shrink-0 text-fg-subtle">Name</dt>
+                <dd className="min-w-0 truncate text-fg">{user.displayName}</dd>
+              </div>
+            ) : null}
+            <div className="flex gap-3">
+              <dt className="w-24 shrink-0 text-fg-subtle">Email</dt>
+              <dd className="min-w-0 truncate text-fg">{user.email}</dd>
+            </div>
             <div className="flex gap-3">
               <dt className="w-24 shrink-0 text-fg-subtle">Programme</dt>
               <dd className="text-fg-muted">
@@ -134,11 +146,10 @@ export default function SettingsPage() {
                 {CURRENT_SEMESTER.label} · {CURRENT_SEMESTER.name} · Group {CURRENT_SEMESTER.group}
               </dd>
             </div>
-            <div className="flex gap-3">
-              <dt className="w-24 shrink-0 text-fg-subtle">Sign-in</dt>
-              <dd className="text-fg-muted">Authentication is not enabled in this build.</dd>
-            </div>
           </dl>
+          <div className="mt-5">
+            <SignOutButton />
+          </div>
         </SettingsSection>
 
         <SettingsSection

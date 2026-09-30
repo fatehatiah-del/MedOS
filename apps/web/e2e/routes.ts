@@ -1,6 +1,6 @@
 /** Every route of the Phase 1 shell with the heading it must show. */
 export const ROUTES = [
-  { path: "/today", heading: "Good afternoon, Fateh", nav: "Today" },
+  { path: "/today", heading: "Good afternoon, Test", nav: "Today" },
   { path: "/courses", heading: "Courses", nav: "Courses" },
   { path: "/courses/pharmacology", heading: "Pharmacology I", nav: "Pharmacology" },
   { path: "/calendar", heading: "Calendar", nav: "Calendar" },

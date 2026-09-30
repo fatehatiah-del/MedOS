@@ -2,6 +2,7 @@ import { DEFAULT_STUDY_AVAILABILITY, formatMinutes } from "@medos/shared";
 import { EmptyState, PageHeader, Section, Surface } from "@medos/ui";
 import { ListChecks } from "lucide-react";
 import type { Metadata } from "next";
+import { requireUser } from "@/server/session";
 
 export const metadata: Metadata = { title: "Study Plan" };
 
@@ -15,7 +16,9 @@ const PRIORITY_FACTORS: readonly { name: string; detail: string }[] = [
   { name: "Lecture recency", detail: "How recently each lecture was given." },
 ];
 
-export default function StudyPlanPage() {
+export default async function StudyPlanPage() {
+  await requireUser();
+
   const { weekdayMinutes, weekendMinutes } = DEFAULT_STUDY_AVAILABILITY;
 
   return (

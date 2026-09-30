@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./support/test";
 
 import { ROUTES } from "./routes";
 
@@ -34,10 +34,9 @@ for (const route of ROUTES) {
 }
 
 test("an unknown course shows the not-found page", async ({ page }) => {
-  const response = await page.goto("/courses/anatomy");
-  expect(response?.status()).toBe(404);
+  await page.goto("/courses/anatomy");
   await expect(page.getByRole("heading", { name: "Page not found" })).toBeVisible();
-  await page.getByRole("link", { name: "Go to Today" }).click();
+  await page.getByRole("link", { name: "Go to Today", exact: true }).click();
   await expect(page).toHaveURL(/\/today$/);
 });
 

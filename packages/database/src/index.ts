@@ -1,12 +1,12 @@
 export * from "./schema";
 
 export {
-  type Database,
-  type DatabaseConnection,
-  MIGRATIONS_FOLDER,
-  type Schema,
-  connect,
-} from "./client";
+  type ResourceSummary,
+  type UserScope,
+  type WeekWithLectures,
+  createUserScope,
+} from "./access/user-scope";
+export { type Database, type DatabaseConnection, type Schema, connect } from "./client";
 export {
   DatabaseConfigError,
   type DatabaseTarget,

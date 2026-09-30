@@ -1,6 +1,8 @@
+import { migrate } from "../migrate";
+
 import { runCommand } from "./run";
 
 await runCommand("db:migrate", async (connection) => {
-  await connection.migrate();
+  await migrate(connection);
   console.log(`Migrations are up to date (${connection.driver}).`);
 });

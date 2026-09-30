@@ -32,6 +32,21 @@ this file records how it has been interpreted so far and why.
 - **Fonts are self-hosted** from npm packages (Inter for the interface, Source Serif 4 for
   headings). Builds need no network access and no third party sees page loads.
 
+## Authentication boundary
+
+Added in Phase 3 and described in [`authentication.md`](authentication.md). The points that shape
+other code:
+
+- **Everything is private by default.** Public paths are an allow-list in
+  `src/server/auth/routes.ts`; a new route is private without any extra work.
+- **Each private page verifies the session itself** with `requireUser()`. A layout cannot do this
+  for its children, because layouts are not re-run on navigation. A test enforces it.
+- **Study data is reached only through `getUserScope()`**, which binds every query to the signed-in
+  user. Code outside `src/server` cannot import the database handle (ESLint rule).
+- **Workspace pages are rendered per request.** Nothing private is prerendered at build time.
+- **The database connection is opened lazily** on first use and kept on `globalThis`, so builds
+  never touch the database and development reloads do not open a second connection.
+
 ## Data seams
 
 - `getTodayOverview()` in `apps/web/src/features/today` is the single source for the Today screen.

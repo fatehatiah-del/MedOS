@@ -3,6 +3,7 @@ import { PageHeader } from "@medos/ui";
 import type { Metadata } from "next";
 
 import { FixtureNotice } from "@/components/fixture-notice";
+import { personalGreeting } from "@/features/auth/messages";
 import { getTodayOverview } from "@/features/today/get-today-overview";
 import {
   CoursesSection,
@@ -13,6 +14,7 @@ import {
   ScheduleSection,
 } from "@/features/today/sections";
 import { summariseToday } from "@/features/today/summary";
+import { requireUser } from "@/server/session";
 
 export const metadata: Metadata = { title: "Today" };
 
@@ -25,6 +27,8 @@ export const metadata: Metadata = { title: "Today" };
 const column = "contents @4xl:block @4xl:space-y-10";
 
 export default async function TodayPage() {
+  // Who is asking comes from the session. The schedule and plan below are still fixtures.
+  const user = await requireUser();
   const today = await getTodayOverview();
   const summary = summariseToday(today);
   const dateLabel = formatDate(today.date, { weekday: true });
@@ -33,7 +37,7 @@ export default async function TodayPage() {
     <div className="space-y-9">
       <PageHeader
         eyebrow={summary.week ? `${dateLabel} · Week ${summary.week}` : dateLabel}
-        title={`${summary.greeting}, ${today.studentName}`}
+        title={personalGreeting(summary.greeting, user.displayName)}
       />
 
       {today.source === "fixture" ? <FixtureNotice /> : null}

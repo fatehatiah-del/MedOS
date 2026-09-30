@@ -1,6 +1,7 @@
 import { Notice, PageHeader, Tabs, TabsContent, TabsList, TabsTrigger } from "@medos/ui";
 import { ChartNoAxesColumn } from "lucide-react";
 import type { Metadata } from "next";
+import { requireUser } from "@/server/session";
 
 export const metadata: Metadata = { title: "Statistics" };
 
@@ -46,7 +47,9 @@ const STATISTIC_LEVELS = [
   },
 ] as const;
 
-export default function StatisticsPage() {
+export default async function StatisticsPage() {
+  await requireUser();
+
   return (
     <div className="space-y-10">
       <PageHeader

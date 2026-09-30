@@ -12,7 +12,8 @@ what was implemented and why. For commands, see the README.
 
 ## Tables
 
-Eleven tables and one view. Only the entities listed for Phase 2 in `BUILD_PLAN.md` exist; study
+Eleven domain tables and one view, plus four authentication tables added in Phase 3 (described in
+[`authentication.md`](authentication.md)). Only the entities listed for Phase 2 in `BUILD_PLAN.md` exist; study
 guides, questions, flashcards, annotations and plans are added by their own phases.
 
 | Table              | One row is                                                              |
@@ -64,8 +65,13 @@ So the database itself rejects a course attached to another user's semester, or 
 against another user's lecture. Queries filter by `user_id`; the constraints guarantee that doing
 so is sufficient.
 
-`users.auth_subject` is reserved for the identifier issued by the authentication provider. Phase 3
-fills it in and looks the user up by it. Nothing else about the schema needs to change.
+Since Phase 3 the owner is the authenticated user: the `users` row is the same record the
+authentication framework signs in. Application code reaches study data only through
+`createUserScope(db, userId)`, whose operations are all bound to one user and accept no user id.
+See [`authentication.md`](authentication.md).
+
+Phase 2 reserved a `users.auth_subject` column for the identity link. Phase 3 removed it, because
+the link lives in `auth_accounts`, which supports several sign-in methods per user.
 
 ## Integrity rules
 
@@ -73,16 +79,17 @@ fills it in and looks the user up by it. Nothing else about the schema needs to 
 (`2026-fall`, `public-health`) exist for URLs and are unique within their parent, but are never
 used as keys. Names and file names are never identifiers.
 
-**Deletion.** Every foreign key is `ON DELETE RESTRICT`. Deleting a semester, course, week,
-lecture or resource fails while anything still depends on it, so study history cannot disappear
-as a side effect. Removal is deliberate and bottom-up. A test asserts that no cascading foreign key
-exists.
+**Deletion.** Every foreign key on study data is `ON DELETE RESTRICT`. Deleting a semester,
+course, week, lecture or resource fails while anything still depends on it, so study history
+cannot disappear as a side effect. Removal is deliberate and bottom-up. The only cascading keys
+are on `auth_sessions` and `auth_accounts`, which have no meaning without their user; a test
+asserts that these two are the only ones.
 
 **Uniqueness.**
 
 | Constraint                             | Prevents                                     |
 | -------------------------------------- | -------------------------------------------- |
-| `users (email)`, `(auth_subject)`      | Duplicate accounts.                          |
+| `users (email)`                        | Duplicate accounts.                          |
 | `semesters (user_id, slug)`            | The same semester twice for one user.        |
 | `courses (semester_id, slug)`          | The same course twice in a semester.         |
 | `weeks (course_id, number)`            | Duplicate teaching weeks in a course.        |
@@ -141,8 +148,9 @@ no medical content is invented. The seed matches rows on their natural keys and 
 only if it differs from the definition, so running it again changes nothing. It refuses to run
 when `NODE_ENV=production`.
 
-`seedSemester(db, userId)` is exported separately, so Phase 3 can create the real user's semester
-without the fixtures.
+`seedSemester(db, userId)` is exported separately, so a real account's semester can be created
+without the fixtures. Nothing calls it for new accounts yet: that belongs to the phase that
+connects the course screens to the database.
 
 ## Left for later phases
 
@@ -150,7 +158,8 @@ without the fixtures.
   the new one is decided with the sync tool (Phase 5). The current schema allows several resources
   per lecture and never overwrites a row's file identity.
 - **One open study session per user** is a timer rule (Phase 13) and is not constrained yet.
-- **Row-level security.** Ownership is enforced by constraints and by queries. Database-level
-  policies can be added with authentication if the chosen provider calls for them.
-- **The web app does not query the database yet.** Screens move from fixtures to real data in the
-  phases that build them, starting with Phase 4.
+- **Row-level security.** Ownership is enforced by constraints and by the user-scoped data access
+  layer. Database-level policies are not used.
+- **The workspace screens do not query study data yet.** The web app uses the database for
+  authentication only; screens move from fixtures to real data in the phases that build them,
+  starting with Phase 4.

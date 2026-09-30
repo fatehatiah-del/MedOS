@@ -7,10 +7,13 @@ import Link from "next/link";
 import { CourseMark } from "@/components/course-mark";
 import { courseHref } from "@/config/navigation";
 import { HierarchyPreview } from "@/features/courses/hierarchy-preview";
+import { requireUser } from "@/server/session";
 
 export const metadata: Metadata = { title: "Courses" };
 
-export default function CoursesPage() {
+export default async function CoursesPage() {
+  await requireUser();
+
   return (
     <div className="space-y-10">
       <PageHeader

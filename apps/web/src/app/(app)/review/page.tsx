@@ -2,6 +2,7 @@ import { EmptyState, PageHeader, Section, Surface } from "@medos/ui";
 import { Bookmark, Clock, Layers, Target } from "lucide-react";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { requireUser } from "@/server/session";
 
 export const metadata: Metadata = { title: "Review" };
 
@@ -37,7 +38,9 @@ const REVIEW_QUEUES: readonly {
   },
 ];
 
-export default function ReviewPage() {
+export default async function ReviewPage() {
+  await requireUser();
+
   return (
     <div className="space-y-10">
       <PageHeader

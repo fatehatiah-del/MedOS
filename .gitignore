@@ -38,3 +38,6 @@ Thumbs.db
 
 # local Claude Code settings
 .claude/settings.local.json
+
+# E2E scratch database and saved browser state
+.e2e/

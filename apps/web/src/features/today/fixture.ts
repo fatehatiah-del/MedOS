@@ -11,7 +11,6 @@ export const TODAY_FIXTURE: TodayOverview = {
   source: "fixture",
   date: "2026-09-30",
   time: "15:00",
-  studentName: "Fateh",
   schedule: [
     {
       id: "fixture-schedule-1",

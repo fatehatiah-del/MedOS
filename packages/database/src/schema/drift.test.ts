@@ -4,7 +4,7 @@ import path from "node:path";
 import { generateDrizzleJson, generateMigration } from "drizzle-kit/api";
 import { describe, expect, it } from "vitest";
 
-import { MIGRATIONS_FOLDER } from "../client";
+import { MIGRATIONS_FOLDER } from "../migrate";
 
 import * as schema from "./index";
 

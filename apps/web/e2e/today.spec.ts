@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./support/test";
 
 test.describe("Today", () => {
   test("presents the dashboard sections in priority order", async ({ page, isMobile }) => {

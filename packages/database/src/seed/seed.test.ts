@@ -36,7 +36,7 @@ describe("development seed", () => {
     const result = await seedDevelopment(connection.db);
 
     expect(result.user.email).toBe(DEVELOPMENT_USER.email);
-    expect(result.user.authSubject).toBeNull();
+    expect(result.user.emailVerified).toBe(false);
 
     expect(result.semester).toMatchObject({
       slug: "2026-fall",

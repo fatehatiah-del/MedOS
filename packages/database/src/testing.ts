@@ -1,4 +1,5 @@
 import { type DatabaseConnection, connect } from "./client";
+import { migrate } from "./migrate";
 
 /**
  * A fresh in-memory PostgreSQL database with every migration applied. Each
@@ -6,6 +7,6 @@ import { type DatabaseConnection, connect } from "./client";
  */
 export async function createTestDatabase(): Promise<DatabaseConnection> {
   const connection = await connect("pglite:memory");
-  await connection.migrate();
+  await migrate(connection);
   return connection;
 }

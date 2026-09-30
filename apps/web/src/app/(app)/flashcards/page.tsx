@@ -3,10 +3,13 @@ import { Layers } from "lucide-react";
 import type { Metadata } from "next";
 
 import { CourseList } from "@/components/course-list";
+import { requireUser } from "@/server/session";
 
 export const metadata: Metadata = { title: "Flashcards" };
 
-export default function FlashcardsPage() {
+export default async function FlashcardsPage() {
+  await requireUser();
+
   return (
     <div className="space-y-10">
       <PageHeader

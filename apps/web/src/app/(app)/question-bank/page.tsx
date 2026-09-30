@@ -2,6 +2,7 @@ import { Badge, PageHeader, Section } from "@medos/ui";
 import type { Metadata } from "next";
 
 import { CourseList } from "@/components/course-list";
+import { requireUser } from "@/server/session";
 
 export const metadata: Metadata = { title: "Question Bank" };
 
@@ -12,7 +13,9 @@ const RECALL_STEPS: readonly { title: string; detail: string }[] = [
   { title: "Rate your recall", detail: "Again, Hard, Good or Easy." },
 ];
 
-export default function QuestionBankPage() {
+export default async function QuestionBankPage() {
+  await requireUser();
+
   return (
     <div className="space-y-10">
       <PageHeader

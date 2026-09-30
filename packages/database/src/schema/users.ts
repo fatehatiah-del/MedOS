@@ -1,27 +1,30 @@
 import { sql } from "drizzle-orm";
-import { check, pgTable, text, unique, uuid } from "drizzle-orm/pg-core";
+import { boolean, check, pgTable, text, unique, uuid } from "drizzle-orm/pg-core";
 
 import { id, timestamps } from "./columns";
 
 /**
- * The owner of study data. MedOS has one user today, but every owned table
- * carries `user_id` so access can be scoped per user from the start.
+ * A MedOS user: the owner of study data, and the same record the
+ * authentication framework signs in. There is one user concept, not two.
  *
- * `auth_subject` is the identifier issued by the authentication provider. It
- * stays empty until authentication is implemented (Phase 3).
+ * How someone proves they are this user (a password, a Google account) is
+ * kept out of this table, in `auth_accounts`. Every owned table carries
+ * `user_id`, so access is scoped per user.
  */
 export const users = pgTable(
   "users",
   {
     id: id(),
     email: text("email").notNull(),
+    /** Set only once the address has been proven, e.g. by Google. */
+    emailVerified: boolean("email_verified").notNull().default(false),
     displayName: text("display_name").notNull(),
-    authSubject: text("auth_subject"),
+    /** Profile picture URL supplied by an identity provider, if any. */
+    image: text("image"),
     ...timestamps,
   },
   (table) => [
     unique("users_email_unique").on(table.email),
-    unique("users_auth_subject_unique").on(table.authSubject),
     check("users_email_lowercase", sql`${table.email} = lower(${table.email})`),
   ],
 );

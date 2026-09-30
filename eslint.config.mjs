@@ -29,5 +29,31 @@ export default defineConfig([
       ],
     },
   },
+  {
+    // The web app reaches data only through the user-scoped helpers in
+    // src/server/session.ts. Nothing outside src/server may open the database.
+    files: ["apps/web/src/**/*.{ts,tsx}"],
+    ignores: ["apps/web/src/server/**", "apps/web/src/**/*.test.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "@/server/database",
+              message:
+                "Use getUserScope() from @/server/session so queries are bound to the signed-in user.",
+            },
+            {
+              name: "@medos/database",
+              importNames: ["connect"],
+              message:
+                "Use getUserScope() from @/server/session so queries are bound to the signed-in user.",
+            },
+          ],
+        },
+      ],
+    },
+  },
   prettier,
 ]);

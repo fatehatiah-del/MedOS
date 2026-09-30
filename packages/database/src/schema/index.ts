@@ -1,4 +1,5 @@
 export * from "./academic";
+export * from "./auth";
 export * from "./calendar";
 export * from "./progress";
 export * from "./relations";
