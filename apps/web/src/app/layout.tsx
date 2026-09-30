@@ -34,7 +34,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <head>
         <script dangerouslySetInnerHTML={{ __html: BOOT_SCRIPT }} />
       </head>
-      <body>
+      {/*
+        Browser extensions (Grammarly, for one) add attributes to <body> before React hydrates.
+        suppressHydrationWarning covers this element's own attributes only; mismatches in anything
+        rendered inside it are still reported.
+      */}
+      <body suppressHydrationWarning>
         {children}
         <ThemeWatcher />
       </body>
