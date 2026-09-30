@@ -1,0 +1,37 @@
+# dependencies
+node_modules/
+
+# next.js
+.next/
+out/
+next-env.d.ts
+
+# build output
+dist/
+*.tsbuildinfo
+
+# testing
+coverage/
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
+# environment — never commit real values
+.env
+.env.*
+!.env.example
+
+# hosting
+.vercel/
+
+# editor / OS
+.DS_Store
+Thumbs.db
+*.log
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# local Claude Code settings
+.claude/settings.local.json

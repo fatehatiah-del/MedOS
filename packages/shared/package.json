@@ -1,0 +1,14 @@
+{
+  "name": "@medos/shared",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Domain constants, types and pure helpers shared by every MedOS app and package.",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  }
+}

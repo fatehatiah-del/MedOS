@@ -1,0 +1,12 @@
+* text=auto eol=lf
+
+# The specification files are preserved byte-for-byte.
+CLAUDE.md -text
+BUILD_PLAN.md -text
+
+*.png binary
+*.jpg binary
+*.ico binary
+*.woff2 binary
+*.pdf binary
+*.docx binary

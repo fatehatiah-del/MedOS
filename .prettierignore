@@ -1,0 +1,14 @@
+# The specification files are preserved exactly as written.
+CLAUDE.md
+BUILD_PLAN.md
+
+node_modules
+.next
+out
+dist
+coverage
+test-results
+playwright-report
+blob-report
+package-lock.json
+next-env.d.ts

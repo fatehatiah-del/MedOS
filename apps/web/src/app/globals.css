@@ -1,0 +1,5 @@
+@import "tailwindcss";
+@import "../../../../packages/ui/src/styles/theme.css";
+
+/* Workspace packages are symlinked through node_modules, which Tailwind skips. */
+@source "../../../../packages/ui/src";

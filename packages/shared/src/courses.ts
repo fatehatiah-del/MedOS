@@ -1,0 +1,49 @@
+/**
+ * The six Semester 5 courses. Each course is an independent learning
+ * environment: Public & Global Health and Communication Skills are separate
+ * courses, and flashcard review is never mixed across courses.
+ */
+export const COURSE_IDS = [
+  "pathology",
+  "pathophysiology",
+  "microbiology",
+  "pharmacology",
+  "public-health",
+  "communication-skills",
+] as const;
+
+export type CourseId = (typeof COURSE_IDS)[number];
+
+export interface CourseDefinition {
+  /** Stable identifier, also used as the URL slug. */
+  id: CourseId;
+  /** Official course name. */
+  name: string;
+  /** Compact name used in navigation and dense lists. */
+  shortName: string;
+}
+
+export const COURSES: readonly CourseDefinition[] = [
+  { id: "pathology", name: "Pathology I", shortName: "Pathology" },
+  { id: "pathophysiology", name: "Pathophysiology I", shortName: "Pathophysiology" },
+  { id: "microbiology", name: "Medical Microbiology I", shortName: "Microbiology" },
+  { id: "pharmacology", name: "Pharmacology I", shortName: "Pharmacology" },
+  { id: "public-health", name: "Public & Global Health", shortName: "Public Health" },
+  { id: "communication-skills", name: "Communication Skills", shortName: "Communication Skills" },
+];
+
+export function isCourseId(value: string): value is CourseId {
+  return (COURSE_IDS as readonly string[]).includes(value);
+}
+
+export function getCourse(id: CourseId): CourseDefinition {
+  const course = COURSES.find((candidate) => candidate.id === id);
+  if (!course) {
+    throw new Error(`Unknown course id: ${id}`);
+  }
+  return course;
+}
+
+export function findCourse(id: string): CourseDefinition | undefined {
+  return isCourseId(id) ? getCourse(id) : undefined;
+}
