@@ -10,8 +10,9 @@ this file records how it has been interpreted so far and why.
 - **Source-only packages.** `@medos/shared` and `@medos/ui` export TypeScript source. The web app
   compiles them (`transpilePackages`), and Vitest reads them directly. There is no package build
   step to keep in sync.
-- **Packages are created when needed.** `database`, `parsers`, `study-engine`, `fsrs` and
-  `apps/sync` are not scaffolded yet. `@medos/shared` is deliberately free of browser and
+- **Packages are created when needed.** `@medos/database` arrived with Phase 2 (see
+  [`database.md`](database.md)); `parsers`, `study-engine`, `fsrs` and `apps/sync` are not
+  scaffolded yet. `@medos/shared` is deliberately free of browser and
   framework dependencies so the future sync CLI and database package can use it.
 - **One lint, format and unit-test configuration at the root.** Type-checking runs per workspace.
 

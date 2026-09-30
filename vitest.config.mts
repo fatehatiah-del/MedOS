@@ -16,6 +16,16 @@ export default defineConfig({
         },
       },
       {
+        test: {
+          name: "database",
+          environment: "node",
+          include: ["packages/database/src/**/*.test.ts"],
+          // Each file starts an embedded PostgreSQL instance and applies the migrations.
+          testTimeout: 30_000,
+          hookTimeout: 60_000,
+        },
+      },
+      {
         plugins: [react()],
         test: {
           name: "ui",

@@ -22,6 +22,9 @@ playwright/.cache/
 .env.*
 !.env.example
 
+# local embedded database (pglite:./.medos/pgdata)
+.medos/
+
 # hosting
 .vercel/
 

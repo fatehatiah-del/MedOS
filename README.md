@@ -14,6 +14,7 @@ dashboard.
 | [`CLAUDE.md`](CLAUDE.md)                       | Product and engineering specification (source of truth). |
 | [`BUILD_PLAN.md`](BUILD_PLAN.md)               | Staged implementation roadmap with acceptance gates.     |
 | [`docs/architecture.md`](docs/architecture.md) | Architecture decisions and assumptions made so far.      |
+| [`docs/database.md`](docs/database.md)         | Data model, integrity rules and database workflow.       |
 
 ## Current status
 
@@ -21,13 +22,15 @@ dashboard.
 | ----- | ------------------------------------- | ----------- |
 | 0     | Repository and engineering foundation | Complete    |
 | 1     | Design system and application shell   | Complete    |
-| 2     | Database foundation                   | Next        |
-| 3     | Authentication and privacy            | Planned     |
+| 2     | Database foundation                   | Complete    |
+| 3     | Authentication and privacy            | Next        |
 | 4–22  | See `BUILD_PLAN.md`                   | Not started |
 
-What exists today is the application shell: navigation, theming, the design system and ten routes
-with honest empty states. There is **no database, authentication, sync, parsing, question engine,
-flashcard scheduling or AI**. The Today screen renders a clearly labelled development fixture.
+What exists today is the application shell (navigation, theming, the design system and ten routes
+with honest empty states) and the database foundation (schema, migrations, client and development
+seed). The two are not connected yet: the screens still render fixtures and empty states, and the
+Today screen is a clearly labelled development fixture. There is **no authentication, sync,
+parsing, question engine, flashcard scheduling or AI**.
 
 ## Architecture
 
@@ -47,6 +50,9 @@ MedOS/
 │           ├── lib/         Small framework-agnostic utilities
 │           └── env.ts       Validated environment configuration
 ├── packages/
+│   ├── database/            PostgreSQL schema, migrations, client and development seed
+│   │   ├── migrations/      Generated SQL migrations (tracked)
+│   │   └── src/             schema/, seed/, cli/, client.ts, config.ts
 │   ├── shared/              Domain constants and pure helpers (courses, semester, dates, study time)
 │   └── ui/                  Design tokens and reusable, accessible UI primitives
 ├── docs/
@@ -56,8 +62,8 @@ MedOS/
 ```
 
 Packages planned by the specification are added when their phase begins, rather than created
-empty: `packages/database` (Phase 2), `apps/sync` (Phase 5), `packages/parsers` (Phase 6),
-`packages/fsrs` (Phase 11) and `packages/study-engine` (Phase 15).
+empty: `apps/sync` (Phase 5), `packages/parsers` (Phase 6), `packages/fsrs` (Phase 11) and
+`packages/study-engine` (Phase 15).
 
 ### Stack
 
@@ -67,6 +73,7 @@ empty: `packages/database` (Phase 2), `apps/sync` (Phase 5), `packages/parsers` 
 | Language   | TypeScript, strict mode with `noUncheckedIndexedAccess`    |
 | Styling    | Tailwind CSS v4 with semantic design tokens                |
 | Primitives | Radix UI (dialog, dropdown menu, tabs), lucide icons       |
+| Database   | PostgreSQL, Drizzle ORM, drizzle-kit migrations            |
 | Validation | Zod                                                        |
 | Tests      | Vitest and React Testing Library; Playwright with axe-core |
 | Quality    | ESLint (flat config), Prettier                             |
@@ -89,45 +96,88 @@ npm run dev                  # http://localhost:3000
 
 Run from the repository root.
 
-| Command             | What it does                                                 |
-| ------------------- | ------------------------------------------------------------ |
-| `npm run dev`       | Start the development server.                                |
-| `npm run build`     | Create the production build.                                 |
-| `npm run start`     | Serve the production build.                                  |
-| `npm run typecheck` | Type-check every workspace.                                  |
-| `npm run lint`      | Lint the repository with ESLint.                             |
-| `npm run format`    | Format with Prettier (`format:check` verifies only).         |
-| `npm run test`      | Run unit and component tests once (`test:watch` to watch).   |
-| `npm run test:e2e`  | Build for production, then run the Playwright suite.         |
-| `npm run validate`  | Typecheck, lint, format check, unit tests and E2E, in order. |
+| Command             | What it does                                                |
+| ------------------- | ----------------------------------------------------------- |
+| `npm run dev`       | Start the development server.                               |
+| `npm run build`     | Create the production build.                                |
+| `npm run start`     | Serve the production build.                                 |
+| `npm run typecheck` | Type-check every workspace.                                 |
+| `npm run lint`      | Lint the repository with ESLint.                            |
+| `npm run format`    | Format with Prettier (`format:check` verifies only).        |
+| `npm run test`      | Run unit and component tests once (`test:watch` to watch).  |
+| `npm run test:e2e`  | Build for production, then run the Playwright suite.        |
+| `npm run validate`  | Typecheck, lint, format check, migration check, tests, E2E. |
 
 Extra arguments are forwarded, for example `npm run dev -- --port 4000`.
 
 ### Tests
 
-- **Unit and component tests** live beside the code as `*.test.ts(x)` and run in three Vitest
-  projects: `shared` (Node), `ui` and `web` (jsdom).
+- **Unit and component tests** live beside the code as `*.test.ts(x)` and run in four Vitest
+  projects: `shared` and `database` (Node), `ui` and `web` (jsdom).
+- **Database tests** are part of `npm run test`. Each test file starts a fresh in-memory PostgreSQL
+  (PGlite), applies the tracked migrations to it, and exercises the real constraints. Run them
+  alone with `npx vitest run --project database`.
 - **End-to-end tests** live in `apps/web/e2e` and run against the production build in a desktop
   and a mobile viewport. They cover every route, navigation, the sidebar, theming and persistence,
   keyboard use, horizontal overflow, and automated accessibility checks (including colour
   contrast) in both themes.
 
+## Database
+
+PostgreSQL, accessed through [Drizzle ORM](https://orm.drizzle.team) and owned entirely by
+[`packages/database`](packages/database). The data model and its integrity rules are described in
+[`docs/database.md`](docs/database.md).
+
+`DATABASE_URL` decides where the database lives:
+
+| Value                    | Meaning                                                                 |
+| ------------------------ | ----------------------------------------------------------------------- |
+| `pglite:./.medos/pgdata` | Embedded PostgreSQL in a local folder. Nothing to install.              |
+| `postgres://…`           | A PostgreSQL server, local or hosted. Use this for anything long-lived. |
+
+The embedded option (the default in `.env.example`) is real PostgreSQL compiled to WebAssembly. It
+runs the same migrations and enforces the same constraints as a server, but only one process can
+open the folder at a time.
+
+```bash
+cp .env.example apps/web/.env.local   # once
+npm run db:migrate                    # create or update the schema
+npm run db:seed                       # development data (safe to repeat)
+```
+
+| Command               | What it does                                                       |
+| --------------------- | ------------------------------------------------------------------ |
+| `npm run db:generate` | Write a new SQL migration from changes to the schema files.        |
+| `npm run db:check`    | Verify the migration history is consistent.                        |
+| `npm run db:migrate`  | Apply pending migrations to the database in `DATABASE_URL`.        |
+| `npm run db:seed`     | Insert development data. Idempotent; refuses to run in production. |
+| `npm run db:studio`   | Browse the database with Drizzle Studio.                           |
+
+Schema changes always go through a migration: edit `packages/database/src/schema`, run
+`db:generate`, review and commit the generated SQL. A test fails if the schema and the migrations
+disagree.
+
+`db:seed` creates a placeholder user, the Fall 2026 semester, the six courses and three structural
+weeks (with one, two and no lectures). It is development data, not imported university material.
+
 ## Environment configuration
 
-Configuration is read only from environment variables and validated at startup by
-[`apps/web/src/env.ts`](apps/web/src/env.ts); an invalid value stops the app with a clear message.
+Configuration is read only from environment variables. The web app validates its variables at
+startup in [`apps/web/src/env.ts`](apps/web/src/env.ts); an invalid value stops it with a clear
+message. The database commands read `DATABASE_URL` from the same file.
 
 ```bash
 cp .env.example apps/web/.env.local
 ```
 
-| Variable      | Required | Default | Notes                               |
-| ------------- | -------- | ------- | ----------------------------------- |
-| `AI_PROVIDER` | No       | `none`  | `none` is the only supported value. |
-| `APP_URL`     | No       | —       | Public base URL of the deployment.  |
+| Variable       | Required            | Default | Notes                                                        |
+| -------------- | ------------------- | ------- | ------------------------------------------------------------ |
+| `AI_PROVIDER`  | No                  | `none`  | `none` is the only supported value.                          |
+| `APP_URL`      | No                  | —       | Public base URL of the deployment.                           |
+| `DATABASE_URL` | For `db:*` commands | —       | See [Database](#database). The web app does not read it yet. |
 
-Variables for the database, authentication and storage are listed in `.env.example` as reserved
-and are not read yet. Real `.env` files are git-ignored; never commit secrets.
+Variables for authentication and storage are listed in `.env.example` as reserved and are not read
+yet. Real `.env` files are git-ignored; never commit secrets.
 
 ## Design system
 
