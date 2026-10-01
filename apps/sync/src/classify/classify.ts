@@ -1,5 +1,5 @@
 import type { ResourceKind } from "@medos/database";
-import type { CourseId } from "@medos/shared";
+import { COURSES, type CourseId } from "@medos/shared";
 
 import { mimeTypeFor } from "../scan/files";
 import type { ScanResult, ScannedFile } from "../scan/walk";
@@ -129,7 +129,10 @@ export function classifyScan(scan: Pick<ScanResult, "files" | "directories">): C
   for (const folder of topFolders) {
     const slug = courseForFolder(folder);
     if (!slug) {
-      issues.push({ path: folder, message: "folder name does not match any course" });
+      issues.push({
+        path: folder,
+        message: `folder name does not match any course (expected one of: ${COURSES.map((course) => course.shortName).join(", ")})`,
+      });
       continue;
     }
     foldersByCourse.set(slug, [...(foldersByCourse.get(slug) ?? []), folder]);
@@ -352,4 +355,26 @@ export function classifyScan(scan: Pick<ScanResult, "files" | "directories">): C
   });
 
   return { courses, files, issues };
+}
+
+export interface CourseFolderSummary {
+  /** Course folders holding at least one file, placed or needing review. */
+  withMaterial: CourseStructure[];
+  /** Course folders holding no files yet. Valid: no weeks or lectures are invented for them. */
+  empty: CourseStructure[];
+  /** Courses that have no folder in the source. */
+  notFound: CourseId[];
+}
+
+/** Splits the recognised course folders by whether they hold material, in course order. */
+export function summariseCourseFolders(classification: Classification): CourseFolderSummary {
+  const withFiles = new Set(classification.files.map((file) => file.courseSlug));
+  const summary: CourseFolderSummary = { withMaterial: [], empty: [], notFound: [] };
+  for (const { id } of COURSES) {
+    const course = classification.courses.find((entry) => entry.slug === id);
+    if (!course) summary.notFound.push(id);
+    else if (withFiles.has(id)) summary.withMaterial.push(course);
+    else summary.empty.push(course);
+  }
+  return summary;
 }

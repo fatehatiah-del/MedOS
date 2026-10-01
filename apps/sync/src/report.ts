@@ -1,7 +1,8 @@
 import type { ResourceKind } from "@medos/database";
+import { COURSES } from "@medos/shared";
 
 import type { ApplyResult } from "./apply";
-import type { Classification } from "./classify/classify";
+import { type Classification, summariseCourseFolders } from "./classify/classify";
 import type { SyncPlan } from "./plan";
 import type { ScanResult } from "./scan/walk";
 
@@ -25,11 +26,30 @@ const row = (label: string, value: string | number) => `  ${label.padEnd(24)}${v
 function structureLines(classification: Classification): string[] {
   const weeks = classification.courses.flatMap((course) => course.weeks);
   const lectures = weeks.flatMap((week) => week.lectures);
+  const courses = summariseCourseFolders(classification);
   return [
     row("Courses discovered", classification.courses.length),
+    row("  with material", courses.withMaterial.length),
+    row("  empty", courses.empty.length),
     row("Weeks discovered", weeks.length),
     row("Lectures inferred", lectures.length),
   ];
+}
+
+/** Empty course folders and courses with no folder, by name and source folder. */
+function courseFolderLines(classification: Classification): string[] {
+  const courses = summariseCourseFolders(classification);
+  const nameOf = (slug: string) => COURSES.find((course) => course.id === slug)?.shortName ?? slug;
+  const lines: string[] = [];
+  if (courses.empty.length > 0) {
+    lines.push("", "Empty courses (folder found, no material yet):");
+    for (const course of courses.empty) lines.push(`  ${nameOf(course.slug)}  (${course.folder})`);
+  }
+  if (courses.notFound.length > 0) {
+    lines.push("", "Courses without a folder:");
+    for (const slug of courses.notFound) lines.push(`  ${nameOf(slug)}`);
+  }
+  return lines;
 }
 
 function kindLines(files: readonly { kind: ResourceKind | null; attached: boolean }[]): string[] {
@@ -102,6 +122,7 @@ export function formatScanReport(
     row("Unreadable", scan.unreadable.length),
     "",
     ...kindLines(files),
+    ...courseFolderLines(classification),
   ];
   const review = classification.files.filter((file) => file.outcome === "needs-review");
   if (review.length > 0) {

@@ -94,9 +94,17 @@ case, spacing, punctuation, "&" versus "and", and a trailing "I":
 | Communication Skills   | Communication Skills, Communication, Communications, communication-skills |
 
 Aliases are defined once, in `packages/shared/src/courses.ts`, and each belongs to exactly one
-course (a test enforces this). Public Health and Communication Skills never share a name. An
-unrecognised folder ("Anatomy", "Patho") is reported and nothing in it is imported. If two folders
+course (a test enforces this). Public Health and Communication Skills never share a name. Names
+are matched whole, never by prefix: "Patho" could be Pathology or Pathophysiology, so it is not
+recognised, is reported with the expected names, and nothing in it is imported. If two folders
 match the same course, neither is imported until one remains.
+
+The course is recorded by its id; the folder name is kept exactly as it is on disk, and relative
+paths always use it. An alias such as "Pharma" is only ever a folder name the source happens to
+use — MedOS never shortens a folder name.
+
+An empty course folder is valid. `scan` counts courses with material and empty courses
+separately and lists the empty ones; no weeks or lectures are created for them.
 
 ### Weeks
 
