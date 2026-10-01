@@ -55,22 +55,27 @@ export const LECTURE_CATEGORIES: readonly LectureCategory[] = [
 export type CategoryState =
   { status: "available"; files: number } | { status: "empty" } | { status: "later" };
 
-export interface CategoryWithState extends LectureCategory {
+export interface CategoryWithState<
+  R extends { kind: ResourceKind } = { kind: ResourceKind },
+> extends LectureCategory {
   state: CategoryState;
+  /** The lecture's resources in this category, in the order given. */
+  resources: R[];
 }
 
 /**
  * What exists for each category, from the lecture's resources. A category is
  * "available" only when material is actually attached; nothing is assumed.
  */
-export function lectureCategoryStates(
-  resources: readonly { kind: ResourceKind }[],
-): CategoryWithState[] {
+export function lectureCategoryStates<R extends { kind: ResourceKind }>(
+  resources: readonly R[],
+): CategoryWithState<R>[] {
   return LECTURE_CATEGORIES.map((category) => {
-    const files = resources.filter((resource) => resource.kind === category.resourceKind).length;
+    const matching = resources.filter((resource) => resource.kind === category.resourceKind);
+    const files = matching.length;
     const state: CategoryState =
       files > 0 ? { status: "available", files } : { status: category.whenEmpty ?? "empty" };
-    return { ...category, state };
+    return { ...category, state, resources: matching };
   });
 }
 

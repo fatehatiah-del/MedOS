@@ -17,6 +17,7 @@ dashboard.
 | [`docs/database.md`](docs/database.md)                     | Data model, integrity rules and database workflow.            |
 | [`docs/academic-hierarchy.md`](docs/academic-hierarchy.md) | Courses, weeks, lectures, routes and completion.              |
 | [`docs/sync.md`](docs/sync.md)                             | MedOS Sync: setup, commands, folder rules, safety guarantees. |
+| [`docs/parsing.md`](docs/parsing.md)                       | Parsing pipeline, content model, fidelity and security.       |
 | [`docs/authentication.md`](docs/authentication.md)         | Sign-in, sessions and the private boundary.                   |
 | [`docs/google-auth-setup.md`](docs/google-auth-setup.md)   | Manual steps to enable Google sign-in.                        |
 
@@ -30,7 +31,7 @@ dashboard.
 | 3     | Authentication and privacy            | Complete    |
 | 4     | Course / week / lecture system        | Complete    |
 | 5     | Local MedOS sync CLI                  | Complete    |
-| 6     | Parsing and resource pipeline         | Next        |
+| 6     | Parsing and resource pipeline         | Complete    |
 | 7–22  | See `BUILD_PLAN.md`                   | Not started |
 
 What exists today:
@@ -43,13 +44,16 @@ What exists today:
 - the academic structure: courses, weeks and lectures from the database, lecture pages with their
   five kinds of material, and manual lecture completion with course and week progress;
 - MedOS Sync: a local command that reads your study folder (never writing to it) and imports its
-  courses, weeks, lectures and materials, with a dry run, change detection and a manifest.
+  courses, weeks, lectures and materials, with a dry run, change detection and a manifest;
+- parsing: imported Study Guides, MCQ quizzes, Question Banks and lecture PDFs are read into
+  validated, source-faithful structured content, shown as ready (or with a plain reason why not)
+  on each lecture page.
 
-Imported files are registered, classified and stored, but not yet parsed: reading study guides
-and questions is Phase 6. Until you run a sync, lectures are development placeholders when enabled
+Parsed content is stored but not yet presented for study: the Study Guide reader, PDF viewer, MCQ
+engine and Question Bank practice are Phases 7–10. Until you run a sync, lectures are development placeholders when enabled
 (see [`docs/academic-hierarchy.md`](docs/academic-hierarchy.md)). The Today screen's
-schedule and plan are a clearly labelled development fixture. There is **no sync, parsing, question
-engine, flashcard scheduling or AI**.
+schedule and plan are a clearly labelled development fixture. There is **no reader, question
+engine, flashcard scheduling or AI** yet.
 
 ## Architecture
 
@@ -72,6 +76,7 @@ MedOS/
 │           ├── proxy.ts     Redirects requests without a session cookie to /login
 │           └── env.ts       Validated environment configuration
 ├── packages/
+│   ├── parsers/             Source files → typed, source-faithful content (DOCX, HTML quiz, PDF)
 │   ├── database/            PostgreSQL schema, migrations, client and development seed
 │   │   ├── migrations/      Generated SQL migrations (tracked)
 │   │   └── src/             schema/, seed/, cli/, client.ts, config.ts
@@ -84,7 +89,7 @@ MedOS/
 ```
 
 Packages planned by the specification are added when their phase begins, rather than created
-empty: `packages/parsers` (Phase 6), `packages/fsrs` (Phase 11) and `packages/study-engine`
+empty: `packages/fsrs` (Phase 11) and `packages/study-engine`
 (Phase 15).
 
 ### Stack
@@ -212,7 +217,9 @@ nothing in it is created, changed, renamed, moved or deleted. Full details are i
 2. Add `MEDOS_SOURCE_DIR` (your folder) and `MEDOS_SYNC_USER` (your MedOS email) to
    `apps/web/.env.local`.
 3. Look first: `npm run medos-sync -- sync --dry-run`. Nothing is changed.
-4. Import: `npm run medos-sync -- sync`.
+4. Import: `npm run medos-sync -- sync`. New and changed materials are then read into MedOS
+   content ([`docs/parsing.md`](docs/parsing.md)); `npm run medos-sync -- process` does that step
+   on its own.
 
 `npm run medos-sync -- scan` shows what the folder contains without using the database, and
 `npm run medos-sync -- status` shows what earlier syncs recorded.

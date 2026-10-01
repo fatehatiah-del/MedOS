@@ -29,6 +29,13 @@
       "when": 1790801079620,
       "tag": "0003_sync_manifest",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1790847884018,
+      "tag": "0004_parsed_content",
+      "breakpoints": true
     }
   ]
 }

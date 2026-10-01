@@ -1,9 +1,11 @@
 export * from "./schema";
 
 export {
+  type ContentSummary,
   type CourseOverview,
   type LectureDetail,
   type LectureOutline,
+  type ResourceContentView,
   type ResourceSummary,
   type UserScope,
   type WeekOutline,

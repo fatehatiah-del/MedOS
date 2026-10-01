@@ -4,6 +4,7 @@ import { COURSES } from "@medos/shared";
 import type { ApplyResult } from "./apply";
 import { type Classification, summariseCourseFolders } from "./classify/classify";
 import type { SyncPlan } from "./plan";
+import type { ProcessReport, ProcessedResource } from "./process/process";
 import type { ScanResult } from "./scan/walk";
 
 /*
@@ -149,10 +150,11 @@ export function formatSyncReport(input: {
   plan: SyncPlan;
   dryRun: boolean;
   result?: ApplyResult;
+  processing?: ProcessReport;
   verbose: boolean;
   storage: string;
 }): string {
-  const { scan, plan, dryRun, result, verbose, storage } = input;
+  const { scan, plan, dryRun, result, processing, verbose, storage } = input;
   const count = (change: string) => plan.files.filter((file) => file.change === change).length;
   const files = plan.files.map((planned) => ({
     kind: planned.kind,
@@ -226,7 +228,70 @@ export function formatSyncReport(input: {
       lines.push(`  ${planned.file.relativePath}: ${planned.reasons.join("; ")}`);
     }
   }
+  if (processing) lines.push("", ...processLines(processing));
   lines.push(...issueLines(plan.classification, scan, verbose));
   if (verbose) lines.push(...structureTree(plan.classification));
   return lines.join("\n");
+}
+
+const OUTCOME_LABELS = {
+  parsed: "read",
+  failed: "could not read",
+  unsupported: "not supported",
+} as const;
+
+const REASON_LABELS = {
+  new: "new",
+  "source-changed": "source changed",
+  "parser-updated": "parser updated",
+  requested: "requested",
+} as const;
+
+/** "23 sections · 9 tables · …" from a content summary, leaving out zero counts. */
+function statsLine(stats: Record<string, number> | undefined): string {
+  if (!stats) return "";
+  return Object.entries(stats)
+    .filter(([, value]) => value > 0)
+    .map(
+      ([key, value]) => `${value} ${key.replace(/[A-Z]/g, (letter) => ` ${letter.toLowerCase()}`)}`,
+    )
+    .join(" · ");
+}
+
+/** What processing did (or, in a dry run, would do) to imported materials. */
+export function processLines(report: ProcessReport): string[] {
+  const count = (outcome: ProcessedResource["outcome"]) =>
+    report.processed.filter((entry) => entry.outcome === outcome).length;
+  const lines = [report.dryRun ? "Processing (dry run)" : "Processing"];
+  if (report.dryRun) {
+    lines.push(row("Would process", report.processed.length));
+  } else {
+    lines.push(
+      row("Read into content", count("parsed")),
+      row("Could not be read", count("failed")),
+      row("Not supported", count("unsupported")),
+    );
+  }
+  lines.push(row("Already current", report.upToDate));
+  if (report.failedBefore.length > 0) lines.push(row("Failed before", report.failedBefore.length));
+  if (report.dryRun) lines.push("  Files imported by a sync are processed right after it.");
+
+  if (report.processed.length > 0) {
+    lines.push("", report.dryRun ? "Would process:" : "Processed:");
+    for (const entry of report.processed) {
+      const state = entry.outcome ? OUTCOME_LABELS[entry.outcome] : REASON_LABELS[entry.reason];
+      const detail = entry.outcome === "parsed" ? statsLine(entry.stats) : (entry.message ?? "");
+      lines.push(`  [${state}] ${entry.label}${detail ? ` — ${detail}` : ""}`);
+      for (const issue of entry.issues ?? []) {
+        lines.push(`      note: ${issue.message}${issue.location ? ` (${issue.location})` : ""}`);
+      }
+    }
+  }
+  if (report.failedBefore.length > 0) {
+    lines.push("", 'Could not be read earlier (run "process --all" to try again):');
+    for (const entry of report.failedBefore) {
+      lines.push(`  ${entry.label}${entry.message ? ` — ${entry.message}` : ""}`);
+    }
+  }
+  return lines;
 }

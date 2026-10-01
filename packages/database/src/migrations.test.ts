@@ -39,6 +39,8 @@ describe("migrations", () => {
       "exam_events",
       "lecture_progress",
       "lectures",
+      "resource_contents",
+      "resource_media",
       "resources",
       "semesters",
       "study_sessions",
@@ -62,7 +64,7 @@ describe("migrations", () => {
             and left(table_name, 5) <> 'auth_'`,
     );
     // Every domain table except `users` itself (the view exposes user_id too).
-    expect(owned).toHaveLength(11);
+    expect(owned).toHaveLength(13);
     expect(owned).not.toContain("users");
 
     const audited = await names(
@@ -70,7 +72,7 @@ describe("migrations", () => {
           where table_schema = 'public' and column_name = 'updated_at'
             and data_type = 'timestamp with time zone' and left(table_name, 5) <> 'auth_'`,
     );
-    expect(audited).toHaveLength(11);
+    expect(audited).toHaveLength(13);
   });
 
   it("never delete study data as a side effect", async () => {

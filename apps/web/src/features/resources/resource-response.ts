@@ -26,3 +26,21 @@ export async function resourceResponse(
 
   return json(resource, 200);
 }
+
+/**
+ * Answers a request for a resource's parsed content, with the same rules as
+ * the resource itself: 401 without a session, the same 404 for anything that
+ * is not the user's. Content is validated against its schema before it is
+ * sent. Images inside it are named by hash only; nothing says where files live.
+ */
+export async function resourceContentResponse(
+  scope: UserScope | null,
+  resourceId: string,
+): Promise<Response> {
+  if (!scope) return json({ error: "Authentication required." }, 401);
+
+  const view = await scope.resources.content(resourceId);
+  if (!view) return json({ error: "Not found." }, 404);
+
+  return json(view, 200);
+}

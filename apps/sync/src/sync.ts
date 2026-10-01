@@ -3,6 +3,7 @@ import type { Database } from "@medos/database";
 import { type ApplyResult, applySync } from "./apply";
 import { type Classification, classifyScan } from "./classify/classify";
 import { type SyncPlan, planSync } from "./plan";
+import { type ProcessReport, processResources } from "./process/process";
 import { type ScanResult, scanSource } from "./scan/walk";
 import { loadSyncState } from "./state";
 import type { ObjectStore } from "./store";
@@ -12,9 +13,10 @@ import type { ObjectStore } from "./store";
  *
  *   source folder ─scan─▶ files ─classify─▶ course/week/lecture/kind
  *                 ─plan─▶ differences from the last sync ─apply─▶ MedOS
+ *                 ─process─▶ structured content from the stored originals
  *
- * A dry run stops after "plan": it reads the source folder and the database
- * and writes to neither.
+ * A dry run stops after "plan" (and lists what processing would do): it reads
+ * the source folder and the database and writes to neither.
  */
 
 export interface SyncRun {
@@ -23,6 +25,8 @@ export interface SyncRun {
   plan: SyncPlan;
   /** Absent for a dry run. */
   result?: ApplyResult;
+  /** Processing of imported materials into structured content. */
+  processing: ProcessReport;
 }
 
 export interface SyncOptions {
@@ -30,6 +34,8 @@ export interface SyncOptions {
   dryRun: boolean;
   removePlaceholders?: boolean;
   now?: Date;
+  /** See ProcessOptions.onUnexpectedError. */
+  onUnexpectedError?: (label: string, error: unknown) => void;
 }
 
 export async function scanAndClassify(sourceRoot: string) {
@@ -45,7 +51,15 @@ export async function runSync(
 ): Promise<SyncRun> {
   const { scan, classification } = await scanAndClassify(sourceRoot);
   const plan = planSync(scan, classification, await loadSyncState(db, userId));
-  if (options.dryRun) return { scan, classification, plan };
+  const processOptions = {
+    store: options.store,
+    now: options.now,
+    onUnexpectedError: options.onUnexpectedError,
+  };
+  if (options.dryRun) {
+    const processing = await processResources(db, userId, { ...processOptions, dryRun: true });
+    return { scan, classification, plan, processing };
+  }
 
   const result = await applySync(db, userId, plan, {
     store: options.store,
@@ -53,5 +67,6 @@ export async function runSync(
     removePlaceholders: options.removePlaceholders,
     now: options.now,
   });
-  return { scan, classification, plan, result };
+  const processing = await processResources(db, userId, processOptions);
+  return { scan, classification, plan, result, processing };
 }

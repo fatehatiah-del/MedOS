@@ -5,6 +5,7 @@ import {
   courses,
   createUserScope,
   lectures,
+  resourceContents,
   resources,
   semesters,
   users,
@@ -13,7 +14,7 @@ import {
 import { createTestDatabase } from "@medos/database/testing";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { resourceResponse } from "./resource-response";
+import { resourceContentResponse, resourceResponse } from "./resource-response";
 
 let connection: DatabaseConnection;
 let db: Database;
@@ -82,9 +83,31 @@ async function createOwner(label: string) {
         sizeBytes: 2048,
         contentHash: "d".repeat(64),
         storageKey: `originals/${user.id}/lecture.pdf`,
+        status: "parsed",
       })
       .returning(),
   );
+  await db.insert(resourceContents).values({
+    ...owned,
+    resourceId: resource.id,
+    format: "pdf",
+    parser: "pdf-registration",
+    parserVersion: 1,
+    sourceContentHash: "d".repeat(64),
+    content: {
+      format: "pdf",
+      pageCount: 1,
+      metadata: {
+        title: `${label} lecture`,
+        author: null,
+        creator: null,
+        producer: null,
+        createdAt: null,
+      },
+      pages: [{ number: 1, text: `Private notes of ${label}` }],
+    },
+    extractedAt: new Date(),
+  });
   return { user, resource, scope: createUserScope(db, user.id) };
 }
 
@@ -134,5 +157,37 @@ describe("private resource addresses", () => {
   it("cannot be enumerated: identifiers are random, not sequential", () => {
     expect(a.resource.id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-/);
     expect(a.resource.id).not.toBe(b.resource.id);
+  });
+});
+
+describe("private parsed content", () => {
+  it("requires a session", async () => {
+    const response = await resourceContentResponse(null, a.resource.id);
+    expect(response.status).toBe(401);
+    expect(await response.text()).not.toContain("Private notes");
+  });
+
+  it("serves the owner the validated content, without storage details", async () => {
+    const response = await resourceContentResponse(a.scope, a.resource.id);
+    const body = await response.text();
+
+    expect(response.status).toBe(200);
+    expect(JSON.parse(body)).toMatchObject({
+      resource: { id: a.resource.id, status: "parsed", content: { format: "pdf", current: true } },
+      content: { format: "pdf", pages: [{ number: 1, text: "Private notes of a" }] },
+    });
+    expect(body).not.toContain("originals/");
+    expect(body).not.toContain("d".repeat(64));
+    expect(response.headers.get("cache-control")).toBe("private, no-store");
+  });
+
+  it("answers another user exactly as if the resource did not exist", async () => {
+    const others = await resourceContentResponse(b.scope, a.resource.id);
+    const missing = await resourceContentResponse(b.scope, "00000000-0000-4000-8000-000000000000");
+    const malformed = await resourceContentResponse(b.scope, "../../a");
+
+    expect(others.status).toBe(404);
+    expect(await others.text()).toBe(await missing.text());
+    expect(malformed.status).toBe(404);
   });
 });

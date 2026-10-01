@@ -1,3 +1,10 @@
+import {
+  type ContentFormat,
+  type ContentStats,
+  type ParseIssue,
+  type ParsedContent,
+  validateContent,
+} from "@medos/parsers/model";
 import { and, asc, eq, like, sql } from "drizzle-orm";
 
 import type { Database } from "../client";
@@ -7,6 +14,7 @@ import {
   type Lecture,
   type LectureProgress,
   type Resource,
+  type ResourceContent,
   type ResourceKind,
   type Semester,
   type Week,
@@ -27,8 +35,21 @@ function isId(value: string): boolean {
 }
 
 /**
- * What a client may know about a resource. The storage key and source path
- * are deliberately absent: files are only ever reached through MedOS.
+ * What the parsing pipeline produced for a resource, in summary. `current` is
+ * false when the content was made from an earlier version of the file.
+ */
+export interface ContentSummary {
+  format: ContentFormat;
+  stats: ContentStats;
+  issueCount: number;
+  current: boolean;
+  extractedAt: Date;
+}
+
+/**
+ * What a client may know about a resource. The storage key, source path and
+ * content hash are deliberately absent: files are only ever reached through
+ * MedOS. `processingError` is written for the user and never holds a path.
  */
 export type ResourceSummary = Pick<
   Resource,
@@ -39,19 +60,17 @@ export type ResourceSummary = Pick<
   | "mimeType"
   | "sizeBytes"
   | "status"
+  | "processingError"
   | "createdAt"
->;
+> & { content: ContentSummary | null };
 
-const resourceSummary = {
-  id: resources.id,
-  lectureId: resources.lectureId,
-  kind: resources.kind,
-  originalFilename: resources.originalFilename,
-  mimeType: resources.mimeType,
-  sizeBytes: resources.sizeBytes,
-  status: resources.status,
-  createdAt: resources.createdAt,
-};
+/** A resource's parsed content, validated, with what the parser reported. */
+export interface ResourceContentView {
+  resource: ResourceSummary;
+  /** Null until the resource has been parsed. */
+  content: ParsedContent | null;
+  issues: ParseIssue[];
+}
 
 const resourceSummaryColumns = {
   id: true,
@@ -61,8 +80,38 @@ const resourceSummaryColumns = {
   mimeType: true,
   sizeBytes: true,
   status: true,
+  processingError: true,
   createdAt: true,
+  // Read to decide whether content is current; never returned.
+  contentHash: true,
 } as const;
+
+const contentSummaryColumns = {
+  format: true,
+  stats: true,
+  issues: true,
+  sourceContentHash: true,
+  extractedAt: true,
+} as const;
+
+type ResourceRow = Pick<Resource, keyof typeof resourceSummaryColumns> & {
+  content: Pick<ResourceContent, keyof typeof contentSummaryColumns> | null;
+};
+
+function toSummary({ contentHash, content, ...resource }: ResourceRow): ResourceSummary {
+  return {
+    ...resource,
+    content: content
+      ? {
+          format: content.format,
+          stats: content.stats,
+          issueCount: content.issues.length,
+          current: content.sourceContentHash === contentHash,
+          extractedAt: content.extractedAt,
+        }
+      : null,
+  };
+}
 
 /** A course with the counts its card needs. */
 export interface CourseOverview {
@@ -270,7 +319,11 @@ export function createUserScope(db: Database, userId: string) {
               },
             },
             progress: { columns: { completedAt: true } },
-            resources: { columns: resourceSummaryColumns, orderBy: asc(resources.createdAt) },
+            resources: {
+              columns: resourceSummaryColumns,
+              orderBy: asc(resources.createdAt),
+              with: { content: { columns: contentSummaryColumns } },
+            },
           },
         });
         if (!found) return null;
@@ -282,7 +335,7 @@ export function createUserScope(db: Database, userId: string) {
           week: weekRow,
           course,
           completedAt: progress?.completedAt ?? null,
-          resources: attached,
+          resources: attached.map(toSummary),
           weekLectures,
         };
       },
@@ -314,20 +367,43 @@ export function createUserScope(db: Database, userId: string) {
     resources: {
       async get(resourceId: string): Promise<ResourceSummary | null> {
         if (!isId(resourceId)) return null;
-        const [resource] = await db
-          .select(resourceSummary)
-          .from(resources)
-          .where(and(eq(resources.id, resourceId), eq(resources.userId, userId)));
-        return resource ?? null;
+        const resource = await db.query.resources.findFirst({
+          where: and(eq(resources.id, resourceId), eq(resources.userId, userId)),
+          columns: resourceSummaryColumns,
+          with: { content: { columns: contentSummaryColumns } },
+        });
+        return resource ? toSummary(resource) : null;
       },
 
       async listForLecture(lectureId: string): Promise<ResourceSummary[]> {
         if (!isId(lectureId)) return [];
-        return db
-          .select(resourceSummary)
-          .from(resources)
-          .where(and(eq(resources.lectureId, lectureId), eq(resources.userId, userId)))
-          .orderBy(asc(resources.createdAt));
+        const rows = await db.query.resources.findMany({
+          where: and(eq(resources.lectureId, lectureId), eq(resources.userId, userId)),
+          columns: resourceSummaryColumns,
+          with: { content: { columns: contentSummaryColumns } },
+          orderBy: asc(resources.createdAt),
+        });
+        return rows.map(toSummary);
+      },
+
+      /**
+       * A resource with its parsed content. The content is checked against
+       * its schema as it is read, so callers always receive the typed model.
+       * Null when the resource is not the user's, or does not exist.
+       */
+      async content(resourceId: string): Promise<ResourceContentView | null> {
+        if (!isId(resourceId)) return null;
+        const row = await db.query.resources.findFirst({
+          where: and(eq(resources.id, resourceId), eq(resources.userId, userId)),
+          columns: resourceSummaryColumns,
+          with: { content: { columns: { ...contentSummaryColumns, content: true } } },
+        });
+        if (!row) return null;
+        return {
+          resource: toSummary(row),
+          content: row.content ? validateContent(row.content.content) : null,
+          issues: row.content?.issues ?? [],
+        };
       },
     },
   };

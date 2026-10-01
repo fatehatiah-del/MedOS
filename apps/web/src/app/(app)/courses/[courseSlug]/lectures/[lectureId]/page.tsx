@@ -24,6 +24,7 @@ import {
   lectureCategoryStates,
 } from "@/features/lectures/categories";
 import { CompletionControl } from "@/features/lectures/completion-control";
+import { materialState } from "@/features/resources/processing";
 import { getWorkspace } from "@/server/workspace";
 
 interface LecturePageProps {
@@ -132,19 +133,43 @@ export default async function LecturePage({ params }: LecturePageProps) {
                   <p className="text-[13px] leading-relaxed text-fg-muted">
                     {category.description}
                   </p>
-                  <div className="mt-auto pt-1">
-                    <Badge tone={available ? "accent" : "outline"}>
-                      {categoryStateLabel(category.state)}
-                    </Badge>
-                  </div>
+                  {category.resources.length > 0 ? (
+                    <ul className="mt-auto space-y-3 border-t border-border pt-3">
+                      {category.resources.map((resource) => {
+                        const state = materialState(resource);
+                        return (
+                          <li key={resource.id} className="space-y-1.5">
+                            <div className="flex items-start justify-between gap-3">
+                              <span
+                                className="min-w-0 text-[13px] break-words text-fg"
+                                title={resource.originalFilename}
+                              >
+                                {resource.originalFilename}
+                              </span>
+                              <Badge tone={state.tone} className="shrink-0">
+                                {state.label}
+                              </Badge>
+                            </div>
+                            <p className="text-xs leading-relaxed text-fg-subtle">{state.detail}</p>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  ) : (
+                    <div className="mt-auto pt-1">
+                      <Badge tone={available ? "accent" : "outline"}>
+                        {categoryStateLabel(category.state)}
+                      </Badge>
+                    </div>
+                  )}
                 </Surface>
               </li>
             );
           })}
         </ul>
         <p className="text-xs leading-relaxed text-fg-subtle">
-          Material appears here once it has been synced from your study folder. Reading, practice
-          and review open in later phases.
+          Material appears here once it has been synced from your study folder, and is read into
+          MedOS content by the sync. Reading, practice and review open in later phases.
         </p>
       </Section>
 

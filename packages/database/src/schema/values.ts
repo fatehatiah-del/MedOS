@@ -15,8 +15,14 @@ export const RESOURCE_KINDS = [
 ] as const;
 export type ResourceKind = (typeof RESOURCE_KINDS)[number];
 
-/** Where a resource is in the import pipeline. The original file is kept in every state. */
-export const RESOURCE_STATUSES = ["pending", "stored", "parsed", "failed"] as const;
+/**
+ * Where a resource is in the import pipeline. The original file is kept in every state.
+ * - `stored`: the original is preserved; it has not been parsed (yet, or since it changed);
+ * - `parsed`: its structured content is current;
+ * - `failed`: it could not be read (`processing_error` says why);
+ * - `unsupported`: MedOS has no parser for this kind of file (`processing_error` says why).
+ */
+export const RESOURCE_STATUSES = ["pending", "stored", "parsed", "failed", "unsupported"] as const;
 export type ResourceStatus = (typeof RESOURCE_STATUSES)[number];
 
 /**
@@ -39,6 +45,13 @@ export const SYNC_STATUSES = [
   "ignored",
 ] as const;
 export type SyncStatus = (typeof SYNC_STATUSES)[number];
+
+/**
+ * Where structured content comes from. Imported source material and future
+ * AI-generated material must always stay distinguishable.
+ */
+export const CONTENT_ORIGINS = ["source", "ai-generated"] as const;
+export type ContentOrigin = (typeof CONTENT_ORIGINS)[number];
 
 export const CALENDAR_EVENT_TYPES = [
   "lecture",

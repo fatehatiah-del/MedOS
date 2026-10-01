@@ -17,6 +17,13 @@ export default defineConfig({
       },
       {
         test: {
+          name: "parsers",
+          environment: "node",
+          include: ["packages/parsers/src/**/*.test.ts"],
+        },
+      },
+      {
+        test: {
           name: "database",
           environment: "node",
           include: ["packages/database/src/**/*.test.ts"],

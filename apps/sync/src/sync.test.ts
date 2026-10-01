@@ -284,7 +284,11 @@ describe("J. a changed source file is detected", () => {
     const [after] = (await resourcesOf(user.id)).filter((row) => row.sourcePath === guide);
     expect(after?.id).toBe(before?.id);
     expect(after?.contentHash).not.toBe(before?.contentHash);
-    expect(after?.status).toBe("stored");
+    // The new version is processed again in the same sync (Phase 6). This fixture is not a real
+    // DOCX, so it is reported as unreadable, with the original kept.
+    expect(run.processing.processed.map((entry) => entry.label)).toContain(guide);
+    expect(after?.status).toBe("failed");
+    expect(after?.processingError).toMatch(/not a valid Word document/);
     // Both versions remain in the store.
     const stored = readdirSync(path.join(storage, "sha256")).flatMap((shard) =>
       readdirSync(path.join(storage, "sha256", shard)),

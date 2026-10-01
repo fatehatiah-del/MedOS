@@ -45,10 +45,11 @@ export function resolveSourceDir(value: string | undefined): string {
  * repository (git-ignored). It must never be inside the source folder: MedOS
  * does not write there.
  */
-export function resolveStorageDir(value: string | undefined, sourceDir: string): string {
+export function resolveStorageDir(value: string | undefined, sourceDir?: string): string {
   const storage = value?.trim()
     ? path.resolve(value.trim())
     : path.join(findWorkspaceRoot(), ".medos", "objects");
+  if (!sourceDir) return storage;
   if (isWithin(storage, sourceDir)) {
     throw new ConfigError(
       "The storage folder is inside the source folder. MedOS never writes into the source folder; " +

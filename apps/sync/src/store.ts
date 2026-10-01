@@ -1,5 +1,6 @@
 import { constants } from "node:fs";
-import { access, copyFile, mkdir, rename, rm } from "node:fs/promises";
+import { createHash } from "node:crypto";
+import { access, copyFile, mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 /**
@@ -12,7 +13,7 @@ import path from "node:path";
  * earlier versions remain available.
  *
  * The interface is the seam for later storage: an S3-compatible store for
- * the hosted app implements the same three methods.
+ * the hosted app implements the same methods.
  */
 export interface ObjectStore {
   /** Human-readable location, for reports. */
@@ -20,6 +21,17 @@ export interface ObjectStore {
   has(key: string): Promise<boolean>;
   /** Stores the file at `sourcePath` under `key`, unless that key exists. Only reads the source. */
   put(key: string, sourcePath: string): Promise<"stored" | "existing">;
+  /** Stores bytes (e.g. an image extracted from a document) under their content key. */
+  putBytes(key: string, bytes: Uint8Array): Promise<"stored" | "existing">;
+  /** The stored bytes. Throws ObjectMissingError when there is no such object. */
+  read(key: string): Promise<Uint8Array>;
+}
+
+export class ObjectMissingError extends Error {
+  constructor(key: string) {
+    super(`No stored object ${key}.`);
+    this.name = "ObjectMissingError";
+  }
 }
 
 /** The storage key for content with this SHA-256. Relative and machine-independent. */
@@ -69,5 +81,35 @@ export class LocalObjectStore implements ObjectStore {
       throw error;
     }
     return "stored";
+  }
+
+  async putBytes(key: string, bytes: Uint8Array): Promise<"stored" | "existing"> {
+    const target = this.pathFor(key);
+    // Content addressing is a promise: the bytes must be what the key says.
+    if (`sha256/${createHash("sha256").update(bytes).digest("hex")}` !== key) {
+      throw new Error(`Content does not match its storage key ${key}.`);
+    }
+    if (await this.has(key)) return "existing";
+
+    await mkdir(path.dirname(target), { recursive: true });
+    const temporary = `${target}.${process.pid}.partial`;
+    try {
+      await writeFile(temporary, bytes, { flag: "wx" });
+      await rename(temporary, target);
+    } catch (error) {
+      await rm(temporary, { force: true });
+      if (await this.has(key)) return "existing";
+      throw error;
+    }
+    return "stored";
+  }
+
+  async read(key: string): Promise<Uint8Array> {
+    try {
+      return new Uint8Array(await readFile(this.pathFor(key)));
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code === "ENOENT") throw new ObjectMissingError(key);
+      throw error;
+    }
   }
 }

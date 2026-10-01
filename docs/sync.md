@@ -63,7 +63,8 @@ message saying so.
 | -------------------------------------- | -------------------------------------------------------- |
 | `npm run medos-sync -- scan`           | Shows what the folder contains. Uses no database.        |
 | `npm run medos-sync -- sync --dry-run` | Shows exactly what a sync would change. Changes nothing. |
-| `npm run medos-sync -- sync`           | Imports.                                                 |
+| `npm run medos-sync -- sync`           | Imports, then reads new and changed materials.           |
+| `npm run medos-sync -- process`        | Reads imported materials into content (`--all`: all).    |
 | `npm run medos-sync -- status`         | Shows what earlier syncs recorded.                       |
 | `npm run medos-sync -- --help`         | Help.                                                    |
 
@@ -211,10 +212,15 @@ Originals are copied to `<storage>/sha256/<first two characters>/<sha256>`. The 
 git-ignored. Copies are written to a temporary name and renamed, so an interrupted sync never
 leaves a partial file. They are never modified or deleted by a sync.
 
+## After importing: parsing
+
+Since Phase 6 a sync reads each new or changed material from MedOS's stored copy (never from the
+study folder) into structured content: Study Guide sections, MCQ questions, Question Bank items,
+and PDF page registration. The report ends with a **Processing** section. A file that cannot be
+read is reported with a plain reason and its original stays stored and attached. See
+[`parsing.md`](parsing.md).
+
 ## What is not done yet
 
-- **Parsing.** Files are registered, classified and stored, not read. Study Guide sections, MCQ
-  questions and Question Bank items are extracted in Phase 6. A resource's status is `stored`
-  until then; nothing is presented as parsed.
 - **Uploading to a hosted MedOS.** The sync writes to the configured database and local storage.
 - **A screen for corrections and review.**

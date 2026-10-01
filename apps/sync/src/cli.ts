@@ -12,7 +12,8 @@ import { migrate } from "@medos/database/migrate";
 import { eq } from "drizzle-orm";
 
 import { ConfigError, resolveSourceDir, resolveStorageDir, resolveUserEmail } from "./config";
-import { formatScanReport, formatSyncReport } from "./report";
+import { processResources } from "./process/process";
+import { formatScanReport, formatSyncReport, processLines } from "./report";
 import { SyncError, findUserId } from "./state";
 import { LocalObjectStore } from "./store";
 import { runSync, scanAndClassify } from "./sync";
@@ -25,13 +26,18 @@ Usage:
 Commands:
   scan                 Read the source folder and show what MedOS finds. Uses no database.
   sync --dry-run       Show exactly what a sync would change. Changes nothing.
-  sync                 Import: create weeks and lectures, attach materials, copy originals.
+  sync                 Import: create weeks and lectures, attach materials, copy originals,
+                       then read new and changed materials into structured content.
+  process              Read imported materials into structured content (what a sync does
+                       after importing). Uses MedOS's stored copies, not the source folder.
+  process --all        Read every material again, including ones that failed before.
   status               Show what earlier syncs recorded.
 
 Options:
   --source <folder>    The study folder (or MEDOS_SOURCE_DIR).
   --user <email>       The MedOS account to import into (or MEDOS_SYNC_USER).
-  --dry-run            With sync: plan only.
+  --dry-run            With sync or process: plan only.
+  --all                With process: read every material again.
   --remove-placeholders
                        With sync: remove development placeholder lectures first.
   --verbose            List every file, the structure, and skipped files.
@@ -52,6 +58,12 @@ async function withDatabase<T>(work: (connection: DatabaseConnection) => Promise
   }
 }
 
+/** Details of an internal error, for the person running the command; never stored or shown in the app. */
+function reportUnexpected(label: string, error: unknown): void {
+  console.error(`medos-sync: internal error while reading ${label}:`);
+  console.error(error);
+}
+
 async function main(argv: readonly string[]): Promise<void> {
   const { positionals, values } = parseArgs({
     args: [...argv],
@@ -60,6 +72,7 @@ async function main(argv: readonly string[]): Promise<void> {
       source: { type: "string" },
       user: { type: "string" },
       "dry-run": { type: "boolean", default: false },
+      all: { type: "boolean", default: false },
       "remove-placeholders": { type: "boolean", default: false },
       verbose: { type: "boolean", default: false },
       help: { type: "boolean", default: false },
@@ -94,8 +107,38 @@ async function main(argv: readonly string[]): Promise<void> {
           store: new LocalObjectStore(storage),
           dryRun,
           removePlaceholders: values["remove-placeholders"],
+          onUnexpectedError: reportUnexpected,
         });
         console.log(formatSyncReport({ ...run, dryRun, verbose, storage }));
+      });
+      return;
+    }
+
+    case "process": {
+      const sourceValue = values.source ?? process.env.MEDOS_SOURCE_DIR;
+      const storage = resolveStorageDir(
+        process.env.MEDOS_STORAGE_DIR,
+        sourceValue ? resolveSourceDir(sourceValue) : undefined,
+      );
+      const email = resolveUserEmail(values.user ?? process.env.MEDOS_SYNC_USER);
+      const dryRun = values["dry-run"];
+      await withDatabase(async ({ db }) => {
+        const userId = await findUserId(db, email);
+        const report = await processResources(db, userId, {
+          store: new LocalObjectStore(storage),
+          dryRun,
+          reprocessAll: values.all,
+          onUnexpectedError: reportUnexpected,
+        });
+        console.log(
+          [
+            dryRun ? "MedOS Sync — process, dry run (nothing is changed)" : "MedOS Sync — process",
+            "",
+            `Storage: ${storage}`,
+            "",
+            ...processLines(report),
+          ].join("\n"),
+        );
       });
       return;
     }

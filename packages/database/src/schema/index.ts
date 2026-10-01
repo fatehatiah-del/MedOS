@@ -1,6 +1,7 @@
 export * from "./academic";
 export * from "./auth";
 export * from "./calendar";
+export * from "./content";
 export * from "./progress";
 export * from "./relations";
 export * from "./resources";

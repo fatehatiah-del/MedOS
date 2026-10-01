@@ -2,6 +2,7 @@ import { relations } from "drizzle-orm";
 
 import { courses, lectures, semesters, weeks } from "./academic";
 import { calendarEvents, examEvents } from "./calendar";
+import { resourceContents, resourceMedia } from "./content";
 import { lectureProgress, studySessions } from "./progress";
 import { resources, syncFiles } from "./resources";
 import { users } from "./users";
@@ -45,6 +46,16 @@ export const lecturesRelations = relations(lectures, ({ one, many }) => ({
 export const resourcesRelations = relations(resources, ({ one, many }) => ({
   lecture: one(lectures, { fields: [resources.lectureId], references: [lectures.id] }),
   syncFiles: many(syncFiles),
+  content: one(resourceContents),
+  media: many(resourceMedia),
+}));
+
+export const resourceContentsRelations = relations(resourceContents, ({ one }) => ({
+  resource: one(resources, { fields: [resourceContents.resourceId], references: [resources.id] }),
+}));
+
+export const resourceMediaRelations = relations(resourceMedia, ({ one }) => ({
+  resource: one(resources, { fields: [resourceMedia.resourceId], references: [resources.id] }),
 }));
 
 export const syncFilesRelations = relations(syncFiles, ({ one }) => ({

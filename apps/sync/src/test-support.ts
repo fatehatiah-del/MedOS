@@ -18,7 +18,7 @@ import path from "node:path";
  */
 
 /** Builds a folder tree. Keys are relative paths ("Pharma/w4/quiz.html"); a trailing "/" makes an empty folder. */
-export function createSourceTree(entries: Record<string, string>): string {
+export function createSourceTree(entries: Record<string, string | Uint8Array>): string {
   const root = mkdtempSync(path.join(tmpdir(), "medos-source-"));
   for (const [relative, contents] of Object.entries(entries)) {
     const target = path.join(root, ...relative.split("/").filter(Boolean));
