@@ -26,6 +26,16 @@ export default defineConfig({
         },
       },
       {
+        test: {
+          name: "sync",
+          environment: "node",
+          include: ["apps/sync/src/**/*.test.ts"],
+          // Integration tests start an embedded PostgreSQL instance.
+          testTimeout: 30_000,
+          hookTimeout: 60_000,
+        },
+      },
+      {
         plugins: [react()],
         test: {
           name: "ui",

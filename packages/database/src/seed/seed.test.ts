@@ -1,9 +1,9 @@
 import { COURSES, FALL_2026 } from "@medos/shared";
-import { asc, eq } from "drizzle-orm";
+import { and, asc, eq } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import type { DatabaseConnection } from "../client";
-import { courses, lectures, semesters, users, weeks } from "../schema";
+import { courses, lectureProgress, lectures, semesters, users, weeks } from "../schema";
 import { createUser } from "../test-support";
 import { createTestDatabase } from "../testing";
 
@@ -11,6 +11,7 @@ import {
   DEVELOPMENT_USER,
   fixtureLectureTitle,
   isFixtureLecture,
+  removeFixtureLectures,
   seedDevelopment,
 } from "./development";
 import { seedSemester } from "./semester";
@@ -180,6 +181,67 @@ describe("seedSemester", () => {
     expect(seeded.courses.every((course) => course.userId === other.id)).toBe(true);
     // Two users now each have their own six courses.
     expect(await connection.db.select().from(courses)).toHaveLength(12);
+  });
+});
+
+describe("removeFixtureLectures", () => {
+  it("removes placeholders and their completion, and keeps real lectures and their weeks", async () => {
+    const user = await createUser(connection.db);
+    await ensureWorkspace(connection.db, user.id, { fixtureLectures: true });
+    const [course] = await connection.db
+      .select()
+      .from(courses)
+      .where(eq(courses.userId, user.id))
+      .orderBy(asc(courses.position));
+    if (!course) throw new Error("expected a course");
+    const [realWeek] = await connection.db
+      .insert(weeks)
+      .values({ userId: user.id, courseId: course.id, number: 9 })
+      .returning();
+    if (!realWeek) throw new Error("expected a week");
+    const [real] = await connection.db
+      .insert(lectures)
+      .values({
+        userId: user.id,
+        courseId: course.id,
+        weekId: realWeek.id,
+        number: 1,
+        title: "A real lecture",
+      })
+      .returning();
+    const [placeholder] = await connection.db
+      .select()
+      .from(lectures)
+      .where(and(eq(lectures.userId, user.id), eq(lectures.title, fixtureLectureTitle(1, 1))));
+    if (!real || !placeholder) throw new Error("expected lectures");
+    await connection.db.insert(lectureProgress).values([
+      { userId: user.id, lectureId: placeholder.id, completedAt: new Date() },
+      { userId: user.id, lectureId: real.id, completedAt: new Date() },
+    ]);
+
+    const removed = await removeFixtureLectures(connection.db, user.id);
+
+    expect(removed.lectures).toBe(24);
+    const remaining = await connection.db
+      .select()
+      .from(lectures)
+      .where(eq(lectures.userId, user.id));
+    expect(remaining.map((lecture) => lecture.title)).toEqual(["A real lecture"]);
+    const remainingWeeks = await connection.db
+      .select()
+      .from(weeks)
+      .where(eq(weeks.userId, user.id));
+    expect(remainingWeeks.map((week) => week.number)).toEqual([9]);
+    const progress = await connection.db
+      .select()
+      .from(lectureProgress)
+      .where(eq(lectureProgress.userId, user.id));
+    expect(progress.map((row) => row.lectureId)).toEqual([real.id]);
+    // Another run finds nothing more to remove.
+    expect(await removeFixtureLectures(connection.db, user.id)).toEqual({
+      lectures: 0,
+      weeks: 0,
+    });
   });
 });
 

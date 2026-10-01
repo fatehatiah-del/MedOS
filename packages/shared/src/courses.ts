@@ -21,15 +21,57 @@ export interface CourseDefinition {
   name: string;
   /** Compact name used in navigation and dense lists. */
   shortName: string;
+  /**
+   * Other names the course's folder may have in the source material, e.g.
+   * "Pharma". Matched after ignoring case, spacing, punctuation and a trailing
+   * "I". Each alias belongs to exactly one course.
+   */
+  folderAliases: readonly string[];
 }
 
 export const COURSES: readonly CourseDefinition[] = [
-  { id: "pathology", name: "Pathology I", shortName: "Pathology" },
-  { id: "pathophysiology", name: "Pathophysiology I", shortName: "Pathophysiology" },
-  { id: "microbiology", name: "Medical Microbiology I", shortName: "Microbiology" },
-  { id: "pharmacology", name: "Pharmacology I", shortName: "Pharmacology" },
-  { id: "public-health", name: "Public & Global Health", shortName: "Public Health" },
-  { id: "communication-skills", name: "Communication Skills", shortName: "Communication Skills" },
+  {
+    id: "pathology",
+    name: "Pathology I",
+    shortName: "Pathology",
+    folderAliases: ["Pathology", "Path"],
+  },
+  {
+    id: "pathophysiology",
+    name: "Pathophysiology I",
+    shortName: "Pathophysiology",
+    folderAliases: ["Pathophysiology", "Pathophys", "Pathophysio", "Patho-physiology"],
+  },
+  {
+    id: "microbiology",
+    name: "Medical Microbiology I",
+    shortName: "Microbiology",
+    folderAliases: ["Microbiology", "Micro", "Medical Microbiology", "Microbio"],
+  },
+  {
+    id: "pharmacology",
+    name: "Pharmacology I",
+    shortName: "Pharmacology",
+    folderAliases: ["Pharmacology", "Pharma", "Pharm"],
+  },
+  {
+    id: "public-health",
+    name: "Public & Global Health",
+    shortName: "Public Health",
+    folderAliases: [
+      "Public Health",
+      "Public & Global Health",
+      "Public and Global Health",
+      "Global Health",
+      "PGH",
+    ],
+  },
+  {
+    id: "communication-skills",
+    name: "Communication Skills",
+    shortName: "Communication Skills",
+    folderAliases: ["Communication Skills", "Communication", "Communications", "Comm Skills"],
+  },
 ];
 
 export function isCourseId(value: string): value is CourseId {

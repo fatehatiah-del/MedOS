@@ -101,9 +101,9 @@ every course, course list and lecture page that shows them carries a "Developmen
 They are created once per account, never mixed into an account that already has weeks, and never
 overwrite an existing lecture. The E2E tests enable the flag; production should not.
 
-## Relationship to the future S5 import
+## Relationship to the S5 import
 
-The sync tool (Phase 5) will map the source folder onto this structure:
+MedOS Sync (Phase 5, see [`sync.md`](sync.md)) maps the source folder onto this structure:
 
 ```
 S5\<subject>\w4\lecture-2\StudyGuide.docx
@@ -116,5 +116,5 @@ S5\<subject>\w4\lecture-2\StudyGuide.docx
 - Files become `resources` of the lecture, with their relative path, hash and kind recorded.
 
 Folder paths are provenance, never identifiers: rows keep their UUIDs if folders are renamed.
-Before the first real import, placeholder lectures must be removed; they are identifiable by their
-title prefix (`FIXTURE_LECTURE_PREFIX`).
+Before the first real import, the sync removes placeholder lectures when run with
+`--remove-placeholders`; they are identified by their title prefix (`FIXTURE_LECTURE_PREFIX`).

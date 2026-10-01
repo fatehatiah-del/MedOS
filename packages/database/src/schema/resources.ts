@@ -1,6 +1,7 @@
 import { sql } from "drizzle-orm";
 import {
   bigint,
+  boolean,
   check,
   foreignKey,
   index,
@@ -86,10 +87,22 @@ export const syncFiles = pgTable(
     detectedLectureNumber: integer("detected_lecture_number"),
     detectedKind: text("detected_kind", { enum: RESOURCE_KINDS }),
     status: text("status", { enum: SYNC_STATUSES }).notNull().default("pending"),
+    /** Why the file was classified as it was, in words, e.g. "file name mentions MCQ". */
+    classificationReason: text("classification_reason"),
     errorMessage: text("error_message"),
     lastSyncedAt: timestamp("last_synced_at", { withTimezone: true }),
     /** The resource this file was uploaded as, once it has been. */
     resourceId: uuid("resource_id"),
+    /*
+     * Manual corrections. Automatic classification is only a proposal: when
+     * set, these win over what the scanner detects, on every later sync.
+     */
+    /** Use this kind instead of the detected one. */
+    overrideKind: text("override_kind", { enum: RESOURCE_KINDS }),
+    /** Attach the file to this lecture instead of the detected one. */
+    overrideLectureId: uuid("override_lecture_id"),
+    /** Leave the file out of MedOS entirely. It stays on record. */
+    ignored: boolean("ignored").notNull().default(false),
     ...timestamps,
   },
   (table) => [
@@ -98,6 +111,15 @@ export const syncFiles = pgTable(
       columns: [table.resourceId, table.userId],
       foreignColumns: [resources.id, resources.userId],
     }).onDelete("restrict"),
+    foreignKey({
+      name: "sync_files_override_lecture_fk",
+      columns: [table.overrideLectureId, table.userId],
+      foreignColumns: [lectures.id, lectures.userId],
+    }).onDelete("restrict"),
+    check(
+      "sync_files_override_kind_valid",
+      sql`${table.overrideKind} is null or ${oneOf(table.overrideKind, RESOURCE_KINDS)}`,
+    ),
     unique("sync_files_user_path_unique").on(table.userId, table.relativePath),
     index("sync_files_resource_idx").on(table.resourceId),
     check("sync_files_status_valid", oneOf(table.status, SYNC_STATUSES)),

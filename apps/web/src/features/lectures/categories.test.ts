@@ -48,6 +48,14 @@ describe("lecture categories", () => {
     expect(categoryStateLabel({ status: "available", files: 2 })).toBe("2 files");
   });
 
+  it("count imported flashcard files like any other material", () => {
+    const states = lectureCategoryStates([{ kind: "flashcards" }]);
+    expect(states.find((category) => category.id === "flashcards")?.state).toEqual({
+      status: "available",
+      files: 1,
+    });
+  });
+
   it("name only the categories that have material", () => {
     expect(availableCategoryLabels(["mcq", "study-guide", "image"])).toEqual([
       "Study Guide",

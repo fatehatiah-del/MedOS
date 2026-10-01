@@ -1,0 +1,19 @@
+{
+  "name": "@medos/sync",
+  "version": "0.1.0",
+  "private": true,
+  "description": "MedOS Sync: the local companion that reads the Semester 5 folder (read-only) and brings it into MedOS.",
+  "type": "module",
+  "scripts": {
+    "cli": "tsx src/cli.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@medos/database": "*",
+    "@medos/shared": "*",
+    "drizzle-orm": "^0.45.3"
+  },
+  "devDependencies": {
+    "tsx": "^4.23.15"
+  }
+}

@@ -1,8 +1,16 @@
 import { type IsoDate, addDays } from "@medos/shared";
-import { eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, like, sql } from "drizzle-orm";
 
 import type { Database } from "../client";
-import { type Course, type User, lectures, users, weeks } from "../schema";
+import {
+  type Course,
+  type User,
+  lectureProgress,
+  lectures,
+  resources,
+  users,
+  weeks,
+} from "../schema";
 
 import { type SeededSemester, seedSemester } from "./semester";
 import { overwriteWhenChanged } from "./upsert";
@@ -131,6 +139,51 @@ export async function seedFixtureLectures(
     weekCount: courses.length * FIXTURE_WEEKS.length,
     lectureCount: fixtureLectures.length,
   };
+}
+
+export interface FixtureRemovalResult {
+  lectures: number;
+  weeks: number;
+}
+
+/**
+ * Deletes a user's placeholder lectures, with their completion records, and
+ * then any week left without lectures. Real lectures are never touched: a
+ * lecture is removed only if its title marks it as a placeholder and no
+ * material is attached to it. Runs in one transaction.
+ */
+export async function removeFixtureLectures(
+  db: Database,
+  userId: string,
+): Promise<FixtureRemovalResult> {
+  return db.transaction(async (tx) => {
+    const placeholders = await tx
+      .select({ id: lectures.id })
+      .from(lectures)
+      .where(
+        and(
+          eq(lectures.userId, userId),
+          like(lectures.title, `${FIXTURE_LECTURE_PREFIX}%`),
+          sql`not exists (select 1 from ${resources} where ${resources.lectureId} = ${lectures.id})`,
+        ),
+      );
+    const ids = placeholders.map((lecture) => lecture.id);
+    if (ids.length === 0) return { lectures: 0, weeks: 0 };
+
+    await tx.delete(lectureProgress).where(inArray(lectureProgress.lectureId, ids));
+    await tx.delete(lectures).where(inArray(lectures.id, ids));
+    const emptied = await tx
+      .delete(weeks)
+      .where(
+        and(
+          eq(weeks.userId, userId),
+          sql`not exists (select 1 from ${lectures} where ${lectures.weekId} = ${weeks.id})`,
+        ),
+      )
+      .returning({ id: weeks.id });
+
+    return { lectures: ids.length, weeks: emptied.length };
+  });
 }
 
 /**

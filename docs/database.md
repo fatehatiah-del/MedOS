@@ -162,5 +162,6 @@ weeks at all. See [`academic-hierarchy.md`](academic-hierarchy.md).
 - **One open study session per user** is a timer rule (Phase 13) and is not constrained yet.
 - **Row-level security.** Ownership is enforced by constraints and by the user-scoped data access
   layer. Database-level policies are not used.
-- **Removing placeholders.** Placeholder lectures are identified by their title prefix. The sync
-  tool (Phase 5) must remove them before the first real import.
+- **Sync corrections screen.** The manifest (`sync_files`) has override columns
+  (`override_kind`, `override_lecture_id`, `ignored`) that every sync respects; there is no screen
+  for them yet. See [`sync.md`](sync.md).

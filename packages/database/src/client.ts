@@ -4,6 +4,7 @@ import path from "node:path";
 import type { PgDatabase, PgQueryResultHKT } from "drizzle-orm/pg-core";
 
 import { type DatabaseTarget, parseDatabaseUrl } from "./config";
+import { acquireDatabaseLock } from "./lock";
 import * as schema from "./schema";
 
 export type Schema = typeof schema;
@@ -33,12 +34,22 @@ export async function connect(databaseUrl: string | undefined): Promise<Database
       import("@electric-sql/pglite"),
       import("drizzle-orm/pglite"),
     ]);
-    if (target.dataDir) mkdirSync(path.dirname(target.dataDir), { recursive: true });
+    let release = () => {};
+    if (target.dataDir) {
+      mkdirSync(path.dirname(target.dataDir), { recursive: true });
+      release = acquireDatabaseLock(target.dataDir);
+    }
     const client = new PGlite(target.dataDir ?? undefined);
     return {
       db: drizzle(client, { schema }),
       driver: "pglite",
-      close: () => client.close(),
+      close: async () => {
+        try {
+          await client.close();
+        } finally {
+          release();
+        }
+      },
     };
   }
 

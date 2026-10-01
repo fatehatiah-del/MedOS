@@ -9,15 +9,16 @@ and spaced review to exam preparation.
 MedOS is a private, single-user application. It is not a generic LMS, document manager or SaaS
 dashboard.
 
-| Document                                                   | Purpose                                                  |
-| ---------------------------------------------------------- | -------------------------------------------------------- |
-| [`CLAUDE.md`](CLAUDE.md)                                   | Product and engineering specification (source of truth). |
-| [`BUILD_PLAN.md`](BUILD_PLAN.md)                           | Staged implementation roadmap with acceptance gates.     |
-| [`docs/architecture.md`](docs/architecture.md)             | Architecture decisions and assumptions made so far.      |
-| [`docs/database.md`](docs/database.md)                     | Data model, integrity rules and database workflow.       |
-| [`docs/academic-hierarchy.md`](docs/academic-hierarchy.md) | Courses, weeks, lectures, routes and completion.         |
-| [`docs/authentication.md`](docs/authentication.md)         | Sign-in, sessions and the private boundary.              |
-| [`docs/google-auth-setup.md`](docs/google-auth-setup.md)   | Manual steps to enable Google sign-in.                   |
+| Document                                                   | Purpose                                                       |
+| ---------------------------------------------------------- | ------------------------------------------------------------- |
+| [`CLAUDE.md`](CLAUDE.md)                                   | Product and engineering specification (source of truth).      |
+| [`BUILD_PLAN.md`](BUILD_PLAN.md)                           | Staged implementation roadmap with acceptance gates.          |
+| [`docs/architecture.md`](docs/architecture.md)             | Architecture decisions and assumptions made so far.           |
+| [`docs/database.md`](docs/database.md)                     | Data model, integrity rules and database workflow.            |
+| [`docs/academic-hierarchy.md`](docs/academic-hierarchy.md) | Courses, weeks, lectures, routes and completion.              |
+| [`docs/sync.md`](docs/sync.md)                             | MedOS Sync: setup, commands, folder rules, safety guarantees. |
+| [`docs/authentication.md`](docs/authentication.md)         | Sign-in, sessions and the private boundary.                   |
+| [`docs/google-auth-setup.md`](docs/google-auth-setup.md)   | Manual steps to enable Google sign-in.                        |
 
 ## Current status
 
@@ -28,8 +29,9 @@ dashboard.
 | 2     | Database foundation                   | Complete    |
 | 3     | Authentication and privacy            | Complete    |
 | 4     | Course / week / lecture system        | Complete    |
-| 5     | Local MedOS sync CLI                  | Next        |
-| 6–22  | See `BUILD_PLAN.md`                   | Not started |
+| 5     | Local MedOS sync CLI                  | Complete    |
+| 6     | Parsing and resource pipeline         | Next        |
+| 7–22  | See `BUILD_PLAN.md`                   | Not started |
 
 What exists today:
 
@@ -39,10 +41,13 @@ What exists today:
 - authentication and the private boundary: sign-in with email and password or Google, server-side
   sessions, and user-scoped data access;
 - the academic structure: courses, weeks and lectures from the database, lecture pages with their
-  five kinds of material, and manual lecture completion with course and week progress.
+  five kinds of material, and manual lecture completion with course and week progress;
+- MedOS Sync: a local command that reads your study folder (never writing to it) and imports its
+  courses, weeks, lectures and materials, with a dry run, change detection and a manifest.
 
-No real study material has been imported yet, so lectures are development placeholders when
-enabled (see [`docs/academic-hierarchy.md`](docs/academic-hierarchy.md)). The Today screen's
+Imported files are registered, classified and stored, but not yet parsed: reading study guides
+and questions is Phase 6. Until you run a sync, lectures are development placeholders when enabled
+(see [`docs/academic-hierarchy.md`](docs/academic-hierarchy.md)). The Today screen's
 schedule and plan are a clearly labelled development fixture. There is **no sync, parsing, question
 engine, flashcard scheduling or AI**.
 
@@ -54,6 +59,7 @@ that consumes them, so there is no separate build step for packages.
 ```
 MedOS/
 ├── apps/
+│   ├── sync/                MedOS Sync, the local command that imports the study folder
 │   └── web/                 Next.js application (App Router)
 │       ├── e2e/             Playwright tests
 │       └── src/
@@ -78,8 +84,8 @@ MedOS/
 ```
 
 Packages planned by the specification are added when their phase begins, rather than created
-empty: `apps/sync` (Phase 5), `packages/parsers` (Phase 6), `packages/fsrs` (Phase 11) and
-`packages/study-engine` (Phase 15).
+empty: `packages/parsers` (Phase 6), `packages/fsrs` (Phase 11) and `packages/study-engine`
+(Phase 15).
 
 ### Stack
 
@@ -196,6 +202,21 @@ placeholder weeks and lectures in your own account, set `DEV_FIXTURE_LECTURES=tr
 `apps/web/.env.local` and restart the dev server. They are added once, to an account with no weeks
 yet, and are labelled as development data.
 
+## Importing your study folder
+
+MedOS Sync reads your Semester 5 folder and brings it into MedOS. It only ever reads the folder:
+nothing in it is created, changed, renamed, moved or deleted. Full details are in
+[`docs/sync.md`](docs/sync.md).
+
+1. Sign up in the app, then stop the dev server.
+2. Add `MEDOS_SOURCE_DIR` (your folder) and `MEDOS_SYNC_USER` (your MedOS email) to
+   `apps/web/.env.local`.
+3. Look first: `npm run medos-sync -- sync --dry-run`. Nothing is changed.
+4. Import: `npm run medos-sync -- sync`.
+
+`npm run medos-sync -- scan` shows what the folder contains without using the database, and
+`npm run medos-sync -- status` shows what earlier syncs recorded.
+
 ## Authentication
 
 MedOS is private: every page except the login and sign-up screens requires a session. Sign-in is
@@ -231,16 +252,19 @@ Invalid values stop the affected feature with a clear message. The database comm
 cp .env.example apps/web/.env.local
 ```
 
-| Variable                    | Required      | Default | Notes                                                                          |
-| --------------------------- | ------------- | ------- | ------------------------------------------------------------------------------ |
-| `DATABASE_URL`              | Yes           | —       | See [Database](#database).                                                     |
-| `AUTH_SECRET`               | Yes           | —       | Signs session cookies. At least 32 characters; `npm run auth:secret`.          |
-| `APP_URL`                   | In production | —       | Public address of the app, e.g. `https://medos.example`.                       |
-| `AUTH_GOOGLE_CLIENT_ID`     | No            | —       | Set together with the secret to enable Google sign-in.                         |
-| `AUTH_GOOGLE_CLIENT_SECRET` | No            | —       | Server-only.                                                                   |
-| `AUTH_ALLOWED_EMAILS`       | No            | —       | Comma-separated addresses allowed to create an account.                        |
-| `DEV_FIXTURE_LECTURES`      | No            | `false` | `true` adds placeholder weeks and lectures to a new account. Development only. |
-| `AI_PROVIDER`               | No            | `none`  | `none` is the only supported value.                                            |
+| Variable                    | Required      | Default          | Notes                                                                          |
+| --------------------------- | ------------- | ---------------- | ------------------------------------------------------------------------------ |
+| `DATABASE_URL`              | Yes           | —                | See [Database](#database).                                                     |
+| `AUTH_SECRET`               | Yes           | —                | Signs session cookies. At least 32 characters; `npm run auth:secret`.          |
+| `APP_URL`                   | In production | —                | Public address of the app, e.g. `https://medos.example`.                       |
+| `AUTH_GOOGLE_CLIENT_ID`     | No            | —                | Set together with the secret to enable Google sign-in.                         |
+| `AUTH_GOOGLE_CLIENT_SECRET` | No            | —                | Server-only.                                                                   |
+| `AUTH_ALLOWED_EMAILS`       | No            | —                | Comma-separated addresses allowed to create an account.                        |
+| `MEDOS_SOURCE_DIR`          | For sync      | —                | Your study folder. Read only.                                                  |
+| `MEDOS_SYNC_USER`           | For sync      | —                | Email of the MedOS account to import into.                                     |
+| `MEDOS_STORAGE_DIR`         | No            | `.medos/objects` | Where copies of originals are kept. Never inside the source folder.            |
+| `DEV_FIXTURE_LECTURES`      | No            | `false`          | `true` adds placeholder weeks and lectures to a new account. Development only. |
+| `AI_PROVIDER`               | No            | `none`           | `none` is the only supported value.                                            |
 
 None of these is exposed to the browser. Variables for storage are listed in `.env.example` as
 reserved and are not read yet. Real `.env` files are git-ignored; never commit secrets.

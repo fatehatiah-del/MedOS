@@ -9,6 +9,7 @@ export const RESOURCE_KINDS = [
   "original-lecture",
   "mcq",
   "question-bank",
+  "flashcards",
   "image",
   "supplementary",
 ] as const;
@@ -18,7 +19,25 @@ export type ResourceKind = (typeof RESOURCE_KINDS)[number];
 export const RESOURCE_STATUSES = ["pending", "stored", "parsed", "failed"] as const;
 export type ResourceStatus = (typeof RESOURCE_STATUSES)[number];
 
-export const SYNC_STATUSES = ["pending", "synced", "changed", "missing", "failed"] as const;
+/**
+ * Where a source file stands after the last sync:
+ * - `synced`: imported and attached to a lecture;
+ * - `needs-review`: kept on record but not attached, because its course, week,
+ *   lecture or kind could not be determined with confidence;
+ * - `missing`: seen before, absent from the source folder now (nothing deleted);
+ * - `ignored`: excluded by a manual override;
+ * - `failed`: could not be read.
+ * `pending` and `changed` are transient states during a sync.
+ */
+export const SYNC_STATUSES = [
+  "pending",
+  "synced",
+  "changed",
+  "missing",
+  "failed",
+  "needs-review",
+  "ignored",
+] as const;
 export type SyncStatus = (typeof SYNC_STATUSES)[number];
 
 export const CALENDAR_EVENT_TYPES = [

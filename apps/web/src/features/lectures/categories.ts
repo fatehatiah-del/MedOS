@@ -11,8 +11,10 @@ export interface LectureCategory {
   id: LectureCategoryId;
   label: string;
   description: string;
-  /** The resource kind that provides this category, or null if it is not a file. */
-  resourceKind: ResourceKind | null;
+  /** The resource kind whose files belong to this category. */
+  resourceKind: ResourceKind;
+  /** What to show with no files: "empty" (nothing imported yet) or "later" (feature not built yet). */
+  whenEmpty?: "empty" | "later";
 }
 
 export const LECTURE_CATEGORIES: readonly LectureCategory[] = [
@@ -44,7 +46,9 @@ export const LECTURE_CATEGORIES: readonly LectureCategory[] = [
     id: "flashcards",
     label: "Flashcards",
     description: "Cards you write or create from the study guide, reviewed within this course.",
-    resourceKind: null,
+    resourceKind: "flashcards",
+    // Imported card files can exist already; writing and reviewing cards comes later.
+    whenEmpty: "later",
   },
 ];
 
@@ -63,12 +67,10 @@ export function lectureCategoryStates(
   resources: readonly { kind: ResourceKind }[],
 ): CategoryWithState[] {
   return LECTURE_CATEGORIES.map((category) => {
-    if (category.resourceKind === null) return { ...category, state: { status: "later" } };
     const files = resources.filter((resource) => resource.kind === category.resourceKind).length;
-    return {
-      ...category,
-      state: files > 0 ? { status: "available", files } : { status: "empty" },
-    };
+    const state: CategoryState =
+      files > 0 ? { status: "available", files } : { status: category.whenEmpty ?? "empty" };
+    return { ...category, state };
   });
 }
 
@@ -85,7 +87,7 @@ export function categoryStateLabel(state: CategoryState): string {
 
 /** Labels of the categories with material, for a compact line in lists. */
 export function availableCategoryLabels(kinds: readonly ResourceKind[]): string[] {
-  return LECTURE_CATEGORIES.filter(
-    (category) => category.resourceKind !== null && kinds.includes(category.resourceKind),
-  ).map((category) => category.label);
+  return LECTURE_CATEGORIES.filter((category) => kinds.includes(category.resourceKind)).map(
+    (category) => category.label,
+  );
 }
