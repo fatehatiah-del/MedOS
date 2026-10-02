@@ -40,6 +40,14 @@
   --danger: #b23a34;
   --danger-soft: #fbe9e7;
 
+  --violet: #6a4bb0;
+  --violet-soft: #f0ebfa;
+  --teal: #1d6f78;
+  --teal-soft: #e0f1f2;
+  /* The user's own marks over source text in the Study Guide reader. */
+  --highlight: #fbe6a2;
+  --highlight-note: #f6dcc6;
+
   --overlay: rgb(27 26 23 / 0.32);
 
   --course-pathology: #b4536a;
@@ -79,6 +87,13 @@
   --warning-soft: #2a2011;
   --danger: #ee8a82;
   --danger-soft: #2e1614;
+
+  --violet: #bba6f2;
+  --violet-soft: #211b33;
+  --teal: #6fc6cf;
+  --teal-soft: #0f2628;
+  --highlight: #4b3d0f;
+  --highlight-note: #4a2c1a;
 
   --overlay: rgb(0 0 0 / 0.6);
 
@@ -123,6 +138,13 @@
   --color-danger: var(--danger);
   --color-danger-soft: var(--danger-soft);
 
+  --color-violet: var(--violet);
+  --color-violet-soft: var(--violet-soft);
+  --color-teal: var(--teal);
+  --color-teal-soft: var(--teal-soft);
+  --color-highlight: var(--highlight);
+  --color-highlight-note: var(--highlight-note);
+
   --color-overlay: var(--overlay);
 
   --color-course-pathology: var(--course-pathology);
@@ -145,6 +167,7 @@
   --animate-fade-in: fade-in 140ms ease-out;
   --animate-pop-in: pop-in 160ms cubic-bezier(0.2, 0.8, 0.2, 1);
   --animate-slide-in-left: slide-in-left 200ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  --animate-slide-in-right: slide-in-right 200ms cubic-bezier(0.2, 0.8, 0.2, 1);
 
   @keyframes fade-in {
     from {
@@ -162,6 +185,12 @@
   @keyframes slide-in-left {
     from {
       transform: translateX(-100%);
+    }
+  }
+
+  @keyframes slide-in-right {
+    from {
+      transform: translateX(100%);
     }
   }
 }

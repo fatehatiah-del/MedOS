@@ -52,6 +52,8 @@ export default defineConfig({
     timeout: 120_000,
     env: {
       DATABASE_URL: `pglite:${path.join(__dirname, ".e2e", "pgdata")}`,
+      // Images extracted from the synthetic Study Guide (see e2e/support/reader-fixture.ts).
+      MEDOS_STORAGE_DIR: path.join(__dirname, ".e2e", "objects"),
       // Generated per run and never written anywhere.
       AUTH_SECRET: randomBytes(32).toString("base64url"),
       APP_URL: baseURL,

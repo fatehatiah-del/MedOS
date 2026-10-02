@@ -15,7 +15,7 @@ import { ConfigError, resolveSourceDir, resolveStorageDir, resolveUserEmail } fr
 import { processResources } from "./process/process";
 import { formatScanReport, formatSyncReport, processLines } from "./report";
 import { SyncError, findUserId } from "./state";
-import { LocalObjectStore } from "./store";
+import { LocalObjectStore } from "@medos/storage";
 import { runSync, scanAndClassify } from "./sync";
 
 const HELP = `MedOS Sync — bring your study folder into MedOS, read-only.

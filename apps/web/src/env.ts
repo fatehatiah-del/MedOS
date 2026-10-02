@@ -17,6 +17,11 @@ const envSchema = z.object({
    * Development aid: give an account with no weeks a set of placeholder weeks
    * and lectures. Leave it off wherever real material will be imported.
    */
+  /**
+   * Where MedOS keeps its copies of originals and extracted images, shared
+   * with MedOS Sync. Defaults to `.medos/objects` in the repository.
+   */
+  MEDOS_STORAGE_DIR: z.string().optional(),
   DEV_FIXTURE_LECTURES: z
     .enum(["true", "false"])
     .default("false")

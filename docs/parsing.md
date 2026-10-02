@@ -194,15 +194,20 @@ database, so nothing real was written): the Pharmacology Week 1 Study Guide (23 
 40 answers exactly, from two different parsers), and both lecture PDFs (101 and 277 pages). The
 ZIP in Pathophysiology Week 1 stays under review and is not unpacked.
 
+**To verify before Phase 10:** the Question Bank was expected to hold 21 questions, but MedOS
+parsed 40 items. Check the source document before building Question Bank practice; the data has
+not been changed to match either number.
+
 Automated tests use only synthetic files built in code (`@medos/parsers/testing`); no course
 material is committed.
 
 ## Limitations
 
-- No reading interface yet: the Study Guide reader is Phase 7, the PDF viewer Phase 8, the MCQ
-  engine Phase 9 and Question Bank practice Phase 10. Phase 6 shows each material's state on the
-  lecture page and serves the content through the private API.
-- Extracted images are stored but not served yet; the route arrives with the reader.
+- Study Guides are read in the reader (Phase 7, [`reader.md`](reader.md)), which also serves
+  their extracted images privately. The PDF viewer is Phase 8, the MCQ engine Phase 9 and
+  Question Bank practice Phase 10.
+- Text units and anchors (`model/text-units.ts`) address passages of parsed content for user
+  data; they read the content and never change it.
 - Only HTML quizzes that keep their questions in a JSON data block are read. Quizzes written as
   plain HTML markup are reported as unreadable rather than guessed at.
 - `.doc`, PowerPoint, image-only PDFs' text, imported flashcard files and ZIP archives are not read.

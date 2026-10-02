@@ -26,7 +26,7 @@ import {
 import { eq } from "drizzle-orm";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 
-import { LocalObjectStore, contentKey } from "../store";
+import { LocalObjectStore, contentKey } from "@medos/storage";
 import { runSync } from "../sync";
 import { createScratchFolder, createSourceTree, removeFolder, snapshotTree } from "../test-support";
 

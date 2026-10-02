@@ -17,7 +17,7 @@ import { CourseMark } from "@/components/course-mark";
 import { FixtureNotice } from "@/components/fixture-notice";
 import { courseHref } from "@/config/navigation";
 import { FIXTURE_LECTURES_NOTICE } from "@/features/courses/fixture-data";
-import { lectureHref } from "@/features/courses/progress";
+import { lectureHref, studyGuideHref } from "@/features/courses/progress";
 import {
   type LectureCategoryId,
   categoryStateLabel,
@@ -66,7 +66,10 @@ export default async function LecturePage({ params }: LecturePageProps) {
   const { lecture, week, course, completedAt, resources, weekLectures } = detail;
 
   const categories = lectureCategoryStates(resources);
-  const fixtures = await scope.lectures.includesFixtures();
+  const [fixtures, reading] = await Promise.all([
+    scope.lectures.includesFixtures(),
+    scope.studyGuides.progress.forLecture(lecture.id),
+  ]);
   const position =
     weekLectures.length > 1
       ? `Lecture ${lecture.number} of ${weekLectures.length}`
@@ -151,6 +154,21 @@ export default async function LecturePage({ params }: LecturePageProps) {
                               </Badge>
                             </div>
                             <p className="text-xs leading-relaxed text-fg-subtle">{state.detail}</p>
+                            {resource.content?.format === "study-guide" ? (
+                              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 pt-1">
+                                <Link
+                                  href={studyGuideHref(course.slug, lecture.id, resource.id)}
+                                  aria-label={`Open Study Guide: ${resource.originalFilename}`}
+                                  className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-accent px-3 text-[13px] font-medium text-accent-fg transition-colors duration-150 hover:bg-accent-hover"
+                                >
+                                  Open Study Guide
+                                </Link>
+                                {/* Reading progress is shown, never used to complete the lecture. */}
+                                <span className="text-xs text-fg-subtle tabular-nums">
+                                  {reading.get(resource.id) ?? 0}% read
+                                </span>
+                              </div>
+                            ) : null}
                           </li>
                         );
                       })}
@@ -169,7 +187,9 @@ export default async function LecturePage({ params }: LecturePageProps) {
         </ul>
         <p className="text-xs leading-relaxed text-fg-subtle">
           Material appears here once it has been synced from your study folder, and is read into
-          MedOS content by the sync. Reading, practice and review open in later phases.
+          MedOS content by the sync. Study Guides open in the reader; the lecture viewer, MCQ and
+          Question Bank practice open in later phases. Reading a Study Guide never marks the lecture
+          complete.
         </p>
       </Section>
 

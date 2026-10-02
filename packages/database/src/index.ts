@@ -7,6 +7,7 @@ export {
   type LectureOutline,
   type ResourceContentView,
   type ResourceSummary,
+  type StoredMedia,
   type UserScope,
   type WeekOutline,
   createUserScope,
@@ -36,3 +37,14 @@ export {
 } from "./seed/development";
 export { type SeededSemester, seedSemester } from "./seed/semester";
 export { type EnsureWorkspaceOptions, ensureWorkspace } from "./seed/workspace";
+export {
+  type AnnotationInput,
+  type AnnotationResult,
+  type AnnotationView,
+  MAX_NOTE_LENGTH,
+  MAX_QUOTE_LENGTH,
+  type ReadingProgressView,
+  type StudyGuideView,
+  percentOf,
+  readingProgressView,
+} from "./access/study-guides";

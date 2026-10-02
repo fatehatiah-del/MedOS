@@ -45,8 +45,11 @@ export async function AppShell({ children }: { children: ReactNode }) {
           className="flex-1 px-5 pt-8 pb-20 focus:outline-none sm:px-8 lg:px-12 lg:pt-11"
         >
           {/* A container, so pages respond to the workspace width rather than the viewport
-              (the sidebar can be expanded, collapsed or absent). */}
-          <div className="@container mx-auto w-full max-w-[1080px]">{children}</div>
+              (the sidebar can be expanded, collapsed or absent). A page marked
+              data-layout="wide" (the Study Guide reader) may use more of it. */}
+          <div className="@container mx-auto w-full max-w-[1080px] has-[[data-layout=wide]]:max-w-[1560px]">
+            {children}
+          </div>
         </main>
       </div>
     </div>

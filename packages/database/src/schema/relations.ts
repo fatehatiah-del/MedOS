@@ -4,6 +4,7 @@ import { courses, lectures, semesters, weeks } from "./academic";
 import { calendarEvents, examEvents } from "./calendar";
 import { resourceContents, resourceMedia } from "./content";
 import { lectureProgress, studySessions } from "./progress";
+import { studyGuideAnnotations, studyGuideProgress } from "./reading";
 import { resources, syncFiles } from "./resources";
 import { users } from "./users";
 
@@ -48,6 +49,8 @@ export const resourcesRelations = relations(resources, ({ one, many }) => ({
   syncFiles: many(syncFiles),
   content: one(resourceContents),
   media: many(resourceMedia),
+  annotations: many(studyGuideAnnotations),
+  readingProgress: one(studyGuideProgress),
 }));
 
 export const resourceContentsRelations = relations(resourceContents, ({ one }) => ({
@@ -82,4 +85,18 @@ export const examEventsRelations = relations(examEvents, ({ one }) => ({
     references: [calendarEvents.id],
   }),
   course: one(courses, { fields: [examEvents.courseId], references: [courses.id] }),
+}));
+
+export const studyGuideAnnotationsRelations = relations(studyGuideAnnotations, ({ one }) => ({
+  resource: one(resources, {
+    fields: [studyGuideAnnotations.resourceId],
+    references: [resources.id],
+  }),
+}));
+
+export const studyGuideProgressRelations = relations(studyGuideProgress, ({ one }) => ({
+  resource: one(resources, {
+    fields: [studyGuideProgress.resourceId],
+    references: [resources.id],
+  }),
 }));

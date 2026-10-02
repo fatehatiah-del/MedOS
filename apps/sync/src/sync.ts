@@ -6,7 +6,7 @@ import { type SyncPlan, planSync } from "./plan";
 import { type ProcessReport, processResources } from "./process/process";
 import { type ScanResult, scanSource } from "./scan/walk";
 import { loadSyncState } from "./state";
-import type { ObjectStore } from "./store";
+import type { ObjectStore } from "@medos/storage";
 
 /*
  * The pipeline, end to end:

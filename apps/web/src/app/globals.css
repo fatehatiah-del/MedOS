@@ -3,3 +3,77 @@
 
 /* Workspace packages are symlinked through node_modules, which Tailwind skips. */
 @source "../../../../packages/ui/src";
+
+/*
+ * Study Guide reader. Source text is rendered as parsed; these rules only
+ * style it and the user's own marks over it.
+ */
+@layer components {
+  .sg-reader :where(p, li) {
+    overflow-wrap: break-word;
+  }
+
+  /* A slide reference ("S17") from the source, set apart from the sentence it ends. */
+  .sg-slide-ref {
+    margin-inline-start: 0.3em;
+    border-radius: 0.3rem;
+    background-color: var(--subtle);
+    padding: 0.05em 0.35em;
+    font-size: 0.78em;
+    font-weight: 500;
+    color: var(--fg-muted);
+    white-space: nowrap;
+  }
+
+  .sg-table th,
+  .sg-table td {
+    border-bottom: 1px solid var(--border);
+    padding: 0.55rem 0.75rem;
+    vertical-align: top;
+    font-size: 14.5px;
+    line-height: 1.55;
+  }
+  .sg-table td + td,
+  .sg-table th + th,
+  .sg-table th + td,
+  .sg-table td + th {
+    border-left: 1px solid var(--border);
+  }
+  .sg-table thead th,
+  .sg-table thead td {
+    background-color: var(--subtle);
+    font-weight: 600;
+  }
+  .sg-table tbody tr:last-child > * {
+    border-bottom: 0;
+  }
+
+  /* The user's marks. Each kind differs in more than colour. */
+  .sg-mark {
+    border-radius: 2px;
+    background-color: transparent;
+    color: inherit;
+    text-decoration-skip-ink: auto;
+    text-underline-offset: 3px;
+  }
+  .sg-mark[data-kinds~="highlight"] {
+    background-color: var(--highlight);
+  }
+  .sg-mark[data-kinds~="note"] {
+    background-color: var(--highlight-note);
+    text-decoration: underline dotted 2px;
+  }
+  .sg-mark[data-kinds~="review-later"] {
+    text-decoration: underline wavy var(--teal) 1.5px;
+  }
+  .sg-mark[data-kinds~="bookmark"] {
+    box-shadow: inset 0 -2px 0 var(--accent);
+  }
+
+  /* Briefly outlines a passage the reader was taken to. */
+  .sg-flash {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 3px;
+  }
+}

@@ -12,26 +12,28 @@ what was implemented and why. For commands, see the README.
 
 ## Tables
 
-Thirteen domain tables and one view, plus four authentication tables added in Phase 3 (described in
+Fifteen domain tables and one view, plus four authentication tables added in Phase 3 (described in
 [`authentication.md`](authentication.md)). Only the entities listed for Phase 2 in `BUILD_PLAN.md` exist; study
 guides, questions, flashcards, annotations and plans are added by their own phases.
 
-| Table               | One row is                                                              |
-| ------------------- | ----------------------------------------------------------------------- |
-| `users`             | An owner of study data.                                                 |
-| `semesters`         | A term with its dates, exam periods and the user's lab group.           |
-| `courses`           | A course in a semester.                                                 |
-| `weeks`             | A teaching week of a course.                                            |
-| `lectures`          | A lecture in a week.                                                    |
-| `resources`         | An original source file attached to a lecture, with its provenance.     |
-| `sync_files`        | What the local sync tool knows about one file in the source folder.     |
-| `resource_contents` | The parsed content of a resource, with its provenance (Phase 6).        |
-| `resource_media`    | An image extracted from a resource (Phase 6).                           |
-| `lecture_progress`  | The user's state for a lecture, including manual completion.            |
-| `study_sessions`    | A timed stretch of study.                                               |
-| `calendar_events`   | Anything scheduled: timetable entries, exams, holidays, study sessions. |
-| `exam_events`       | Exam detail attached to a calendar event.                               |
-| `course_progress`   | _View._ Lectures and completed lectures per course.                     |
+| Table                     | One row is                                                              |
+| ------------------------- | ----------------------------------------------------------------------- |
+| `users`                   | An owner of study data.                                                 |
+| `semesters`               | A term with its dates, exam periods and the user's lab group.           |
+| `courses`                 | A course in a semester.                                                 |
+| `weeks`                   | A teaching week of a course.                                            |
+| `lectures`                | A lecture in a week.                                                    |
+| `resources`               | An original source file attached to a lecture, with its provenance.     |
+| `sync_files`              | What the local sync tool knows about one file in the source folder.     |
+| `resource_contents`       | The parsed content of a resource, with its provenance (Phase 6).        |
+| `resource_media`          | An image extracted from a resource (Phase 6).                           |
+| `study_guide_annotations` | A highlight, note, bookmark or Review Later item on a guide (Phase 7).  |
+| `study_guide_progress`    | How far the user has read a guide (Phase 7). Not completion.            |
+| `lecture_progress`        | The user's state for a lecture, including manual completion.            |
+| `study_sessions`          | A timed stretch of study.                                               |
+| `calendar_events`         | Anything scheduled: timetable entries, exams, holidays, study sessions. |
+| `exam_events`             | Exam detail attached to a calendar event.                               |
+| `course_progress`         | _View._ Lectures and completed lectures per course.                     |
 
 ## Hierarchy
 
@@ -89,17 +91,19 @@ asserts that these two are the only ones.
 
 **Uniqueness.**
 
-| Constraint                             | Prevents                                     |
-| -------------------------------------- | -------------------------------------------- |
-| `users (email)`                        | Duplicate accounts.                          |
-| `semesters (user_id, slug)`            | The same semester twice for one user.        |
-| `courses (semester_id, slug)`          | The same course twice in a semester.         |
-| `weeks (course_id, number)`            | Duplicate teaching weeks in a course.        |
-| `lectures (week_id, number)`           | Two lectures in the same position of a week. |
-| `resources (lecture_id, content_hash)` | The same file attached to a lecture twice.   |
-| `sync_files (user_id, relative_path)`  | Two sync records for one file.               |
-| `lecture_progress (lecture_id)`        | More than one progress row per lecture.      |
-| `exam_events (calendar_event_id)`      | More than one exam detail per event.         |
+| Constraint                             | Prevents                                                                                 |
+| -------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `users (email)`                        | Duplicate accounts.                                                                      |
+| `semesters (user_id, slug)`            | The same semester twice for one user.                                                    |
+| `courses (semester_id, slug)`          | The same course twice in a semester.                                                     |
+| `weeks (course_id, number)`            | Duplicate teaching weeks in a course.                                                    |
+| `lectures (week_id, number)`           | Two lectures in the same position of a week.                                             |
+| `resources (lecture_id, content_hash)` | The same file attached to a lecture twice.                                               |
+| `sync_files (user_id, relative_path)`  | Two sync records for one file.                                                           |
+| `study_guide_progress (resource_id)`   | More than one progress row per guide.                                                    |
+| `study_guide_annotations` (partial)    | The same highlight, bookmark or Review Later item twice on one place (notes may repeat). |
+| `lecture_progress (lecture_id)`        | More than one progress row per lecture.                                                  |
+| `exam_events (calendar_event_id)`      | More than one exam detail per event.                                                     |
 
 **Checks.** Date ranges are ordered; exam periods are either complete or absent; week and lecture
 numbers start at 1; sizes and durations are not negative; content hashes are SHA-256 hex; sync
@@ -120,6 +124,9 @@ queries, `study_sessions (user_id, started_at)`, and the foreign-key columns of 
 
 - **Lecture completion is manual.** It lives in `lecture_progress.completed_at`, which is empty
   until the user marks the lecture complete. No code or trigger sets it from other activity.
+- **Study Guide reading progress is separate.** `study_guide_progress` records how far through a
+  guide the user has read; 100% is not completion and never sets it. Annotations and progress
+  point at parsed content by anchor and never change it (see [`reader.md`](reader.md)).
 - **Course progress is a view.** `BUILD_PLAN.md` lists CourseProgress as an entity. Storing counts
   would duplicate what `lecture_progress` already says and could drift, so `course_progress` is
   computed. If a later phase needs stored per-course state, it becomes a table then.

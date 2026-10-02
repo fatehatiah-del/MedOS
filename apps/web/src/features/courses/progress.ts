@@ -107,3 +107,7 @@ export function formatWeekDates(startsOn: string | null, endsOn: string | null):
   const day = (value: string) => SHORT_DAY.format(new Date(`${value}T00:00:00Z`));
   return `${day(startsOn)} – ${day(endsOn)}`;
 }
+
+export function studyGuideHref(courseSlug: string, lectureId: string, resourceId: string): string {
+  return `${lectureHref(courseSlug, lectureId)}/study-guide/${resourceId}`;
+}

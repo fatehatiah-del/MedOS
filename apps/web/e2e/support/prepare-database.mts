@@ -1,12 +1,17 @@
 import { rmSync } from "node:fs";
+import path from "node:path";
 
 import { connect, parseDatabaseUrl } from "@medos/database";
 import { migrate } from "@medos/database/migrate";
 
+import { prepareReaderFixture } from "./reader-fixture";
+
 /*
  * Runs before the server under test starts: gives every E2E run a brand-new
- * database with the tracked migrations applied and no users. Tests then create
- * their accounts through the real sign-up flow.
+ * database with the tracked migrations applied. Tests create their accounts
+ * through the real sign-up flow; the one exception is the Study Guide reader's
+ * account, whose synthetic material is imported here through MedOS Sync
+ * (an embedded database cannot be written while the server holds it).
  */
 
 const target = parseDatabaseUrl(process.env.DATABASE_URL);
@@ -21,6 +26,7 @@ rmSync(target.dataDir, { recursive: true, force: true });
 const connection = await connect(process.env.DATABASE_URL);
 try {
   await migrate(connection);
+  await prepareReaderFixture(connection.db, path.dirname(target.dataDir));
 } finally {
   // Closed before the server opens it: an embedded database allows one process at a time.
   await connection.close();

@@ -83,3 +83,7 @@ export const STUDY_ACTIVITIES = [
   "other",
 ] as const;
 export type StudyActivity = (typeof STUDY_ACTIVITIES)[number];
+
+/** What a user can attach to a passage or section of a study guide. */
+export const ANNOTATION_KINDS = ["highlight", "note", "bookmark", "review-later"] as const;
+export type AnnotationKind = (typeof ANNOTATION_KINDS)[number];

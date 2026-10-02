@@ -3,6 +3,7 @@ export * from "./auth";
 export * from "./calendar";
 export * from "./content";
 export * from "./progress";
+export * from "./reading";
 export * from "./relations";
 export * from "./resources";
 export * from "./users";

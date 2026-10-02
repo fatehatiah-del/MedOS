@@ -18,6 +18,7 @@ dashboard.
 | [`docs/academic-hierarchy.md`](docs/academic-hierarchy.md) | Courses, weeks, lectures, routes and completion.              |
 | [`docs/sync.md`](docs/sync.md)                             | MedOS Sync: setup, commands, folder rules, safety guarantees. |
 | [`docs/parsing.md`](docs/parsing.md)                       | Parsing pipeline, content model, fidelity and security.       |
+| [`docs/reader.md`](docs/reader.md)                         | Study Guide reader: rendering, annotations, progress, images. |
 | [`docs/authentication.md`](docs/authentication.md)         | Sign-in, sessions and the private boundary.                   |
 | [`docs/google-auth-setup.md`](docs/google-auth-setup.md)   | Manual steps to enable Google sign-in.                        |
 
@@ -32,7 +33,8 @@ dashboard.
 | 4     | Course / week / lecture system        | Complete    |
 | 5     | Local MedOS sync CLI                  | Complete    |
 | 6     | Parsing and resource pipeline         | Complete    |
-| 7–22  | See `BUILD_PLAN.md`                   | Not started |
+| 7     | Study Guide reader                    | Complete    |
+| 8–22  | See `BUILD_PLAN.md`                   | Not started |
 
 What exists today:
 
@@ -47,13 +49,25 @@ What exists today:
   courses, weeks, lectures and materials, with a dry run, change detection and a manifest;
 - parsing: imported Study Guides, MCQ quizzes, Question Banks and lecture PDFs are read into
   validated, source-faithful structured content, shown as ready (or with a plain reason why not)
-  on each lecture page.
+  on each lecture page;
+- the Study Guide reader: the parsed guide as structured, accessible reading (contents, semantic
+  callouts, real tables, figures with their private images), with highlights, notes, bookmarks,
+  Review Later and reading progress that survive a reload. Reading progress is not lecture
+  completion: only **Mark lecture complete** completes a lecture.
 
-Parsed content is stored but not yet presented for study: the Study Guide reader, PDF viewer, MCQ
-engine and Question Bank practice are Phases 7–10. Until you run a sync, lectures are development placeholders when enabled
+Study Guides can be read in MedOS; the PDF viewer, MCQ engine and Question Bank practice are
+Phases 8–10. Until you run a sync, lectures are development placeholders when enabled
 (see [`docs/academic-hierarchy.md`](docs/academic-hierarchy.md)). The Today screen's
-schedule and plan are a clearly labelled development fixture. There is **no reader, question
+schedule and plan are a clearly labelled development fixture. There is **no PDF viewer, question
 engine, flashcard scheduling or AI** yet.
+
+### Open checkpoints
+
+- **Question Bank count, before Phase 10.** The Pharmacology Week 1 Question Bank was expected to
+  hold 21 questions; MedOS parsed 40 items, all paired with answers (see
+  [`docs/parsing.md`](docs/parsing.md#real-material-checked)). Phase 7 does not touch it. Verify
+  against the source document which count is right before building Question Bank practice; do not
+  change the data to match either number without that check.
 
 ## Architecture
 
@@ -81,6 +95,7 @@ MedOS/
 │   │   ├── migrations/      Generated SQL migrations (tracked)
 │   │   └── src/             schema/, seed/, cli/, client.ts, config.ts
 │   ├── shared/              Domain constants and pure helpers (courses, semester, dates, study time)
+│   ├── storage/             Content-addressed object storage, shared by the sync and the web app
 │   └── ui/                  Design tokens and reusable, accessible UI primitives
 ├── docs/
 ├── CLAUDE.md
@@ -269,7 +284,7 @@ cp .env.example apps/web/.env.local
 | `AUTH_ALLOWED_EMAILS`       | No            | —                | Comma-separated addresses allowed to create an account.                        |
 | `MEDOS_SOURCE_DIR`          | For sync      | —                | Your study folder. Read only.                                                  |
 | `MEDOS_SYNC_USER`           | For sync      | —                | Email of the MedOS account to import into.                                     |
-| `MEDOS_STORAGE_DIR`         | No            | `.medos/objects` | Where copies of originals are kept. Never inside the source folder.            |
+| `MEDOS_STORAGE_DIR`         | No            | `.medos/objects` | Copies of originals and extracted images; read by the sync and the web app.    |
 | `DEV_FIXTURE_LECTURES`      | No            | `false`          | `true` adds placeholder weeks and lectures to a new account. Development only. |
 | `AI_PROVIDER`               | No            | `none`           | `none` is the only supported value.                                            |
 

@@ -14,7 +14,7 @@ import { and, eq, inArray } from "drizzle-orm";
 import type { PlannedFile, SyncPlan } from "./plan";
 import { absolutePathOf } from "./scan/walk";
 import { SyncError, lectureKey, loadSyncState, weekKey } from "./state";
-import { type ObjectStore, contentKey } from "./store";
+import { type ObjectStore, contentKey } from "@medos/storage";
 
 /*
  * Carries out a sync plan.

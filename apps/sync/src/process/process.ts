@@ -18,7 +18,7 @@ import {
 import { type ContentStats, type ParseIssue, validateContent } from "@medos/parsers/model";
 import { and, eq } from "drizzle-orm";
 
-import { ObjectMissingError, type ObjectStore, contentKey } from "../store";
+import { ObjectMissingError, type ObjectStore, contentKey } from "@medos/storage";
 
 /*
  * The resource pipeline, after a file has been imported:

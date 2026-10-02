@@ -17,7 +17,7 @@ import { and, eq, sql } from "drizzle-orm";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 
 import { SyncError } from "./state";
-import { LocalObjectStore } from "./store";
+import { LocalObjectStore } from "@medos/storage";
 import { runSync } from "./sync";
 import { createScratchFolder, createSourceTree, removeFolder, snapshotTree } from "./test-support";
 

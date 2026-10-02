@@ -8,6 +8,7 @@ import {
 import { and, asc, eq, like, sql } from "drizzle-orm";
 
 import type { Database } from "../client";
+import { createStudyGuideAccess } from "./study-guides";
 import { FIXTURE_LECTURE_PREFIX } from "../seed/development";
 import {
   type Course,
@@ -21,6 +22,7 @@ import {
   courses,
   lectureProgress,
   lectures,
+  resourceMedia,
   resources,
   semesters,
   weeks,
@@ -28,6 +30,7 @@ import {
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const SLUG = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+const SHA256 = /^[0-9a-f]{64}$/;
 
 /** Identifiers arrive from URLs; anything that is not a UUID cannot match a row. */
 function isId(value: string): boolean {
@@ -65,6 +68,14 @@ export type ResourceSummary = Pick<
 > & { content: ContentSummary | null };
 
 /** A resource's parsed content, validated, with what the parser reported. */
+/** Where an image of a resource is stored. Server-side only; never sent to the browser. */
+export interface StoredMedia {
+  contentHash: string;
+  storageKey: string;
+  mimeType: string;
+  sizeBytes: number;
+}
+
 export interface ResourceContentView {
   resource: ResourceSummary;
   /** Null until the resource has been parsed. */
@@ -364,7 +375,39 @@ export function createUserScope(db: Database, userId: string) {
       },
     },
 
+    /** Study guides for the reader, with the user's annotations and reading progress. */
+    studyGuides: createStudyGuideAccess(db, userId),
+
     resources: {
+      /**
+       * Where an image used by one of the user's resources is stored. Null
+       * unless the resource is theirs and the image belongs to that resource.
+       * For the server only: the storage key never reaches the browser.
+       */
+      async media(resourceId: string, contentHash: string): Promise<StoredMedia | null> {
+        if (!isId(resourceId) || !SHA256.test(contentHash)) return null;
+        const [media] = await db
+          .select({
+            contentHash: resourceMedia.contentHash,
+            storageKey: resourceMedia.storageKey,
+            mimeType: resourceMedia.mimeType,
+            sizeBytes: resourceMedia.sizeBytes,
+          })
+          .from(resourceMedia)
+          .innerJoin(
+            resources,
+            and(eq(resources.id, resourceMedia.resourceId), eq(resources.userId, userId)),
+          )
+          .where(
+            and(
+              eq(resourceMedia.resourceId, resourceId),
+              eq(resourceMedia.contentHash, contentHash),
+              eq(resourceMedia.userId, userId),
+            ),
+          );
+        return media ?? null;
+      },
+
       async get(resourceId: string): Promise<ResourceSummary | null> {
         if (!isId(resourceId)) return null;
         const resource = await db.query.resources.findFirst({

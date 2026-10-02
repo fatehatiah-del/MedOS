@@ -208,7 +208,8 @@ lectures is done by giving the source folder lecture subfolders, or with `overri
 
 ## Storage
 
-Originals are copied to `<storage>/sha256/<first two characters>/<sha256>`. The folder is
+The store is `@medos/storage` (`packages/storage`), shared with the web app, which reads
+extracted images from it to show them in the Study Guide reader. Originals are copied to `<storage>/sha256/<first two characters>/<sha256>`. The folder is
 git-ignored. Copies are written to a temporary name and renamed, so an interrupted sync never
 leaves a partial file. They are never modified or deleted by a sync.
 
