@@ -111,3 +111,11 @@ export function formatWeekDates(startsOn: string | null, endsOn: string | null):
 export function studyGuideHref(courseSlug: string, lectureId: string, resourceId: string): string {
   return `${lectureHref(courseSlug, lectureId)}/study-guide/${resourceId}`;
 }
+
+export function originalLectureHref(
+  courseSlug: string,
+  lectureId: string,
+  resourceId: string,
+): string {
+  return `${lectureHref(courseSlug, lectureId)}/original/${resourceId}`;
+}

@@ -17,7 +17,7 @@ import { CourseMark } from "@/components/course-mark";
 import { FixtureNotice } from "@/components/fixture-notice";
 import { courseHref } from "@/config/navigation";
 import { FIXTURE_LECTURES_NOTICE } from "@/features/courses/fixture-data";
-import { lectureHref, studyGuideHref } from "@/features/courses/progress";
+import { lectureHref, originalLectureHref, studyGuideHref } from "@/features/courses/progress";
 import {
   type LectureCategoryId,
   categoryStateLabel,
@@ -169,6 +169,18 @@ export default async function LecturePage({ params }: LecturePageProps) {
                                 </span>
                               </div>
                             ) : null}
+                            {resource.kind === "original-lecture" &&
+                            resource.content?.format === "pdf" ? (
+                              <div className="pt-1">
+                                <Link
+                                  href={originalLectureHref(course.slug, lecture.id, resource.id)}
+                                  aria-label={`Open lecture: ${resource.originalFilename}`}
+                                  className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-accent px-3 text-[13px] font-medium text-accent-fg transition-colors duration-150 hover:bg-accent-hover"
+                                >
+                                  Open lecture
+                                </Link>
+                              </div>
+                            ) : null}
                           </li>
                         );
                       })}
@@ -187,9 +199,9 @@ export default async function LecturePage({ params }: LecturePageProps) {
         </ul>
         <p className="text-xs leading-relaxed text-fg-subtle">
           Material appears here once it has been synced from your study folder, and is read into
-          MedOS content by the sync. Study Guides open in the reader; the lecture viewer, MCQ and
-          Question Bank practice open in later phases. Reading a Study Guide never marks the lecture
-          complete.
+          MedOS content by the sync. Study Guides open in the reader and lecture PDFs in the viewer;
+          MCQ and Question Bank practice open in later phases. Reading a Study Guide never marks the
+          lecture complete.
         </p>
       </Section>
 

@@ -204,7 +204,8 @@ material is committed.
 ## Limitations
 
 - Study Guides are read in the reader (Phase 7, [`reader.md`](reader.md)), which also serves
-  their extracted images privately. The PDF viewer is Phase 8, the MCQ engine Phase 9 and
+  their extracted images privately. Lecture PDFs open in the viewer (Phase 8,
+  [`lecture-viewer.md`](lecture-viewer.md)); the MCQ engine is Phase 9 and
   Question Bank practice Phase 10.
 - Text units and anchors (`model/text-units.ts`) address passages of parsed content for user
   data; they read the content and never change it.

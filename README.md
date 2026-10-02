@@ -19,6 +19,7 @@ dashboard.
 | [`docs/sync.md`](docs/sync.md)                             | MedOS Sync: setup, commands, folder rules, safety guarantees. |
 | [`docs/parsing.md`](docs/parsing.md)                       | Parsing pipeline, content model, fidelity and security.       |
 | [`docs/reader.md`](docs/reader.md)                         | Study Guide reader: rendering, annotations, progress, images. |
+| [`docs/lecture-viewer.md`](docs/lecture-viewer.md)         | Original lecture viewer: PDF rendering, pages, privacy.       |
 | [`docs/authentication.md`](docs/authentication.md)         | Sign-in, sessions and the private boundary.                   |
 | [`docs/google-auth-setup.md`](docs/google-auth-setup.md)   | Manual steps to enable Google sign-in.                        |
 
@@ -34,7 +35,8 @@ dashboard.
 | 5     | Local MedOS sync CLI                  | Complete    |
 | 6     | Parsing and resource pipeline         | Complete    |
 | 7     | Study Guide reader                    | Complete    |
-| 8–22  | See `BUILD_PLAN.md`                   | Not started |
+| 8     | Original lecture viewer               | Complete    |
+| 9–22  | See `BUILD_PLAN.md`                   | Not started |
 
 What exists today:
 
@@ -53,13 +55,16 @@ What exists today:
 - the Study Guide reader: the parsed guide as structured, accessible reading (contents, semantic
   callouts, real tables, figures with their private images), with highlights, notes, bookmarks,
   Review Later and reading progress that survive a reload. Reading progress is not lecture
-  completion: only **Mark lecture complete** completes a lecture.
+  completion: only **Mark lecture complete** completes a lecture;
+- the original lecture viewer: the lecture PDF rendered privately and lazily in MedOS, with page
+  navigation, zoom, fullscreen, page bookmarks, notes and Review Later, resuming at the last page,
+  and a private download of the original.
 
-Study Guides can be read in MedOS; the PDF viewer, MCQ engine and Question Bank practice are
-Phases 8–10. Until you run a sync, lectures are development placeholders when enabled
+Study Guides and lecture PDFs can be read in MedOS; the MCQ engine and Question Bank practice
+are Phases 9 and 10. Until you run a sync, lectures are development placeholders when enabled
 (see [`docs/academic-hierarchy.md`](docs/academic-hierarchy.md)). The Today screen's
-schedule and plan are a clearly labelled development fixture. There is **no PDF viewer, question
-engine, flashcard scheduling or AI** yet.
+schedule and plan are a clearly labelled development fixture. There is **no question engine,
+flashcard scheduling or AI** yet.
 
 ### Open checkpoints
 

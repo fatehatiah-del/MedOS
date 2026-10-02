@@ -48,3 +48,10 @@ export {
   percentOf,
   readingProgressView,
 } from "./access/study-guides";
+export {
+  type OriginalLectureView,
+  type PageAnnotationInput,
+  type PageAnnotationResult,
+  type PageAnnotationView,
+  type StoredOriginal,
+} from "./access/original-lectures";

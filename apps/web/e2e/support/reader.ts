@@ -15,6 +15,9 @@ export const READER_USER: TestUser = {
   password: "e2e-scratch-password-01",
 };
 
+/** Pages of the synthetic lecture PDF (`pdfId`). */
+export const LECTURE_PAGES = 40;
+
 export interface ReaderFixture {
   lectureId: string;
   /** The long synthetic guide. */
@@ -40,3 +43,6 @@ export function readerFixture(): ReaderFixture {
 
 export const guideUrl = (fixture: ReaderFixture, resourceId = fixture.guideId) =>
   `/courses/pharmacology/lectures/${fixture.lectureId}/study-guide/${resourceId}`;
+
+export const lectureUrl = (fixture: ReaderFixture, resourceId = fixture.pdfId) =>
+  `/courses/pharmacology/lectures/${fixture.lectureId}/original/${resourceId}`;

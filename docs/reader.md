@@ -39,20 +39,20 @@ Nothing on the page scrolls sideways: a wide table scrolls inside its own region
 Server components render the whole guide into the first HTML response; there is no client-side
 rendering of content and nothing is ever inserted as HTML.
 
-| Parsed content         | Rendered as                                                                                                                                                                                                  |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Title, subtitle        | The page's `<h1>` and the line below it, verbatim.                                                                                                                                                           |
-| Preamble               | First, in a box marked "From the document". The source's own CONTENTS page is kept as source text, separate from MedOS's navigation.                                                                         |
-| Section                | `<section>` with a heading one level below the page title (level 1 → `<h2>`, …), whose `id` is the section's stable id, so `#4-gpcr-signalling` links to it.                                                 |
-| Paragraph              | `<p>`, with bold, italic, underline, superscript and subscript as `<strong>`, `<em>`, `<u>`, `<sup>`, `<sub>`, and line breaks as `<br>`.                                                                    |
-| Slide reference        | The source text ("S17", "S52– S55") in a small chip set apart from the sentence; hovering says "Lecture slides 52–55". Not yet a link (that needs the Phase 8 viewer).                                       |
-| List                   | `<ul>`/`<ol>`, nested by level. Ordered lists that carry the source's own numbers ("1.", "20.") show them as text, so nothing is renumbered.                                                                 |
-| Table                  | A real `<table>`: header rows in `<thead>` with `<th scope="col">`; column spans and vertically merged cells as `colspan`/`rowspan`. Empty header cells stay `<td>`. No caption or row headers are invented. |
-| Callout (labelled box) | A box with `role="note"`, named by its label. The label is the source's, verbatim ("What to see" and "WHAT TO SEE" stay as written). Each known kind has its own icon and colour.                            |
-| Unlabelled box         | A plain box with no label. MedOS does not invent one.                                                                                                                                                        |
-| Flow                   | An ordered list of steps with arrows: across on wide screens, down on narrow ones.                                                                                                                           |
-| Figure                 | `<figure>` with its image(s) and `<figcaption>`; the notes beside it ("WHAT TO SEE") follow directly. Opens full size in a dialog.                                                                           |
-| Missing image          | A visible note giving the parser's reason.                                                                                                                                                                   |
+| Parsed content         | Rendered as                                                                                                                                                                                                       |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Title, subtitle        | The page's `<h1>` and the line below it, verbatim.                                                                                                                                                                |
+| Preamble               | First, in a box marked "From the document". The source's own CONTENTS page is kept as source text, separate from MedOS's navigation.                                                                              |
+| Section                | `<section>` with a heading one level below the page title (level 1 → `<h2>`, …), whose `id` is the section's stable id, so `#4-gpcr-signalling` links to it.                                                      |
+| Paragraph              | `<p>`, with bold, italic, underline, superscript and subscript as `<strong>`, `<em>`, `<u>`, `<sup>`, `<sub>`, and line breaks as `<br>`.                                                                         |
+| Slide reference        | The source text ("S17", "S52– S55") in a small chip set apart from the sentence; hovering says "Lecture slides 52–55". Not a link; see [`lecture-viewer.md`](lecture-viewer.md) for how slide links are prepared. |
+| List                   | `<ul>`/`<ol>`, nested by level. Ordered lists that carry the source's own numbers ("1.", "20.") show them as text, so nothing is renumbered.                                                                      |
+| Table                  | A real `<table>`: header rows in `<thead>` with `<th scope="col">`; column spans and vertically merged cells as `colspan`/`rowspan`. Empty header cells stay `<td>`. No caption or row headers are invented.      |
+| Callout (labelled box) | A box with `role="note"`, named by its label. The label is the source's, verbatim ("What to see" and "WHAT TO SEE" stay as written). Each known kind has its own icon and colour.                                 |
+| Unlabelled box         | A plain box with no label. MedOS does not invent one.                                                                                                                                                             |
+| Flow                   | An ordered list of steps with arrows: across on wide screens, down on narrow ones.                                                                                                                                |
+| Figure                 | `<figure>` with its image(s) and `<figcaption>`; the notes beside it ("WHAT TO SEE") follow directly. Opens full size in a dialog.                                                                                |
+| Missing image          | A visible note giving the parser's reason.                                                                                                                                                                        |
 
 Semantic kinds and their look (from `features/study-guide/callouts.ts`). A kind appears only when
 the source's own label or heading names it; ordinary content is never reclassified.
@@ -211,7 +211,7 @@ Automated tests never use real course material.
 
 ## Not in Phase 7
 
-- PDF viewer, slide links from slide references (Phase 8).
+- Clickable slide references. The lecture viewer (Phase 8, [`lecture-viewer.md`](lecture-viewer.md)) opens any page by address, but slide links are prepared, not active.
 - MCQ and Question Bank practice (Phases 9 and 10).
 - Flashcards, including creating one from a selection (Phase 11).
 - Global annotation pages and cross-guide management (Phase 12).

@@ -8,6 +8,7 @@ import {
 import { and, asc, eq, like, sql } from "drizzle-orm";
 
 import type { Database } from "../client";
+import { createOriginalLectureAccess } from "./original-lectures";
 import { createStudyGuideAccess } from "./study-guides";
 import { FIXTURE_LECTURE_PREFIX } from "../seed/development";
 import {
@@ -377,6 +378,9 @@ export function createUserScope(db: Database, userId: string) {
 
     /** Study guides for the reader, with the user's annotations and reading progress. */
     studyGuides: createStudyGuideAccess(db, userId),
+
+    /** Original lecture PDFs for the viewer, with the user's page annotations and position. */
+    originalLectures: createOriginalLectureAccess(db, userId),
 
     resources: {
       /**

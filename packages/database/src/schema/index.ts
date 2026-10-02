@@ -2,6 +2,7 @@ export * from "./academic";
 export * from "./auth";
 export * from "./calendar";
 export * from "./content";
+export * from "./lecture-viewer";
 export * from "./progress";
 export * from "./reading";
 export * from "./relations";

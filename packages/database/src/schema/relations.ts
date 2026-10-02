@@ -3,6 +3,7 @@ import { relations } from "drizzle-orm";
 import { courses, lectures, semesters, weeks } from "./academic";
 import { calendarEvents, examEvents } from "./calendar";
 import { resourceContents, resourceMedia } from "./content";
+import { originalLectureAnnotations, originalLecturePositions } from "./lecture-viewer";
 import { lectureProgress, studySessions } from "./progress";
 import { studyGuideAnnotations, studyGuideProgress } from "./reading";
 import { resources, syncFiles } from "./resources";
@@ -51,6 +52,8 @@ export const resourcesRelations = relations(resources, ({ one, many }) => ({
   media: many(resourceMedia),
   annotations: many(studyGuideAnnotations),
   readingProgress: one(studyGuideProgress),
+  pageAnnotations: many(originalLectureAnnotations),
+  viewerPosition: one(originalLecturePositions),
 }));
 
 export const resourceContentsRelations = relations(resourceContents, ({ one }) => ({
@@ -97,6 +100,23 @@ export const studyGuideAnnotationsRelations = relations(studyGuideAnnotations, (
 export const studyGuideProgressRelations = relations(studyGuideProgress, ({ one }) => ({
   resource: one(resources, {
     fields: [studyGuideProgress.resourceId],
+    references: [resources.id],
+  }),
+}));
+
+export const originalLectureAnnotationsRelations = relations(
+  originalLectureAnnotations,
+  ({ one }) => ({
+    resource: one(resources, {
+      fields: [originalLectureAnnotations.resourceId],
+      references: [resources.id],
+    }),
+  }),
+);
+
+export const originalLecturePositionsRelations = relations(originalLecturePositions, ({ one }) => ({
+  resource: one(resources, {
+    fields: [originalLecturePositions.resourceId],
     references: [resources.id],
   }),
 }));

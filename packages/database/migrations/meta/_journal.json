@@ -43,6 +43,13 @@
       "when": 1790885334806,
       "tag": "0005_study_guide_reader",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1790932798613,
+      "tag": "0006_lecture_viewer",
+      "breakpoints": true
     }
   ]
 }

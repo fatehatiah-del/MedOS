@@ -19,7 +19,7 @@ import { and, eq } from "drizzle-orm";
 import { resolveAuthConfig } from "../../src/server/auth/config";
 import { createAuth } from "../../src/server/auth/create-auth";
 
-import { READER_USER, type ReaderFixture } from "./reader";
+import { LECTURE_PAGES, READER_USER, type ReaderFixture } from "./reader";
 
 /*
  * The Study Guide reader's E2E material: a synthetic study folder (invented
@@ -138,7 +138,15 @@ export async function prepareReaderFixture(db: Database, e2eDir: string): Promis
   mkdirSync(week, { recursive: true });
   writeFileSync(path.join(week, "Reader StudyGuide.docx"), readerGuide());
   writeFileSync(path.join(week, "Second StudyGuide.docx"), secondGuide());
-  writeFileSync(path.join(week, "Lecture.pdf"), buildPdf(["Synthetic page"]));
+  // A long lecture PDF for the viewer; page 5 has no text, like a scanned slide.
+  writeFileSync(
+    path.join(week, "Lecture.pdf"),
+    buildPdf(
+      Array.from({ length: LECTURE_PAGES }, (_, index) =>
+        index === 4 ? "" : `Synthetic lecture page ${index + 1}`,
+      ),
+    ),
+  );
   // Another lecture of the same user, for addressing a guide through the wrong lecture.
   const week2 = path.join(source, "Pharma", "w2");
   mkdirSync(week2, { recursive: true });
