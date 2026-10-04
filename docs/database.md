@@ -12,7 +12,7 @@ what was implemented and why. For commands, see the README.
 
 ## Tables
 
-Nineteen domain tables and one view, plus four authentication tables added in Phase 3 (described in
+Twenty domain tables and one view, plus four authentication tables added in Phase 3 (described in
 [`authentication.md`](authentication.md)). Only the entities listed for Phase 2 in `BUILD_PLAN.md` exist; study
 guides, questions, flashcards, annotations and plans are added by their own phases.
 
@@ -33,6 +33,7 @@ guides, questions, flashcards, annotations and plans are added by their own phas
 | `original_lecture_positions`   | The page the user was last on in a PDF (Phase 8). Not completion.       |
 | `mcq_sessions`                 | A practice session on a quiz: mode, questions, time limit (Phase 9).    |
 | `mcq_attempts`                 | One answer to one question in one session (Phase 9). Never overwritten. |
+| `question_bank_attempts`       | One reveal of a Question Bank item, with the user's rating (Phase 10).  |
 | `lecture_progress`             | The user's state for a lecture, including manual completion.            |
 | `study_sessions`               | A timed stretch of study.                                               |
 | `calendar_events`              | Anything scheduled: timetable entries, exams, holidays, study sessions. |

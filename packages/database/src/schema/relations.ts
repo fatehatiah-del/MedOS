@@ -6,6 +6,7 @@ import { resourceContents, resourceMedia } from "./content";
 import { originalLectureAnnotations, originalLecturePositions } from "./lecture-viewer";
 import { mcqAttempts, mcqSessions } from "./mcq";
 import { lectureProgress, studySessions } from "./progress";
+import { questionBankAttempts } from "./question-bank";
 import { studyGuideAnnotations, studyGuideProgress } from "./reading";
 import { resources, syncFiles } from "./resources";
 import { users } from "./users";
@@ -56,6 +57,7 @@ export const resourcesRelations = relations(resources, ({ one, many }) => ({
   pageAnnotations: many(originalLectureAnnotations),
   viewerPosition: one(originalLecturePositions),
   mcqSessions: many(mcqSessions),
+  recallAttempts: many(questionBankAttempts),
 }));
 
 export const resourceContentsRelations = relations(resourceContents, ({ one }) => ({
@@ -130,4 +132,11 @@ export const mcqSessionsRelations = relations(mcqSessions, ({ one, many }) => ({
 
 export const mcqAttemptsRelations = relations(mcqAttempts, ({ one }) => ({
   session: one(mcqSessions, { fields: [mcqAttempts.sessionId], references: [mcqSessions.id] }),
+}));
+
+export const questionBankAttemptsRelations = relations(questionBankAttempts, ({ one }) => ({
+  resource: one(resources, {
+    fields: [questionBankAttempts.resourceId],
+    references: [resources.id],
+  }),
 }));

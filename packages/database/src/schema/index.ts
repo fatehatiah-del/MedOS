@@ -5,6 +5,7 @@ export * from "./content";
 export * from "./lecture-viewer";
 export * from "./mcq";
 export * from "./progress";
+export * from "./question-bank";
 export * from "./reading";
 export * from "./relations";
 export * from "./resources";

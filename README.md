@@ -21,6 +21,7 @@ dashboard.
 | [`docs/reader.md`](docs/reader.md)                         | Study Guide reader: rendering, annotations, progress, images. |
 | [`docs/lecture-viewer.md`](docs/lecture-viewer.md)         | Original lecture viewer: PDF rendering, pages, privacy.       |
 | [`docs/mcq.md`](docs/mcq.md)                               | MCQ engine: Learn, Exam and USMLE modes, attempts, results.   |
+| [`docs/question-bank.md`](docs/question-bank.md)           | Question Bank active recall: reveal, rate, record.            |
 | [`docs/authentication.md`](docs/authentication.md)         | Sign-in, sessions and the private boundary.                   |
 | [`docs/google-auth-setup.md`](docs/google-auth-setup.md)   | Manual steps to enable Google sign-in.                        |
 
@@ -38,7 +39,8 @@ dashboard.
 | 7     | Study Guide reader                    | Complete    |
 | 8     | Original lecture viewer               | Complete    |
 | 9     | MCQ engine                            | Complete    |
-| 10–22 | See `BUILD_PLAN.md`                   | Not started |
+| 10    | Question Bank / active recall         | Complete    |
+| 11–22 | See `BUILD_PLAN.md`                   | Not started |
 
 What exists today:
 
@@ -62,21 +64,23 @@ What exists today:
   navigation, zoom, fullscreen, page bookmarks, notes and Review Later, resuming at the last page,
   and a private download of the original;
 - the MCQ engine: imported quizzes practised in Learn, Exam and USMLE modes, marked on the server,
-  with a timer, navigator and flags, results by topic and question type, and every attempt kept.
+  with a timer, navigator and flags, results by topic and question type, and every attempt kept;
+- Question Bank active recall: reveal the model answer (typing optional), rate Again, Hard, Good or
+  Easy, with every attempt and rating kept, and the sidebar Question Bank page listing your banks.
 
-Study Guides and lecture PDFs can be read in MedOS and quizzes practised; Question Bank
-practice is Phase 10. Until you run a sync, lectures are development placeholders when enabled
+Study Guides and lecture PDFs can be read in MedOS, quizzes practised and question banks used
+for active recall; flashcards are Phase 11. Until you run a sync, lectures are development placeholders when enabled
 (see [`docs/academic-hierarchy.md`](docs/academic-hierarchy.md)). The Today screen's
-schedule and plan are a clearly labelled development fixture. There is **no Question Bank
-practice, flashcard scheduling or AI** yet.
+schedule and plan are a clearly labelled development fixture. There is **no flashcard
+scheduling or AI** yet.
 
-### Open checkpoints
+### Checkpoints
 
-- **Question Bank count, before Phase 10.** The Pharmacology Week 1 Question Bank was expected to
-  hold 21 questions; MedOS parsed 40 items, all paired with answers (see
-  [`docs/parsing.md`](docs/parsing.md#real-material-checked)). Phase 7 does not touch it. Verify
-  against the source document which count is right before building Question Bank practice; do not
-  change the data to match either number without that check.
+- **Question Bank count (checked in Phase 10).** The Pharmacology Week 1 bank was expected to hold
+  21 questions; MedOS reads 40. The file is titled "Practice Quiz" and holds the same 40 questions
+  as the week's MCQ quiz, so 40 is what it contains (see
+  [`docs/question-bank.md`](docs/question-bank.md)). A different bank may have been intended;
+  nothing was changed.
 
 ## Architecture
 

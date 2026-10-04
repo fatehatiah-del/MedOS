@@ -10,6 +10,7 @@ import {
   imageParagraph,
   paragraph,
   pngBytes,
+  sampleQuestionBank,
   run,
   table,
 } from "@medos/parsers/testing";
@@ -169,6 +170,7 @@ export async function prepareReaderFixture(db: Database, e2eDir: string): Promis
     ),
   );
   writeFileSync(path.join(week, "Quiz.html"), readerQuiz());
+  writeFileSync(path.join(week, "QuestionBank.docx"), sampleQuestionBank());
   // Another lecture of the same user, for addressing a guide through the wrong lecture.
   const week2 = path.join(source, "Pharma", "w2");
   mkdirSync(week2, { recursive: true });
@@ -199,6 +201,7 @@ export async function prepareReaderFixture(db: Database, e2eDir: string): Promis
   const pdf = byName("Lecture.pdf");
   const otherLecture = byName("Lecture W2.pdf");
   const quiz = byName("Quiz.html");
+  const questionBank = byName("QuestionBank.docx");
   const mediaOf = async (resourceId: string) =>
     (
       await db
@@ -214,6 +217,7 @@ export async function prepareReaderFixture(db: Database, e2eDir: string): Promis
     pdfId: pdf.id,
     otherLectureId: otherLecture.lectureId,
     mcqId: quiz.id,
+    questionBankId: questionBank.id,
     guideImages: await mediaOf(guide.id),
     secondGuideImages: await mediaOf(second.id),
   };

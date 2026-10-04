@@ -194,9 +194,9 @@ database, so nothing real was written): the Pharmacology Week 1 Study Guide (23 
 40 answers exactly, from two different parsers), and both lecture PDFs (101 and 277 pages). The
 ZIP in Pathophysiology Week 1 stays under review and is not unpacked.
 
-**To verify before Phase 10:** the Question Bank was expected to hold 21 questions, but MedOS
-parsed 40 items. Check the source document before building Question Bank practice; the data has
-not been changed to match either number.
+**Checked in Phase 10:** the Question Bank was expected to hold 21 questions; MedOS parsed 40.
+The file is titled "Practice Quiz" and holds the same 40 questions as the MCQ quiz, so 40 is
+correct for this file (see [`question-bank.md`](question-bank.md)). Nothing was changed.
 
 Automated tests use only synthetic files built in code (`@medos/parsers/testing`); no course
 material is committed.

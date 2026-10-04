@@ -66,3 +66,9 @@ export {
   isCorrect,
   sessionDeadline,
 } from "./access/mcq";
+export {
+  type BankOverview,
+  MAX_TYPED_ANSWER_LENGTH,
+  type QuestionBankView,
+  type RevealResult,
+} from "./access/question-bank";

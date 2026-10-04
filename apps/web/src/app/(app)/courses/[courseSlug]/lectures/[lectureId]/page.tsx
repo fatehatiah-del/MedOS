@@ -21,6 +21,7 @@ import {
   lectureHref,
   mcqHref,
   originalLectureHref,
+  questionBankHref,
   studyGuideHref,
 } from "@/features/courses/progress";
 import {
@@ -71,11 +72,13 @@ export default async function LecturePage({ params }: LecturePageProps) {
   const { lecture, week, course, completedAt, resources, weekLectures } = detail;
 
   const categories = lectureCategoryStates(resources);
-  const [fixtures, reading, mcqScores] = await Promise.all([
+  const [fixtures, reading, mcqScores, banks] = await Promise.all([
     scope.lectures.includesFixtures(),
     scope.studyGuides.progress.forLecture(lecture.id),
     scope.mcq.latestScores(lecture.id),
+    scope.questionBanks.banks(),
   ]);
+  const practisedBanks = new Map(banks.map((bank) => [bank.resourceId, bank]));
   const position =
     weekLectures.length > 1
       ? `Lecture ${lecture.number} of ${weekLectures.length}`
@@ -192,6 +195,25 @@ export default async function LecturePage({ params }: LecturePageProps) {
                                 ) : null}
                               </div>
                             ) : null}
+                            {resource.kind === "question-bank" &&
+                            resource.content?.format === "question-bank" ? (
+                              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 pt-1">
+                                <Link
+                                  href={questionBankHref(course.slug, lecture.id, resource.id)}
+                                  aria-label={`Practise recall: ${resource.originalFilename}`}
+                                  className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-accent px-3 text-[13px] font-medium text-accent-fg transition-colors duration-150 hover:bg-accent-hover"
+                                >
+                                  Practise recall
+                                </Link>
+                                {/* Shown for information; it never completes the lecture. */}
+                                {practisedBanks.has(resource.id) ? (
+                                  <span className="text-xs text-fg-subtle tabular-nums">
+                                    {practisedBanks.get(resource.id)?.practised} of{" "}
+                                    {practisedBanks.get(resource.id)?.itemCount} practised
+                                  </span>
+                                ) : null}
+                              </div>
+                            ) : null}
                             {resource.kind === "original-lecture" &&
                             resource.content?.format === "pdf" ? (
                               <div className="pt-1">
@@ -222,9 +244,9 @@ export default async function LecturePage({ params }: LecturePageProps) {
         </ul>
         <p className="text-xs leading-relaxed text-fg-subtle">
           Material appears here once it has been synced from your study folder, and is read into
-          MedOS content by the sync. Study Guides open in the reader, lecture PDFs in the viewer and
-          quizzes in MCQ practice; Question Bank practice opens in a later phase. Reading and
-          practising never mark the lecture complete.
+          MedOS content by the sync. Study Guides open in the reader, lecture PDFs in the viewer,
+          quizzes in MCQ practice and question banks in active recall. Reading and practising never
+          mark the lecture complete.
         </p>
       </Section>
 

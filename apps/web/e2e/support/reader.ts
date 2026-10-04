@@ -41,6 +41,8 @@ export interface ReaderFixture {
   pdfId: string;
   /** The synthetic MCQ quiz of the lecture. */
   mcqId: string;
+  /** The synthetic Question Bank of the lecture (two items; see sampleQuestionBank). */
+  questionBankId: string;
   /** Another lecture of the same account. */
   otherLectureId: string;
   guideImages: string[];
@@ -64,3 +66,6 @@ export const lectureUrl = (fixture: ReaderFixture, resourceId = fixture.pdfId) =
 
 export const mcqUrl = (fixture: ReaderFixture) =>
   `/courses/pharmacology/lectures/${fixture.lectureId}/mcq/${fixture.mcqId}`;
+
+export const questionBankUrl = (fixture: ReaderFixture) =>
+  `/courses/pharmacology/lectures/${fixture.lectureId}/question-bank/${fixture.questionBankId}`;

@@ -10,6 +10,7 @@ import { and, asc, eq, like, sql } from "drizzle-orm";
 import type { Database } from "../client";
 import { createMcqAccess } from "./mcq";
 import { createOriginalLectureAccess } from "./original-lectures";
+import { createQuestionBankAccess } from "./question-bank";
 import { createStudyGuideAccess } from "./study-guides";
 import { FIXTURE_LECTURE_PREFIX } from "../seed/development";
 import {
@@ -385,6 +386,9 @@ export function createUserScope(db: Database, userId: string) {
 
     /** MCQ quizzes, practice sessions and attempts. */
     mcq: createMcqAccess(db, userId),
+
+    /** Question Banks for active recall, with the user's attempts and ratings. */
+    questionBanks: createQuestionBankAccess(db, userId),
 
     resources: {
       /**
