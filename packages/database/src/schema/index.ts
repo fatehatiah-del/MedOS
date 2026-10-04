@@ -10,5 +10,6 @@ export * from "./question-bank";
 export * from "./reading";
 export * from "./relations";
 export * from "./resources";
+export * from "./review";
 export * from "./users";
 export * from "./values";

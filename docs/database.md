@@ -37,6 +37,7 @@ guides, questions, flashcards, annotations and plans are added by their own phas
 | `flashcard_decks`              | A deck of one course, optionally of one lecture (Phase 11).                   |
 | `flashcards`                   | A card with its FSRS state; deleted cards are hidden, not removed (Phase 11). |
 | `flashcard_reviews`            | One rating of one card, with the schedule before and after (Phase 11).        |
+| `question_review_items`        | An MCQ or Question Bank question marked Review Later (Phase 12).              |
 | `lecture_progress`             | The user's state for a lecture, including manual completion.                  |
 | `study_sessions`               | A timed stretch of study.                                                     |
 | `calendar_events`              | Anything scheduled: timetable entries, exams, holidays, study sessions.       |

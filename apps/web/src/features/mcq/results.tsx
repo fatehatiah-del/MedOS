@@ -1,6 +1,8 @@
 import { Surface, cn } from "@medos/ui";
 import { Flag } from "lucide-react";
 
+import { ReviewLaterToggle } from "@/features/review/review-later-toggle";
+
 import { FeedbackPanel, MarkWord, OptionLabel, QuestionStem, optionMark } from "./question";
 import type { Breakdown, Results } from "./views";
 
@@ -108,10 +110,13 @@ export function ResultsView({
   results,
   resourceId,
   modeLabel,
+  reviewLater,
 }: {
   results: Results;
   resourceId: string;
   modeLabel: string;
+  /** Keys of the questions marked Review Later. */
+  reviewLater: readonly string[];
 }) {
   return (
     <div className="space-y-8">
@@ -195,6 +200,11 @@ export function ResultsView({
                 feedback={item.feedback}
                 selected={item.selected}
                 resourceId={resourceId}
+              />
+              <ReviewLaterToggle
+                resourceId={resourceId}
+                questionKey={item.question.key}
+                initiallyMarked={reviewLater.includes(item.question.key)}
               />
             </li>
           ))}

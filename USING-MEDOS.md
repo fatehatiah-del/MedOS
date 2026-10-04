@@ -25,9 +25,10 @@ comes with deployment (the last phase).
 | **Courses** → a course → a lecture          | Everything for a lecture in one place, and **Mark lecture complete** (only you ever complete a lecture).                                                                                     |
 | Lecture → **Open Study Guide**              | Read the guide with contents, figures and tables. Select text to Highlight, Add note, Bookmark, Review later or Create flashcard. Reading progress is shown; it never completes the lecture. |
 | Lecture → **Open lecture**                  | The original lecture PDF: pages, zoom, fullscreen, page bookmarks, notes and Review later, resume where you left off, download.                                                              |
-| Lecture → **Practise MCQ**                  | Learn mode (answer and explanation after each question), Exam mode (timed, results at the end), USMLE mode.                                                                                  |
-| Lecture → **Practise recall**               | Question Bank: think or type your answer, reveal the model answer, rate Again / Hard / Good / Easy.                                                                                          |
+| Lecture → **Practise MCQ**                  | Learn mode (answer and explanation after each question), Exam mode (timed, results at the end), USMLE mode. **Review later** marks a question after you answer it.                           |
+| Lecture → **Practise recall**               | Question Bank: think or type your answer, reveal the model answer, rate Again / Hard / Good / Easy. **Review later** marks a question after you reveal it.                                   |
 | Lecture → **Open deck** / **Flashcards**    | Write flashcards (or create them from Study Guide text), then **Review** one course at a time. Scheduling is automatic (FSRS).                                                               |
+| Sidebar → **Review**                        | Everything you marked: Review later, Notes, Highlights, Bookmarks, by course. **Open** goes to the exact place; **Done** clears a Review later item.                                         |
 | Sidebar → **Question Bank**, **Flashcards** | All your banks and decks by course.                                                                                                                                                          |
 | Top right → theme                           | Light, dark or system theme.                                                                                                                                                                 |
 
@@ -37,9 +38,9 @@ flashcard's answer, 1–4 to rate).
 ## What is not built yet
 
 These pages exist but are placeholders or show sample data: **Today** (the schedule and plan shown
-are sample data), **Calendar**, **Study Plan**, **Review**, **Search**, **Statistics**, and parts of
-**Settings**. There is no study timer, no global list of all your notes and highlights, no export,
-and no AI. They are the remaining phases (12–22) in `BUILD_PLAN.md`.
+are sample data), **Calendar**, **Study Plan**, **Search**, **Statistics**, and parts of
+**Settings**. There is no study timer, no export, and no AI.
+They are the remaining phases (13–22) in `BUILD_PLAN.md`.
 
 ## Your data and backups
 
@@ -50,7 +51,7 @@ and no AI. They are the remaining phases (12–22) in `BUILD_PLAN.md`.
   never changes it.
 
 **Backups made so far** (one before each upgrade) are in `.medos\backups`, for example
-`pgdata-before-phase11`.
+`pgdata-before-phase12`.
 
 **To make your own backup:** stop MedOS (close the black window), then copy the folder
 `.medos\pgdata` to somewhere safe (for example `.medos\backups\pgdata-my-backup-<date>`, or a USB
@@ -95,5 +96,5 @@ Folder layout MedOS understands: `S5\<course>\w<week>\[lecture-1\]<files>`, for 
 
 ## For a developer picking this up
 
-Read `README.md`, `CLAUDE.md` (the specification) and `BUILD_PLAN.md` (the phases). Phases 0–11 are
+Read `README.md`, `CLAUDE.md` (the specification) and `BUILD_PLAN.md` (the phases). Phases 0–12 are
 complete and committed; each phase has a document in `docs/`. `npm run validate` runs every check.

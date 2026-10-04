@@ -8,6 +8,7 @@ import { Breadcrumbs } from "@/components/breadcrumbs";
 import { CourseMark } from "@/components/course-mark";
 import { courseHref } from "@/config/navigation";
 import { lectureHref } from "@/features/courses/progress";
+import { AnnotationLink } from "@/features/study-guide/annotation-link";
 import { progressSnapshot } from "@/features/study-guide/annotations";
 import { Blocks, SectionView } from "@/features/study-guide/content";
 import { ContextPanel } from "@/features/study-guide/context-panel";
@@ -205,6 +206,7 @@ export default async function StudyGuidePage({ params }: StudyGuidePageProps) {
         </div>
         <SelectionToolbar />
         <ProgressTracker />
+        <AnnotationLink />
       </ReaderProvider>
     </div>
   );

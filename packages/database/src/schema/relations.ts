@@ -10,6 +10,7 @@ import { lectureProgress, studySessions } from "./progress";
 import { questionBankAttempts } from "./question-bank";
 import { studyGuideAnnotations, studyGuideProgress } from "./reading";
 import { resources, syncFiles } from "./resources";
+import { questionReviewItems } from "./review";
 import { users } from "./users";
 
 /*
@@ -59,6 +60,7 @@ export const resourcesRelations = relations(resources, ({ one, many }) => ({
   viewerPosition: one(originalLecturePositions),
   mcqSessions: many(mcqSessions),
   recallAttempts: many(questionBankAttempts),
+  reviewItems: many(questionReviewItems),
 }));
 
 export const resourceContentsRelations = relations(resourceContents, ({ one }) => ({
@@ -155,4 +157,11 @@ export const flashcardsRelations = relations(flashcards, ({ one, many }) => ({
 
 export const flashcardReviewsRelations = relations(flashcardReviews, ({ one }) => ({
   card: one(flashcards, { fields: [flashcardReviews.cardId], references: [flashcards.id] }),
+}));
+
+export const questionReviewItemsRelations = relations(questionReviewItems, ({ one }) => ({
+  resource: one(resources, {
+    fields: [questionReviewItems.resourceId],
+    references: [resources.id],
+  }),
 }));

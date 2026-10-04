@@ -24,26 +24,28 @@ dashboard.
 | [`docs/mcq.md`](docs/mcq.md)                               | MCQ engine: Learn, Exam and USMLE modes, attempts, results.   |
 | [`docs/question-bank.md`](docs/question-bank.md)           | Question Bank active recall: reveal, rate, record.            |
 | [`docs/flashcards.md`](docs/flashcards.md)                 | Flashcards: decks, Study Guide cards, FSRS review per course. |
+| [`docs/review.md`](docs/review.md)                         | The Review page: notes, highlights, bookmarks, Review Later.  |
 | [`docs/authentication.md`](docs/authentication.md)         | Sign-in, sessions and the private boundary.                   |
 | [`docs/google-auth-setup.md`](docs/google-auth-setup.md)   | Manual steps to enable Google sign-in.                        |
 
 ## Current status
 
-| Phase | Scope                                 | Status      |
-| ----- | ------------------------------------- | ----------- |
-| 0     | Repository and engineering foundation | Complete    |
-| 1     | Design system and application shell   | Complete    |
-| 2     | Database foundation                   | Complete    |
-| 3     | Authentication and privacy            | Complete    |
-| 4     | Course / week / lecture system        | Complete    |
-| 5     | Local MedOS sync CLI                  | Complete    |
-| 6     | Parsing and resource pipeline         | Complete    |
-| 7     | Study Guide reader                    | Complete    |
-| 8     | Original lecture viewer               | Complete    |
-| 9     | MCQ engine                            | Complete    |
-| 10    | Question Bank / active recall         | Complete    |
-| 11    | Flashcards and FSRS                   | Complete    |
-| 12–22 | See `BUILD_PLAN.md`                   | Not started |
+| Phase | Scope                                      | Status      |
+| ----- | ------------------------------------------ | ----------- |
+| 0     | Repository and engineering foundation      | Complete    |
+| 1     | Design system and application shell        | Complete    |
+| 2     | Database foundation                        | Complete    |
+| 3     | Authentication and privacy                 | Complete    |
+| 4     | Course / week / lecture system             | Complete    |
+| 5     | Local MedOS sync CLI                       | Complete    |
+| 6     | Parsing and resource pipeline              | Complete    |
+| 7     | Study Guide reader                         | Complete    |
+| 8     | Original lecture viewer                    | Complete    |
+| 9     | MCQ engine                                 | Complete    |
+| 10    | Question Bank / active recall              | Complete    |
+| 11    | Flashcards and FSRS                        | Complete    |
+| 12    | Notes, highlights, bookmarks, Review Later | Complete    |
+| 13–22 | See `BUILD_PLAN.md`                        | Not started |
 
 What exists today:
 
@@ -71,7 +73,9 @@ What exists today:
 - Question Bank active recall: reveal the model answer (typing optional), rate Again, Hard, Good or
   Easy, with every attempt and rating kept, and the sidebar Question Bank page listing your banks;
 - flashcards: decks per course and lecture, cards you write or create from Study Guide text, and
-  FSRS review that always stays within one course.
+  FSRS review that always stays within one course;
+- the Review page: every note, highlight, bookmark and Review Later item (including MCQ and
+  Question Bank questions) in one place, by course, opening at the exact passage, page or question.
 
 Study Guides and lecture PDFs can be read in MedOS, quizzes practised and question banks used
 for active recall, and flashcards reviewed with FSRS. Until you run a sync, lectures are development placeholders when enabled

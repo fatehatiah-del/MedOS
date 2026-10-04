@@ -19,6 +19,8 @@ import { getWorkspace } from "@/server/workspace";
 
 interface QuestionBankPageProps {
   params: Promise<{ courseSlug: string; lectureId: string; resourceId: string }>;
+  /** `item=q3` puts that question first (from the Review page). */
+  searchParams: Promise<{ item?: string | string[] }>;
 }
 
 const WHEN = new Intl.DateTimeFormat("en-GB", {
@@ -47,14 +49,23 @@ export async function generateMetadata({ params }: QuestionBankPageProps): Promi
   return { title: `${bank.bank.title ?? "Question Bank"} · ${detail.course.shortName}` };
 }
 
-export default async function QuestionBankPracticePage({ params }: QuestionBankPageProps) {
+export default async function QuestionBankPracticePage({
+  params,
+  searchParams,
+}: QuestionBankPageProps) {
   const { courseSlug, lectureId, resourceId } = await params;
+  const { item: requested } = await searchParams;
   const { scope, detail, bank } = await loadBank(courseSlug, lectureId, resourceId);
   const { lecture, week, course } = detail;
 
   const attempts = await scope.questionBanks.history(resourceId);
   const statuses = itemStatuses(bank.bank.items, attempts);
-  const order = practiceOrder(bank.bank.items, statuses);
+  const usual = practiceOrder(bank.bank.items, statuses);
+  const first = typeof requested === "string" && usual.includes(requested) ? requested : null;
+  const order = first ? [first, ...usual.filter((key) => key !== first)] : usual;
+  const reviewLater = (await scope.review.questions.list(resourceId)).map(
+    (entry) => entry.questionKey,
+  );
   const byKey = new Map(bank.bank.items.map((item) => [item.key, item]));
   const practised = [...statuses.values()].filter((status) => status.attempts > 0).length;
 
@@ -101,6 +112,7 @@ export default async function QuestionBankPracticePage({ params }: QuestionBankP
         </p>
         <RecallRunner
           resourceId={resourceId}
+          reviewLater={reviewLater}
           items={order.flatMap((key) => {
             const item = byKey.get(key);
             return item ? [toClientItem(item)] : [];

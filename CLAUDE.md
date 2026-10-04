@@ -1287,3 +1287,10 @@ MedOS succeeds when the user can open it and immediately understand:
 - what exams are approaching
 
 while keeping all Semester 5 study material organized, searchable, testable, reviewable, and traceable to its source.
+
+# 52. Working Rules
+
+- Use npm.
+- Run tests quietly: `npm test -- --silent`
+- Output concise diffs; do not reprint whole files.
+- Do not summarize unchanged code.

@@ -4,6 +4,8 @@ import { Button, Progress } from "@medos/ui";
 import { useRouter } from "next/navigation";
 import { type KeyboardEvent, useEffect, useRef, useState, useTransition } from "react";
 
+import { ReviewLaterToggle } from "@/features/review/review-later-toggle";
+
 import { answerMcqQuestion, finishMcqSession } from "./actions";
 import { FeedbackPanel, MarkWord, OptionLabel, QuestionStem, optionMark } from "./question";
 import type { ClientQuestion, Feedback } from "./views";
@@ -25,14 +27,18 @@ export function LearnRunner({
   resourceId,
   questions,
   answered: initiallyAnswered,
+  reviewLater,
 }: {
   sessionId: string;
   resourceId: string;
   questions: readonly ClientQuestion[];
   answered: Record<string, AnsweredQuestion>;
+  /** Keys of the questions marked Review Later. */
+  reviewLater: readonly string[];
 }) {
   const router = useRouter();
   const [answered, setAnswered] = useState(initiallyAnswered);
+  const [marked, setMarked] = useState(() => new Set(reviewLater));
   const firstOpen = questions.findIndex((question) => !initiallyAnswered[question.key]);
   const [index, setIndex] = useState(firstOpen === -1 ? questions.length - 1 : firstOpen);
   const [choice, setChoice] = useState<number | null>(null);
@@ -166,6 +172,24 @@ export function LearnRunner({
               selected={result.selected}
               resourceId={resourceId}
             />
+          ) : null}
+          {result ? (
+            <div className="mt-3">
+              <ReviewLaterToggle
+                key={question.key}
+                resourceId={resourceId}
+                questionKey={question.key}
+                initiallyMarked={marked.has(question.key)}
+                onChange={(on) =>
+                  setMarked((current) => {
+                    const next = new Set(current);
+                    if (on) next.add(question.key);
+                    else next.delete(question.key);
+                    return next;
+                  })
+                }
+              />
+            </div>
           ) : null}
           {error ? (
             <p role="alert" className="mt-3 text-sm text-danger">

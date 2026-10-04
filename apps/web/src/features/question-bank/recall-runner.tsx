@@ -12,6 +12,7 @@ import {
   useTransition,
 } from "react";
 
+import { ReviewLaterToggle } from "@/features/review/review-later-toggle";
 import { Blocks, InlineContent } from "@/features/study-guide/content";
 
 import { rateRecall, revealQuestion } from "./actions";
@@ -36,10 +37,13 @@ interface Revealed {
 export function RecallRunner({
   resourceId,
   items,
+  reviewLater,
 }: {
   resourceId: string;
   /** In practice order. */
   items: readonly ClientItem[];
+  /** Keys of the questions marked Review Later. */
+  reviewLater: readonly string[];
 }) {
   const router = useRouter();
   const [index, setIndex] = useState(0);
@@ -47,6 +51,7 @@ export function RecallRunner({
   const [showChoices, setShowChoices] = useState(false);
   const [revealed, setRevealed] = useState<Revealed | null>(null);
   const [ratings, setRatings] = useState<Record<string, RecallRating>>({});
+  const [marked, setMarked] = useState(() => new Set(reviewLater));
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
   const shownAt = useRef(0);
@@ -293,6 +298,20 @@ export function RecallRunner({
                 )}
               </p>
             </div>
+            <ReviewLaterToggle
+              key={item.key}
+              resourceId={resourceId}
+              questionKey={item.key}
+              initiallyMarked={marked.has(item.key)}
+              onChange={(on) =>
+                setMarked((current) => {
+                  const next = new Set(current);
+                  if (on) next.add(item.key);
+                  else next.delete(item.key);
+                  return next;
+                })
+              }
+            />
             <div role="group" aria-labelledby="recall-rate" className="space-y-2">
               <h3 id="recall-rate" className="text-sm font-semibold text-fg">
                 How well did you recall it?

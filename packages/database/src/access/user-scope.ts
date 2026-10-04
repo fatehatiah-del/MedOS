@@ -12,6 +12,7 @@ import { createFlashcardAccess } from "./flashcards";
 import { createMcqAccess } from "./mcq";
 import { createOriginalLectureAccess } from "./original-lectures";
 import { createQuestionBankAccess } from "./question-bank";
+import { createReviewAccess } from "./review";
 import { createStudyGuideAccess } from "./study-guides";
 import { FIXTURE_LECTURE_PREFIX } from "../seed/development";
 import {
@@ -393,6 +394,9 @@ export function createUserScope(db: Database, userId: string) {
 
     /** Flashcard decks, cards and FSRS reviews, always within one course. */
     flashcards: createFlashcardAccess(db, userId),
+
+    /** Review Later on questions, and every annotation of the user in one place. */
+    review: createReviewAccess(db, userId),
 
     resources: {
       /**

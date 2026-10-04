@@ -57,6 +57,10 @@ export default async function McqSessionPage({ params }: SessionPageProps) {
   const modeLabel = MODE_LABELS[session.mode];
   const quizHref = mcqHref(course.slug, lecture.id, resourceId);
   const questions = sessionQuestions(quiz.set, session);
+  const { scope } = await getWorkspace();
+  const reviewLater = (await scope.review.questions.list(resourceId)).map(
+    (item) => item.questionKey,
+  );
 
   return (
     <div className="space-y-6">
@@ -96,6 +100,7 @@ export default async function McqSessionPage({ params }: SessionPageProps) {
             results={buildResults(quiz.set, session, attempts)}
             resourceId={resourceId}
             modeLabel={modeLabel}
+            reviewLater={reviewLater}
           />
           <Link
             href={quizHref}
@@ -109,6 +114,7 @@ export default async function McqSessionPage({ params }: SessionPageProps) {
           sessionId={session.id}
           resourceId={resourceId}
           questions={questions.map(toClientQuestion)}
+          reviewLater={reviewLater}
           answered={Object.fromEntries(
             attempts.flatMap((attempt): [string, AnsweredQuestion][] => {
               const question = questions.find((candidate) => candidate.key === attempt.questionKey);
