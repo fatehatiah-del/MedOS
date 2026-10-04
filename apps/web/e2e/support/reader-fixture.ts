@@ -5,6 +5,7 @@ import { type Database, resourceMedia, resources, users } from "@medos/database"
 import {
   buildDocx,
   buildPdf,
+  buildQuizHtml,
   heading,
   imageParagraph,
   paragraph,
@@ -19,7 +20,7 @@ import { and, eq } from "drizzle-orm";
 import { resolveAuthConfig } from "../../src/server/auth/config";
 import { createAuth } from "../../src/server/auth/create-auth";
 
-import { LECTURE_PAGES, READER_USER, type ReaderFixture } from "./reader";
+import { LECTURE_PAGES, QUIZ_QUESTIONS, READER_USER, type ReaderFixture } from "./reader";
 
 /*
  * The Study Guide reader's E2E material: a synthetic study folder (invented
@@ -129,6 +130,26 @@ function secondGuide(): Uint8Array {
   return buildDocx(body, { images: { rIdImg2: { name: "image2.png", bytes: pngBytes(302) } } });
 }
 
+/** A synthetic quiz in the common HTML layout: invented questions of several types. */
+function readerQuiz(): Uint8Array {
+  const image = (variant: number) =>
+    `data:image/png;base64,${Buffer.from(pngBytes(variant)).toString("base64")}`;
+  return buildQuizHtml({
+    title: "Synthetic Practice Quiz",
+    questions: QUIZ_QUESTIONS.map((question, index) => ({
+      topic: question.topic,
+      type: question.type,
+      stem: `Synthetic question ${index + 1} about ${question.topic}?`,
+      options: ["First option", "Second option", "Third option", "Fourth option"],
+      answer: 0,
+      explain: `Synthetic explanation ${index + 1}.`,
+      wrong: { "1": `Synthetic reason the second option of question ${index + 1} is wrong.` },
+      source: `S${index + 1}`,
+      ...(index === 3 ? { img: image(501), img_reveal: image(502) } : {}),
+    })),
+  });
+}
+
 export async function prepareReaderFixture(db: Database, e2eDir: string): Promise<void> {
   const source = path.join(e2eDir, "source");
   const storage = path.join(e2eDir, "objects");
@@ -147,6 +168,7 @@ export async function prepareReaderFixture(db: Database, e2eDir: string): Promis
       ),
     ),
   );
+  writeFileSync(path.join(week, "Quiz.html"), readerQuiz());
   // Another lecture of the same user, for addressing a guide through the wrong lecture.
   const week2 = path.join(source, "Pharma", "w2");
   mkdirSync(week2, { recursive: true });
@@ -176,6 +198,7 @@ export async function prepareReaderFixture(db: Database, e2eDir: string): Promis
   const second = byName("Second StudyGuide.docx");
   const pdf = byName("Lecture.pdf");
   const otherLecture = byName("Lecture W2.pdf");
+  const quiz = byName("Quiz.html");
   const mediaOf = async (resourceId: string) =>
     (
       await db
@@ -190,6 +213,7 @@ export async function prepareReaderFixture(db: Database, e2eDir: string): Promis
     secondGuideId: second.id,
     pdfId: pdf.id,
     otherLectureId: otherLecture.lectureId,
+    mcqId: quiz.id,
     guideImages: await mediaOf(guide.id),
     secondGuideImages: await mediaOf(second.id),
   };

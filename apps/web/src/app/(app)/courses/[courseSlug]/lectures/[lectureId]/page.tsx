@@ -17,7 +17,12 @@ import { CourseMark } from "@/components/course-mark";
 import { FixtureNotice } from "@/components/fixture-notice";
 import { courseHref } from "@/config/navigation";
 import { FIXTURE_LECTURES_NOTICE } from "@/features/courses/fixture-data";
-import { lectureHref, originalLectureHref, studyGuideHref } from "@/features/courses/progress";
+import {
+  lectureHref,
+  mcqHref,
+  originalLectureHref,
+  studyGuideHref,
+} from "@/features/courses/progress";
 import {
   type LectureCategoryId,
   categoryStateLabel,
@@ -66,9 +71,10 @@ export default async function LecturePage({ params }: LecturePageProps) {
   const { lecture, week, course, completedAt, resources, weekLectures } = detail;
 
   const categories = lectureCategoryStates(resources);
-  const [fixtures, reading] = await Promise.all([
+  const [fixtures, reading, mcqScores] = await Promise.all([
     scope.lectures.includesFixtures(),
     scope.studyGuides.progress.forLecture(lecture.id),
+    scope.mcq.latestScores(lecture.id),
   ]);
   const position =
     weekLectures.length > 1
@@ -169,6 +175,23 @@ export default async function LecturePage({ params }: LecturePageProps) {
                                 </span>
                               </div>
                             ) : null}
+                            {resource.kind === "mcq" && resource.content?.format === "mcq-set" ? (
+                              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 pt-1">
+                                <Link
+                                  href={mcqHref(course.slug, lecture.id, resource.id)}
+                                  aria-label={`Practise MCQ: ${resource.originalFilename}`}
+                                  className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-accent px-3 text-[13px] font-medium text-accent-fg transition-colors duration-150 hover:bg-accent-hover"
+                                >
+                                  Practise MCQ
+                                </Link>
+                                {/* Shown for information; it never completes the lecture. */}
+                                {mcqScores.has(resource.id) ? (
+                                  <span className="text-xs text-fg-subtle tabular-nums">
+                                    Last exam {mcqScores.get(resource.id)}%
+                                  </span>
+                                ) : null}
+                              </div>
+                            ) : null}
                             {resource.kind === "original-lecture" &&
                             resource.content?.format === "pdf" ? (
                               <div className="pt-1">
@@ -199,9 +222,9 @@ export default async function LecturePage({ params }: LecturePageProps) {
         </ul>
         <p className="text-xs leading-relaxed text-fg-subtle">
           Material appears here once it has been synced from your study folder, and is read into
-          MedOS content by the sync. Study Guides open in the reader and lecture PDFs in the viewer;
-          MCQ and Question Bank practice open in later phases. Reading a Study Guide never marks the
-          lecture complete.
+          MedOS content by the sync. Study Guides open in the reader, lecture PDFs in the viewer and
+          quizzes in MCQ practice; Question Bank practice opens in a later phase. Reading and
+          practising never mark the lecture complete.
         </p>
       </Section>
 

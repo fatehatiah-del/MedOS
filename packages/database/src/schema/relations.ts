@@ -4,6 +4,7 @@ import { courses, lectures, semesters, weeks } from "./academic";
 import { calendarEvents, examEvents } from "./calendar";
 import { resourceContents, resourceMedia } from "./content";
 import { originalLectureAnnotations, originalLecturePositions } from "./lecture-viewer";
+import { mcqAttempts, mcqSessions } from "./mcq";
 import { lectureProgress, studySessions } from "./progress";
 import { studyGuideAnnotations, studyGuideProgress } from "./reading";
 import { resources, syncFiles } from "./resources";
@@ -54,6 +55,7 @@ export const resourcesRelations = relations(resources, ({ one, many }) => ({
   readingProgress: one(studyGuideProgress),
   pageAnnotations: many(originalLectureAnnotations),
   viewerPosition: one(originalLecturePositions),
+  mcqSessions: many(mcqSessions),
 }));
 
 export const resourceContentsRelations = relations(resourceContents, ({ one }) => ({
@@ -119,4 +121,13 @@ export const originalLecturePositionsRelations = relations(originalLecturePositi
     fields: [originalLecturePositions.resourceId],
     references: [resources.id],
   }),
+}));
+
+export const mcqSessionsRelations = relations(mcqSessions, ({ one, many }) => ({
+  resource: one(resources, { fields: [mcqSessions.resourceId], references: [resources.id] }),
+  attempts: many(mcqAttempts),
+}));
+
+export const mcqAttemptsRelations = relations(mcqAttempts, ({ one }) => ({
+  session: one(mcqSessions, { fields: [mcqAttempts.sessionId], references: [mcqSessions.id] }),
 }));

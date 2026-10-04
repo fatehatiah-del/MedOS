@@ -91,3 +91,11 @@ export type AnnotationKind = (typeof ANNOTATION_KINDS)[number];
 /** What a user can attach to a page of an original lecture. */
 export const PAGE_ANNOTATION_KINDS = ["bookmark", "note", "review-later"] as const;
 export type PageAnnotationKind = (typeof PAGE_ANNOTATION_KINDS)[number];
+
+/** How a set of MCQs is practised. */
+export const MCQ_MODES = ["learn", "exam", "usmle"] as const;
+export type McqMode = (typeof MCQ_MODES)[number];
+
+/** Where an MCQ session stands. A discarded exam never counts in results. */
+export const MCQ_SESSION_STATUSES = ["in-progress", "submitted", "discarded"] as const;
+export type McqSessionStatus = (typeof MCQ_SESSION_STATUSES)[number];

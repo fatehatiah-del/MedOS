@@ -8,6 +8,7 @@ import {
 import { and, asc, eq, like, sql } from "drizzle-orm";
 
 import type { Database } from "../client";
+import { createMcqAccess } from "./mcq";
 import { createOriginalLectureAccess } from "./original-lectures";
 import { createStudyGuideAccess } from "./study-guides";
 import { FIXTURE_LECTURE_PREFIX } from "../seed/development";
@@ -381,6 +382,9 @@ export function createUserScope(db: Database, userId: string) {
 
     /** Original lecture PDFs for the viewer, with the user's page annotations and position. */
     originalLectures: createOriginalLectureAccess(db, userId),
+
+    /** MCQ quizzes, practice sessions and attempts. */
+    mcq: createMcqAccess(db, userId),
 
     resources: {
       /**

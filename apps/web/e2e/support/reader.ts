@@ -18,6 +18,19 @@ export const READER_USER: TestUser = {
 /** Pages of the synthetic lecture PDF (`pdfId`). */
 export const LECTURE_PAGES = 40;
 
+/** Types and topics of the synthetic quiz; the first option is always correct. */
+export const QUIZ_QUESTIONS = [
+  { type: "vignette", topic: "Receptors" },
+  { type: "recall", topic: "Receptors" },
+  { type: "mechanism", topic: "Signalling" },
+  { type: "graph", topic: "Signalling" },
+  { type: "consequence", topic: "Antagonism" },
+  { type: "application", topic: "Antagonism" },
+] as const;
+
+/** USMLE mode uses vignette, mechanism, consequence and application questions. */
+export const QUIZ_USMLE_COUNT = 4;
+
 export interface ReaderFixture {
   lectureId: string;
   /** The long synthetic guide. */
@@ -26,6 +39,8 @@ export interface ReaderFixture {
   secondGuideId: string;
   /** The lecture's PDF: material, but not a Study Guide. */
   pdfId: string;
+  /** The synthetic MCQ quiz of the lecture. */
+  mcqId: string;
   /** Another lecture of the same account. */
   otherLectureId: string;
   guideImages: string[];
@@ -46,3 +61,6 @@ export const guideUrl = (fixture: ReaderFixture, resourceId = fixture.guideId) =
 
 export const lectureUrl = (fixture: ReaderFixture, resourceId = fixture.pdfId) =>
   `/courses/pharmacology/lectures/${fixture.lectureId}/original/${resourceId}`;
+
+export const mcqUrl = (fixture: ReaderFixture) =>
+  `/courses/pharmacology/lectures/${fixture.lectureId}/mcq/${fixture.mcqId}`;

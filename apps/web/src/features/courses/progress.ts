@@ -119,3 +119,7 @@ export function originalLectureHref(
 ): string {
   return `${lectureHref(courseSlug, lectureId)}/original/${resourceId}`;
 }
+
+export function mcqHref(courseSlug: string, lectureId: string, resourceId: string): string {
+  return `${lectureHref(courseSlug, lectureId)}/mcq/${resourceId}`;
+}

@@ -55,3 +55,14 @@ export {
   type PageAnnotationView,
   type StoredOriginal,
 } from "./access/original-lectures";
+export {
+  type AnswerResult,
+  type DraftResult,
+  MAX_QUESTION_TIME_MS,
+  type McqSessionView,
+  type McqSetView,
+  type StartInput,
+  TIME_LIMIT_GRACE_SECONDS,
+  isCorrect,
+  sessionDeadline,
+} from "./access/mcq";
