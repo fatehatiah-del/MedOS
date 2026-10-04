@@ -148,8 +148,15 @@ export function PlanSection({
 export function ProgressSection({
   studiedMinutes,
   availableMinutes,
+  week,
+  streak,
   className,
-}: SectionProps & { studiedMinutes: number; availableMinutes: number }) {
+}: SectionProps & {
+  studiedMinutes: number;
+  availableMinutes: number;
+  week: { studiedMinutes: number; targetMinutes: number; daysStudied: number };
+  streak: { current: number; studiedToday: boolean };
+}) {
   const studied = formatMinutes(studiedMinutes);
   const available = formatMinutes(availableMinutes);
   return (
@@ -170,6 +177,27 @@ export function ProgressSection({
         />
         <p className="mt-2.5 text-xs text-fg-subtle">
           {progressPercent(studiedMinutes, availableMinutes)}% of today&rsquo;s study time
+        </p>
+      </div>
+      <div className="mt-6 border-t border-border pt-5">
+        <p className="text-sm text-fg-muted">
+          <span className="font-medium text-fg tabular-nums">
+            {formatMinutes(week.studiedMinutes)}
+          </span>{" "}
+          of {formatMinutes(week.targetMinutes)} this week
+        </p>
+        <Progress
+          className="mt-2.5"
+          label="Study time this week"
+          value={Math.min(week.studiedMinutes, week.targetMinutes)}
+          max={Math.max(week.targetMinutes, 1)}
+          valueText={`${formatMinutes(week.studiedMinutes)} of ${formatMinutes(week.targetMinutes)}`}
+        />
+        <p className="mt-2.5 text-xs text-fg-subtle">
+          {streak.current === 0
+            ? "No study streak yet."
+            : `${streak.current}-day study streak${streak.studiedToday ? "" : ", continues with study today"}.`}{" "}
+          The week&rsquo;s target is your own study time, Monday to Sunday.
         </p>
       </div>
     </Section>

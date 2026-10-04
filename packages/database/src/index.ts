@@ -136,3 +136,4 @@ export {
   type SearchKind,
   type SearchResult,
 } from "./access/search";
+export { type ProgressSummary } from "./access/progress";

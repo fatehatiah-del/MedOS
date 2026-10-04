@@ -12,6 +12,7 @@ import { createCalendarAccess } from "./calendar";
 import { createFlashcardAccess } from "./flashcards";
 import { createMcqAccess } from "./mcq";
 import { createPlannerAccess } from "./planner";
+import { createProgressAccess } from "./progress";
 import { createOriginalLectureAccess } from "./original-lectures";
 import { createQuestionBankAccess } from "./question-bank";
 import { createReviewAccess } from "./review";
@@ -417,6 +418,9 @@ export function createUserScope(db: Database, userId: string) {
 
     /** Search across courses, lectures, parsed material, flashcards, notes and bookmarks. */
     search: createSearchAccess(db, userId),
+
+    /** Streak, weekly target and progress counts, from real sessions and activity. */
+    progress: createProgressAccess(db, userId),
 
     resources: {
       /**

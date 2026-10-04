@@ -51,7 +51,7 @@ function Highlighted({ text, terms }: { text: string; terms: readonly string[] }
     <>
       {text.split(pattern).map((part, index) =>
         index % 2 === 1 ? (
-          <mark key={index} className="rounded-sm bg-highlight px-0.5 text-fg">
+          <mark key={index} className="rounded-sm bg-highlight text-fg">
             {part}
           </mark>
         ) : (

@@ -6,7 +6,7 @@ import {
   semesterWeekFor,
   zonedDate,
 } from "@medos/shared";
-import { type Weakness, detectWeaknesses } from "@medos/study-engine";
+import { type Weakness, detectWeaknesses, streakOf } from "@medos/study-engine";
 import { and, asc, count, eq, gte, inArray, isNotNull, lt, sql } from "drizzle-orm";
 
 import type { Database } from "../client";
@@ -379,15 +379,9 @@ export function createStatisticsAccess(db: Database, userId: string) {
         metrics({}, now),
         weekly({}),
         db
-          .select({ startedAt: studySessions.startedAt })
+          .select({ startedAt: studySessions.startedAt, seconds: studySessions.activeSeconds })
           .from(studySessions)
-          .where(
-            and(
-              eq(studySessions.userId, userId),
-              isNotNull(studySessions.endedAt),
-              gte(studySessions.activeSeconds, 60),
-            ),
-          ),
+          .where(and(eq(studySessions.userId, userId), isNotNull(studySessions.endedAt))),
         db
           .select({
             id: courses.id,
@@ -414,14 +408,16 @@ export function createStatisticsAccess(db: Database, userId: string) {
           ),
       ]);
 
-      // Streak and consistency: days with at least a minute of finished study.
-      const studied = new Set(sessionDays.map((row) => zonedDate(row.startedAt, ZONE)));
-      let day = studied.has(today) ? today : addDays(today, -1);
-      let streakDays = 0;
-      while (studied.has(day)) {
-        streakDays += 1;
-        day = addDays(day, -1);
+      // Streak and consistency: days with at least a minute of finished study in total.
+      const secondsByDay = new Map<IsoDate, number>();
+      for (const row of sessionDays) {
+        const day = zonedDate(row.startedAt, ZONE);
+        secondsByDay.set(day, (secondsByDay.get(day) ?? 0) + row.seconds);
       }
+      const studied = new Set(
+        [...secondsByDay].filter(([, seconds]) => seconds >= 60).map(([day]) => day),
+      );
+      const streakDays = streakOf(studied, today).current;
       let daysStudiedLast7 = 0;
       for (let back = 0; back < 7; back += 1) {
         if (studied.has(addDays(today, -back))) daysStudiedLast7 += 1;

@@ -107,9 +107,10 @@ interface ViewProps {
 }
 
 async function SemesterView({ scope, courses: links, currentWeek: week }: ViewProps) {
-  const [stats, weaknesses] = await Promise.all([
+  const [stats, weaknesses, progress] = await Promise.all([
     scope.statistics.semester(),
     scope.statistics.weaknesses(),
+    scope.progress.summary(),
   ]);
   return (
     <div className="space-y-12">
@@ -119,15 +120,28 @@ async function SemesterView({ scope, courses: links, currentWeek: week }: ViewPr
             {
               label: "Study streak",
               value:
-                stats.streakDays === 0
+                progress.streak.current === 0
                   ? null
-                  : `${stats.streakDays} ${stats.streakDays === 1 ? "day" : "days"}`,
-              detail: "Consecutive days with timed study",
+                  : `${progress.streak.current} ${progress.streak.current === 1 ? "day" : "days"}`,
+              detail: `Consecutive days with timed study · best ${progress.streak.best}`,
             },
             {
               label: "This week",
-              value: `${stats.daysStudiedLast7} / 7`,
-              detail: "Days with study in the last seven",
+              value: `${formatMinutes(progress.week.studiedMinutes)} / ${formatMinutes(progress.week.targetMinutes)}`,
+              detail: `Study time against your own target · ${progress.week.daysStudied} of 7 days`,
+            },
+            {
+              label: "Questions answered",
+              value: progress.questions.total === 0 ? null : progress.questions.total,
+              detail: `MCQ answers and Question Bank reveals · ${progress.questions.thisWeek} this week`,
+            },
+            {
+              label: "Flashcards mastered",
+              value:
+                progress.flashcards.cards === 0
+                  ? null
+                  : `${progress.flashcards.mastered} / ${progress.flashcards.cards}`,
+              detail: "Next review 21 days or more after the last",
             },
             ...metricTiles(stats.metrics),
           ]}

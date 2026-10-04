@@ -185,6 +185,10 @@ describe("search helpers", () => {
       "receptor",
     ]);
     expect(snippet).toMatch(/^….*receptor.*…$/);
+    // A snippet starts on a whole word.
+    expect(snippetOf(`${"abcdefghij".repeat(10)} THE receptor`, ["receptor"])).toBe(
+      "…THE receptor",
+    );
   });
 });
 

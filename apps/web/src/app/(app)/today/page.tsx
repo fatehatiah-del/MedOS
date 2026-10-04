@@ -29,7 +29,7 @@ export default async function TodayPage() {
   // Who is asking comes from the session; everything shown is the user's own data.
   const { user, semester, scope } = await getWorkspace();
   const courses = (await scope.courses.overview(semester.id)).map(({ course }) => course);
-  const today = await getTodayOverview(scope);
+  const [today, progress] = await Promise.all([getTodayOverview(scope), scope.progress.summary()]);
   const summary = summariseToday(today);
   const dateLabel = formatDate(today.date, { weekday: true });
 
@@ -54,6 +54,8 @@ export default async function TodayPage() {
           <ProgressSection
             studiedMinutes={today.studiedMinutes}
             availableMinutes={summary.availableMinutes}
+            week={progress.week}
+            streak={progress.streak}
             className="order-3"
           />
           <CoursesSection courses={courses} className="order-5" />

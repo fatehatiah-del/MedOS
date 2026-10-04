@@ -99,7 +99,12 @@ export function snippetOf(body: string, terms: readonly string[]): string | null
     Number.POSITIVE_INFINITY,
   );
   if (!Number.isFinite(at)) return null;
-  const start = Math.max(0, at - 50);
+  // Start at a word boundary, so a snippet never begins in the middle of a word.
+  let start = Math.max(0, at - 50);
+  if (start > 0) {
+    const space = flat.indexOf(" ", start);
+    start = space >= 0 && space < at ? space + 1 : at;
+  }
   const end = Math.min(flat.length, start + SNIPPET);
   return `${start > 0 ? "…" : ""}${flat.slice(start, end).trim()}${end < flat.length ? "…" : ""}`;
 }

@@ -30,6 +30,7 @@ dashboard.
 | [`docs/study-planner.md`](docs/study-planner.md)           | Study planner: signals, the formula, editing your plan.       |
 | [`docs/statistics.md`](docs/statistics.md)                 | Statistics and weak spots: measures, rules, evidence.         |
 | [`docs/search.md`](docs/search.md)                         | Search: what it covers, matching, the index.                  |
+| [`docs/progress.md`](docs/progress.md)                     | Progress: streak, weekly target, counts. No badges.           |
 | [`docs/authentication.md`](docs/authentication.md)         | Sign-in, sessions and the private boundary.                   |
 | [`docs/google-auth-setup.md`](docs/google-auth-setup.md)   | Manual steps to enable Google sign-in.                        |
 
@@ -55,7 +56,8 @@ dashboard.
 | 15    | Study planner                              | Complete    |
 | 16    | Weakness engine and analytics              | Complete    |
 | 17    | Search                                     | Complete    |
-| 18–22 | See `BUILD_PLAN.md`                        | Not started |
+| 18    | Gamification (restrained progress)         | Complete    |
+| 19–22 | See `BUILD_PLAN.md`                        | Not started |
 
 What exists today:
 
@@ -98,7 +100,9 @@ What exists today:
 - statistics at semester, course and lecture level from your real activity, and weak spots listed
   with the exact evidence behind them (no mastery scores), including concepts you mark difficult;
 - search (Ctrl+K) across courses, lectures, Study Guide sections, MCQs, Question Bank items,
-  flashcards, notes and bookmarks, each result opening at its source.
+  flashcards, notes and bookmarks, each result opening at its source;
+- restrained progress: a study streak, a weekly target from your own study time, questions
+  answered, flashcards mastered, retention and course completion. No badges or points.
 
 Study Guides and lecture PDFs can be read in MedOS, quizzes practised and question banks used
 for active recall, and flashcards reviewed with FSRS. Until you run a sync, lectures are development placeholders when enabled
