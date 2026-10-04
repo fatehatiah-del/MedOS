@@ -104,6 +104,10 @@ The course is recorded by its id; the folder name is kept exactly as it is on di
 paths always use it. An alias such as "Pharma" is only ever a folder name the source happens to
 use — MedOS never shortens a folder name.
 
+A top-level `Calendars` folder holds the university timetable and academic calendar. It is not
+course material and is skipped without a warning: MedOS carries the calendar as transcribed data
+(see [`calendar.md`](calendar.md)).
+
 An empty course folder is valid. `scan` counts courses with material and empty courses
 separately and lists the empty ones; no weeks or lectures are created for them.
 

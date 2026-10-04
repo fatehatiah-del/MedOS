@@ -53,6 +53,12 @@ export const semesters = pgTable(
     midtermsEndOn: date("midterms_end_on"),
     finalsStartOn: date("finals_start_on"),
     finalsEndOn: date("finals_end_on"),
+    /**
+     * Fingerprint of the university calendar (timetable and academic dates)
+     * last imported for this semester. Empty until the first import; a
+     * different fingerprint means the calendar data changed and is imported again.
+     */
+    calendarVersion: text("calendar_version"),
     ...timestamps,
   },
   (table) => [

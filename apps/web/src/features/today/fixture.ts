@@ -3,12 +3,17 @@ import type { TodayOverview } from "./types";
 /**
  * DEVELOPMENT FIXTURE — not real data.
  *
- * A hand-written snapshot of Wednesday 30 September 2026 used to demonstrate
- * the Today layout before the database, timetable import and study planner
- * exist. Replace `getTodayOverview` (not the page) when those arrive.
+ * A hand-written snapshot of Wednesday 30 September 2026. Its study plan is
+ * what the Today screen shows until the study planner (Phase 15) exists; the
+ * rest is a sample for tests. The real date, schedule and study time come
+ * from `getTodayOverview`.
  */
+
+/** Says which part of Today is not real yet. */
+export const PLAN_FIXTURE_NOTICE =
+  "The recommended study plan is sample data until the study planner arrives. Your schedule, study time and courses are real.";
 export const TODAY_FIXTURE: TodayOverview = {
-  source: "fixture",
+  planSource: "fixture",
   date: "2026-09-30",
   time: "15:00",
   schedule: [

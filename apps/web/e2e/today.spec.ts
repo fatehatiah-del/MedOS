@@ -1,10 +1,54 @@
+import {
+  CURRENT_SEMESTER,
+  COURSES,
+  type IsoDate,
+  availableMinutesFor,
+  formatDate,
+  formatMinutes,
+  semesterWeekFor,
+  universityEvents,
+} from "@medos/shared";
+
 import { expect, test } from "./support/test";
+
+/*
+ * Today shows the real campus date and the day's real Group A schedule, so
+ * the expectations are worked out from the same university calendar data for
+ * whatever day the tests run on. The study plan is still a fixture.
+ */
+
+const ZONE = CURRENT_SEMESTER.timeZone;
+const local = (instant: Date) => {
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat("en-GB", {
+      timeZone: ZONE,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hourCycle: "h23",
+    })
+      .formatToParts(instant)
+      .map((part) => [part.type, part.value]),
+  );
+  return {
+    date: `${parts.year}-${parts.month}-${parts.day}` as IsoDate,
+    time: `${parts.hour}:${parts.minute}`,
+  };
+};
+const today = local(new Date()).date;
+const todaysSessions = universityEvents().filter(
+  (event) => !event.allDay && local(event.startsAt).date === today,
+);
 
 test.describe("Today", () => {
   test("presents the dashboard sections in priority order", async ({ page, isMobile }) => {
     await page.goto("/today");
 
-    await expect(page.getByText("Wednesday, 30 September · Week 1")).toBeVisible();
+    const week = semesterWeekFor(today);
+    const dateLabel = formatDate(today, { weekday: true });
+    await expect(page.getByText(week ? `${dateLabel} · Week ${week}` : dateLabel)).toBeVisible();
     await expect(page.getByRole("note")).toContainText("Development preview");
 
     const regions = page.getByRole("region");
@@ -49,13 +93,22 @@ test.describe("Today", () => {
     }
   });
 
-  test("shows the fixture schedule, plan and progress", async ({ page }) => {
+  test("shows the real schedule, the sample plan and progress", async ({ page }) => {
     await page.goto("/today");
 
     const schedule = page.getByRole("region", { name: "Today's university schedule" });
-    await expect(schedule).toContainText("11:30–14:50");
-    await expect(schedule).toContainText("Public & Global Health");
-    await expect(schedule).toContainText("Sigma");
+    if (todaysSessions.length === 0) {
+      await expect(schedule).toContainText("No university activity today");
+    } else {
+      await expect(schedule.getByRole("listitem")).toHaveCount(todaysSessions.length);
+      for (const session of todaysSessions) {
+        await expect(schedule).toContainText(
+          `${local(session.startsAt).time}–${local(session.endsAt).time}`,
+        );
+        const course = COURSES.find((entry) => entry.id === session.courseId);
+        await expect(schedule).toContainText(course?.name ?? "");
+      }
+    }
 
     const plan = page.getByRole("region", { name: "Recommended study plan" });
     await expect(plan.getByRole("listitem")).toHaveCount(3);
@@ -65,11 +118,14 @@ test.describe("Today", () => {
     // Study time is real (the study timer), not part of the fixture; this account has none.
     const progress = page.getByRole("progressbar", { name: "Study time today" });
     await expect(progress).toHaveAttribute("aria-valuenow", "0");
-    await expect(progress).toHaveAttribute("aria-valuetext", "0m of 2h 30m");
+    await expect(progress).toHaveAttribute(
+      "aria-valuetext",
+      `0m of ${formatMinutes(availableMinutesFor(today))}`,
+    );
 
     const exams = page.getByRole("region", { name: "Exam periods" });
-    await expect(exams).toContainText("12–18 November 2026");
-    await expect(exams).toContainText("In 43 days");
+    if (today < "2026-11-19") await expect(exams).toContainText("12–18 November 2026");
+    await expect(exams).toContainText("18–29 January 2027");
   });
 
   test("links to each of the six courses", async ({ page }) => {

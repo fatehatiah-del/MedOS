@@ -71,8 +71,12 @@ export function formatDate(date: IsoDate, options: DateFormatOptions = {}): stri
   return `${weekdayName}, ${dayAndMonth}`;
 }
 
-/** Formats an inclusive range, e.g. "12–18 November 2026" or "28 September 2026 – 29 January 2027". */
+/**
+ * Formats an inclusive range, e.g. "12–18 November 2026" or "28 September 2026 – 29 January 2027";
+ * a single day as "1 October 2026".
+ */
 export function formatDateRange(range: DateRange, locale = "en-GB"): string {
+  if (range.start === range.end) return formatDate(range.start, { year: true, locale });
   const [startYear, startMonth] = range.start.split("-");
   const [endYear, endMonth] = range.end.split("-");
   if (startYear === endYear && startMonth === endMonth) {

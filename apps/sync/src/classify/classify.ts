@@ -7,6 +7,7 @@ import type { ScanResult, ScannedFile } from "../scan/walk";
 import { type KindConfidence, classifyKind, isCategoryFolder } from "./kind";
 import {
   courseForFolder,
+  isNonCourseFolder,
   lectureFolderLabel,
   lectureNumberInFileName,
   weekForFolder,
@@ -109,7 +110,12 @@ function childFolders(directories: readonly string[], parent: string): string[] 
 
 const byName = (a: string, b: string) => (a < b ? -1 : a > b ? 1 : 0);
 
-export function classifyScan(scan: Pick<ScanResult, "files" | "directories">): Classification {
+export function classifyScan(input: Pick<ScanResult, "files" | "directories">): Classification {
+  // Folders known to hold no course material are left out entirely.
+  const scan = {
+    files: input.files.filter((file) => !isNonCourseFolder(file.segments[0] ?? "")),
+    directories: input.directories.filter((dir) => !isNonCourseFolder(dir.split("/")[0] ?? "")),
+  };
   const issues: ClassificationIssue[] = [];
   const drafts: Draft[] = scan.files.map((file) => ({
     file,

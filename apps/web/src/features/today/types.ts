@@ -3,14 +3,15 @@ import type { CourseId, IsoDate } from "@medos/shared";
 /** Wall-clock time, 24-hour, e.g. "11:30". */
 export type ClockTime = `${number}:${number}`;
 
-export type ScheduleKind = "lecture" | "lab";
+export type ScheduleKind = "lecture" | "lab" | "exam";
 
 export const SCHEDULE_KIND_LABELS: Record<ScheduleKind, string> = {
   lecture: "Lecture",
   lab: "Lab",
+  exam: "Exam",
 };
 
-/** A university timetable entry for the day. */
+/** A university timetable entry or course exam of the day. */
 export interface ScheduleEntry {
   id: string;
   courseId: CourseId;
@@ -44,13 +45,15 @@ export interface StudyPlanItem {
 }
 
 /**
- * Everything the Today screen needs. `source` records where the data came
- * from so fixture data can never be mistaken for the user's real schedule.
+ * Everything the Today screen needs. The date, schedule and study time are
+ * real; `planSource` records that the study plan is still a development
+ * fixture (until the planner, Phase 15), so it can never be mistaken for a
+ * real recommendation.
  *
  * It holds academic data only. Who the user is comes from the session.
  */
 export interface TodayOverview {
-  source: "fixture";
+  planSource: "fixture";
   date: IsoDate;
   /** Local time of the snapshot, used for the greeting. */
   time: ClockTime;

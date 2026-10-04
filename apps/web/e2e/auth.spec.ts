@@ -147,7 +147,9 @@ test.describe("without a session", () => {
     const user = { ...uniqueUser("signup"), name: "Ada Lovelace" };
     await signUp(page, user);
 
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Good afternoon, Ada");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+      /^Good (morning|afternoon|evening), Ada$/,
+    );
     await page.goto("/settings");
     const account = page.getByRole("region", { name: "Account" });
     await expect(account).toContainText("Ada Lovelace");
@@ -244,7 +246,9 @@ test.describe("signing out", () => {
 test.describe("with a session", () => {
   test("the workspace opens and shows who is signed in", async ({ page }) => {
     await page.goto("/today");
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Good afternoon, Test");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+      /^Good (morning|afternoon|evening), Test$/,
+    );
 
     await page.getByRole("button", { name: "Account" }).click();
     const menu = page.getByRole("menu");

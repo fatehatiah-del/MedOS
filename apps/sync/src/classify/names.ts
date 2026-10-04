@@ -43,6 +43,18 @@ export function courseForFolder(name: string): CourseId | null {
   return COURSE_NAME_INDEX.get(normaliseCourseName(name)) ?? null;
 }
 
+/**
+ * Top-level folders that hold no course material and are skipped without a
+ * warning. "Calendars" holds the university timetable and academic calendar,
+ * which MedOS carries as transcribed data (see @medos/shared) rather than
+ * importing as lecture material.
+ */
+const NON_COURSE_FOLDERS: ReadonlySet<string> = new Set(["calendars", "calendar"]);
+
+export function isNonCourseFolder(name: string): boolean {
+  return NON_COURSE_FOLDERS.has(normaliseCourseName(name));
+}
+
 const WEEK_FOLDER = /^(?:w|wk|week)[\s._-]*0*(\d{1,2})(?:$|[\s._-])/i;
 
 /**

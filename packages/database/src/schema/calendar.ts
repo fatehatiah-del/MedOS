@@ -43,6 +43,13 @@ export const calendarEvents = pgTable(
     /** Lab group a timetable event is for, e.g. "A". Empty for shared lectures. */
     studentGroup: text("student_group"),
     notes: text("notes"),
+    /**
+     * Where an imported university event came from, e.g.
+     * "2026-fall:lab-pathology-5-14:00@2026-10-02". Stable across imports, so
+     * importing again updates the event instead of duplicating it. Empty for
+     * events the user created.
+     */
+    sourceKey: text("source_key"),
     ...timestamps,
   },
   (table) => [
@@ -53,6 +60,8 @@ export const calendarEvents = pgTable(
     }).onDelete("restrict"),
     // Target of the exam_events foreign key.
     unique("calendar_events_id_user_course_unique").on(table.id, table.userId, table.courseId),
+    // Each imported event once per user. (Rows without a source key never collide.)
+    unique("calendar_events_source_unique").on(table.userId, table.sourceKey),
     // "What is scheduled between these dates?"
     index("calendar_events_user_starts_idx").on(table.userId, table.startsAt),
     index("calendar_events_course_idx").on(table.courseId),

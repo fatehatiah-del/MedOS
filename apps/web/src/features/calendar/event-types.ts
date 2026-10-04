@@ -1,48 +1,41 @@
+import type { CalendarEventType } from "@medos/database";
+
 /**
  * Calendar event types from the specification, grouped by origin. University
- * events and the user's own sessions must always be visually distinguishable.
- * Presentation-only for now; the persisted model arrives with the database.
+ * events and the user's own events must always be visually distinguishable.
  */
 export type CalendarEventOrigin = "university" | "personal";
 
-export interface CalendarEventType {
-  id: string;
-  label: string;
-  origin: CalendarEventOrigin;
-}
+export const EVENT_TYPE_LABELS: Record<CalendarEventType, string> = {
+  lecture: "Lecture",
+  lab: "Lab",
+  exam: "Exam",
+  midterm: "Midterm",
+  "academic-deadline": "Academic date",
+  holiday: "Holiday",
+  assignment: "Assignment",
+  "study-session": "Study session",
+  revision: "Revision",
+  personal: "Personal",
+};
 
-export const CALENDAR_EVENT_TYPES: readonly CalendarEventType[] = [
-  { id: "lecture", label: "Lecture", origin: "university" },
-  { id: "lab", label: "Lab", origin: "university" },
-  { id: "exam", label: "Exam", origin: "university" },
-  { id: "midterm", label: "Midterm", origin: "university" },
-  { id: "academic-deadline", label: "Academic Deadline", origin: "university" },
-  { id: "holiday", label: "Holiday", origin: "university" },
-  { id: "assignment", label: "Assignment", origin: "university" },
-  { id: "study-session", label: "Study Session", origin: "personal" },
-  { id: "revision", label: "Revision", origin: "personal" },
-  { id: "personal", label: "Personal", origin: "personal" },
-];
+/** Types the user can give their own events, in the order the form offers them. */
+export const USER_TYPE_OPTIONS = [
+  { id: "study-session", label: "Study session" },
+  { id: "revision", label: "Revision" },
+  { id: "assignment", label: "Assignment" },
+  { id: "personal", label: "Personal" },
+] as const;
+
+export const EXAM_KIND_OPTIONS = [
+  { id: "final", label: "Final exam" },
+  { id: "midterm", label: "Midterm exam" },
+  { id: "other", label: "Other exam" },
+] as const;
 
 export const CALENDAR_VIEWS = [
-  {
-    id: "day",
-    label: "Day",
-    emptyDescription: "An hour-by-hour view of one day's lectures, labs and study sessions.",
-  },
-  {
-    id: "week",
-    label: "Week",
-    emptyDescription: "Your Group A timetable alongside the study sessions you plan for the week.",
-  },
-  {
-    id: "month",
-    label: "Month",
-    emptyDescription: "A month at a glance, with exams and deadlines marked.",
-  },
-  {
-    id: "semester",
-    label: "Semester",
-    emptyDescription: "The whole term in one view, from the first week to the final examinations.",
-  },
+  { id: "day", label: "Day" },
+  { id: "week", label: "Week" },
+  { id: "month", label: "Month" },
+  { id: "semester", label: "Semester" },
 ] as const;

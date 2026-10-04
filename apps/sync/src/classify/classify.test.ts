@@ -208,3 +208,17 @@ describe("folders that cannot be read with confidence", () => {
     expect(result.files).toHaveLength(8);
   });
 });
+
+describe("classifyScan: folders without course material", () => {
+  it("skips the Calendars folder without a warning", () => {
+    const result = classifyScan(
+      scanOf([
+        "Calendars/F2026 - Year 3.pdf",
+        "Calendars/current_frankfurt_medicine.pdf",
+        "Pharma/w1/Lecture.pdf",
+      ]),
+    );
+    expect(result.files.map((file) => file.relativePath)).toEqual(["Pharma/w1/Lecture.pdf"]);
+    expect(result.issues.filter((issue) => issue.path.startsWith("Calendars"))).toEqual([]);
+  });
+});

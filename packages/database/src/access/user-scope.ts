@@ -8,6 +8,7 @@ import {
 import { and, asc, eq, like, sql } from "drizzle-orm";
 
 import type { Database } from "../client";
+import { createCalendarAccess } from "./calendar";
 import { createFlashcardAccess } from "./flashcards";
 import { createMcqAccess } from "./mcq";
 import { createOriginalLectureAccess } from "./original-lectures";
@@ -401,6 +402,9 @@ export function createUserScope(db: Database, userId: string) {
 
     /** The study timer: one open session at a time, active time kept by the server. */
     studySessions: createStudySessionAccess(db, userId),
+
+    /** The calendar: imported university events (notes only), the user's own events and exams. */
+    calendar: createCalendarAccess(db, userId),
 
     resources: {
       /**

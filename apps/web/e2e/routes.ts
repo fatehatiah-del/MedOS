@@ -1,6 +1,7 @@
 /** Every route of the Phase 1 shell with the heading it must show. */
-export const ROUTES = [
-  { path: "/today", heading: "Good afternoon, Test", nav: "Today" },
+export const ROUTES: readonly { path: string; heading: string | RegExp; nav: string }[] = [
+  // Today greets by the real campus time of day.
+  { path: "/today", heading: /^Good (morning|afternoon|evening), Test$/, nav: "Today" },
   { path: "/courses", heading: "Courses", nav: "Courses" },
   { path: "/courses/pharmacology", heading: "Pharmacology I", nav: "Pharmacology" },
   { path: "/calendar", heading: "Calendar", nav: "Calendar" },

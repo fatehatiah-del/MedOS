@@ -36,6 +36,11 @@ export {
   seedFixtureLectures,
 } from "./seed/development";
 export { type SeededSemester, seedSemester } from "./seed/semester";
+export {
+  type CalendarImportResult,
+  importUniversityCalendar,
+  universityCalendarFor,
+} from "./seed/calendar";
 export { type EnsureWorkspaceOptions, ensureWorkspace } from "./seed/workspace";
 export {
   type AnnotationInput,
@@ -96,3 +101,13 @@ export {
   type StudyTimeFilter,
   type StudyTimeSummary,
 } from "./access/study-sessions";
+export {
+  type CalendarItem,
+  type CalendarResult,
+  type EventInput,
+  type ExamInput,
+  type StudiedItem,
+  USER_EVENT_TYPES,
+  type UserEventType,
+} from "./access/calendar";
+export { MAX_EVENT_LOCATION, MAX_EVENT_NOTES, MAX_EVENT_TITLE } from "./limits";
