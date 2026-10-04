@@ -30,7 +30,7 @@ export default async function TodayPage() {
   // Who is asking, and their courses, come from the session. Schedule and plan are still fixtures.
   const { user, semester, scope } = await getWorkspace();
   const courses = (await scope.courses.overview(semester.id)).map(({ course }) => course);
-  const today = await getTodayOverview();
+  const today = await getTodayOverview(scope);
   const summary = summariseToday(today);
   const dateLabel = formatDate(today.date, { weekday: true });
 

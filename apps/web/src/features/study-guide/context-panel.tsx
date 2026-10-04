@@ -4,7 +4,7 @@ import type { AnnotationKind } from "@medos/database";
 import { Progress } from "@medos/ui";
 import { Bookmark, Clock, Highlighter, Pencil, StickyNote, Timer, Trash2 } from "lucide-react";
 import Link from "next/link";
-import { useId } from "react";
+import { type ReactNode, useId } from "react";
 
 import { useReader } from "./reader-context";
 import type { ReaderAnnotation } from "./reader-model";
@@ -133,7 +133,14 @@ function Item({
   );
 }
 
-export function ContextPanel({ onNavigate }: { onNavigate?: () => void }) {
+export function ContextPanel({
+  onNavigate,
+  timer,
+}: {
+  onNavigate?: () => void;
+  /** The study timer for this guide, rendered by the page. */
+  timer?: ReactNode;
+}) {
   const { annotations, progress, lectureHref } = useReader();
   const headingId = useId();
   const atEnd = progress.sectionCount > 0 && progress.percent === 100;
@@ -204,13 +211,15 @@ export function ContextPanel({ onNavigate }: { onNavigate?: () => void }) {
         );
       })}
 
-      <div className="space-y-1.5 rounded-lg border border-dashed border-border-strong px-3 py-2.5">
-        <h3 className="flex items-center gap-1.5 text-[13px] font-medium text-fg-muted">
-          <Timer aria-hidden="true" className="size-4" />
-          Study timer
-        </h3>
-        <p className="text-[12.5px] text-fg-subtle">Arrives in a later phase.</p>
-      </div>
+      {timer ? (
+        <div className="space-y-2">
+          <h3 className="flex items-center gap-1.5 text-[13px] font-medium text-fg-muted">
+            <Timer aria-hidden="true" className="size-4" />
+            Study timer
+          </h3>
+          {timer}
+        </div>
+      ) : null}
     </section>
   );
 }

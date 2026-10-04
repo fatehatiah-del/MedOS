@@ -10,6 +10,7 @@ import { lectureHref, originalLectureHref } from "@/features/courses/progress";
 import { LectureViewer } from "@/features/original-lecture/lecture-viewer";
 import { pageFromQuery } from "@/features/original-lecture/pages";
 import { getWorkspace } from "@/server/workspace";
+import { StartTimerButton } from "@/features/timer/start-timer-button";
 
 interface OriginalLecturePageProps {
   params: Promise<{ courseSlug: string; lectureId: string; resourceId: string }>;
@@ -90,6 +91,11 @@ export default async function OriginalLecturePage({
             </span>
           </p>
         </div>
+        <StartTimerButton
+          activities={["original-lecture"]}
+          lectureId={lecture.id}
+          courseId={course.id}
+        />
         {!original.current ? (
           <Notice tone="warning" icon={<TriangleAlert />} title="The file has changed.">
             Its pages were registered from an earlier version. They are read again on the next sync.

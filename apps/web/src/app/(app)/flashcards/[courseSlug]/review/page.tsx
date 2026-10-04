@@ -12,6 +12,7 @@ import {
 } from "@/features/flashcards/load";
 import { ReviewRunner } from "@/features/flashcards/review-runner";
 import { getWorkspace } from "@/server/workspace";
+import { StartTimerButton } from "@/features/timer/start-timer-button";
 
 interface ReviewPageProps {
   params: Promise<{ courseSlug: string }>;
@@ -59,6 +60,7 @@ export default async function ReviewPage({ params, searchParams }: ReviewPagePro
         <PageHeader
           eyebrow={course.name}
           title={deckName ? `Review: ${deckName}` : `Review ${course.shortName}`}
+          actions={<StartTimerButton activities={["flashcards"]} courseId={course.id} />}
           description={`${queue.due} due · ${Math.min(queue.newAvailable, queue.cards.length - queue.due)} new today (${queue.newIntroducedToday} already introduced)`}
         />
       </div>

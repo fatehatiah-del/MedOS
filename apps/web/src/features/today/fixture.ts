@@ -43,5 +43,6 @@ export const TODAY_FIXTURE: TodayOverview = {
       minutes: 25,
     },
   ],
-  studiedMinutes: 80,
+  // Replaced by the real study time from the study timer (see get-today-overview.ts).
+  studiedMinutes: 0,
 };

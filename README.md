@@ -25,6 +25,7 @@ dashboard.
 | [`docs/question-bank.md`](docs/question-bank.md)           | Question Bank active recall: reveal, rate, record.            |
 | [`docs/flashcards.md`](docs/flashcards.md)                 | Flashcards: decks, Study Guide cards, FSRS review per course. |
 | [`docs/review.md`](docs/review.md)                         | The Review page: notes, highlights, bookmarks, Review Later.  |
+| [`docs/study-timer.md`](docs/study-timer.md)               | Study timer: active time, pauses, one timer, recovery.        |
 | [`docs/authentication.md`](docs/authentication.md)         | Sign-in, sessions and the private boundary.                   |
 | [`docs/google-auth-setup.md`](docs/google-auth-setup.md)   | Manual steps to enable Google sign-in.                        |
 
@@ -45,7 +46,8 @@ dashboard.
 | 10    | Question Bank / active recall              | Complete    |
 | 11    | Flashcards and FSRS                        | Complete    |
 | 12    | Notes, highlights, bookmarks, Review Later | Complete    |
-| 13–22 | See `BUILD_PLAN.md`                        | Not started |
+| 13    | Study timer                                | Complete    |
+| 14–22 | See `BUILD_PLAN.md`                        | Not started |
 
 What exists today:
 
@@ -75,7 +77,10 @@ What exists today:
 - flashcards: decks per course and lecture, cards you write or create from Study Guide text, and
   FSRS review that always stays within one course;
 - the Review page: every note, highlight, bookmark and Review Later item (including MCQ and
-  Question Bank questions) in one place, by course, opening at the exact passage, page or question.
+  Question Bank questions) in one place, by course, opening at the exact passage, page or question;
+- the study timer: one timer at a time, started from the lecture or its material with course,
+  lecture and activity filled in, counting active time only (idle and background time pause it),
+  kept on the server across reloads, with study time on each lecture page and on Today.
 
 Study Guides and lecture PDFs can be read in MedOS, quizzes practised and question banks used
 for active recall, and flashcards reviewed with FSRS. Until you run a sync, lectures are development placeholders when enabled

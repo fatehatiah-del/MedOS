@@ -14,6 +14,7 @@ import { createOriginalLectureAccess } from "./original-lectures";
 import { createQuestionBankAccess } from "./question-bank";
 import { createReviewAccess } from "./review";
 import { createStudyGuideAccess } from "./study-guides";
+import { createStudySessionAccess } from "./study-sessions";
 import { FIXTURE_LECTURE_PREFIX } from "../seed/development";
 import {
   type Course,
@@ -397,6 +398,9 @@ export function createUserScope(db: Database, userId: string) {
 
     /** Review Later on questions, and every annotation of the user in one place. */
     review: createReviewAccess(db, userId),
+
+    /** The study timer: one open session at a time, active time kept by the server. */
+    studySessions: createStudySessionAccess(db, userId),
 
     resources: {
       /**

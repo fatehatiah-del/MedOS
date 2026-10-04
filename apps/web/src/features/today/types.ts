@@ -56,5 +56,6 @@ export interface TodayOverview {
   time: ClockTime;
   schedule: ScheduleEntry[];
   plan: StudyPlanItem[];
+  /** Active timed study today, from the study timer. Real even while the rest is a fixture. */
   studiedMinutes: number;
 }

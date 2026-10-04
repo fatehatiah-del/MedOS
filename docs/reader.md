@@ -111,8 +111,8 @@ its own.
 | Review later | yes                   | yes (toggle)           | a wavy underline              |
 
 **Create flashcard** (since Phase 11) opens a card editor with the selected passage as the answer
-and an empty question for you to write; see [`flashcards.md`](flashcards.md). The **Study timer**
-appears in the panel as a later feature (Phase 13).
+and an empty question for you to write; see [`flashcards.md`](flashcards.md). The panel
+also carries the **Study timer** for this guide; see [`study-timer.md`](study-timer.md).
 
 Selecting text in one paragraph, list item, table cell, flow step, caption or heading opens the
 toolbar above it (at the bottom of the screen on touch devices). A selection that spills a little
@@ -215,4 +215,4 @@ Automated tests never use real course material.
 - MCQ and Question Bank practice (Phases 9 and 10).
 - Flashcards were added in Phase 11 ([`flashcards.md`](flashcards.md)).
 - Global annotation pages and cross-guide management (Phase 12).
-- Study timer (Phase 13). Search (Phase 17).
+- Search (Phase 17).

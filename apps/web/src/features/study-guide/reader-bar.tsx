@@ -2,7 +2,7 @@
 
 import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@medos/ui";
 import { ListTree, PanelRight } from "lucide-react";
-import { useRef, useState } from "react";
+import { type ReactNode, useRef, useState } from "react";
 
 import { ContextPanel } from "./context-panel";
 import { ReaderToc } from "./reader-toc";
@@ -18,7 +18,7 @@ import type { TocEntry } from "./structure";
 const BUTTON =
   "inline-flex h-9 items-center gap-2 rounded-lg border border-border-strong bg-surface px-3 text-[13px] font-medium text-fg shadow-xs hover:bg-subtle";
 
-export function ReaderBar({ toc }: { toc: readonly TocEntry[] }) {
+export function ReaderBar({ toc, timer }: { toc: readonly TocEntry[]; timer?: ReactNode }) {
   const [contentsOpen, setContentsOpen] = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
   // A section chosen in the drawer; focus moves there once the drawer has closed.
@@ -68,7 +68,7 @@ export function ReaderBar({ toc }: { toc: readonly TocEntry[] }) {
             Your reading progress, bookmarks, notes, Review Later items and highlights in this Study
             Guide.
           </DialogDescription>
-          <ContextPanel onNavigate={() => setPanelOpen(false)} />
+          <ContextPanel onNavigate={() => setPanelOpen(false)} timer={timer} />
         </DialogContent>
       </Dialog>
     </div>

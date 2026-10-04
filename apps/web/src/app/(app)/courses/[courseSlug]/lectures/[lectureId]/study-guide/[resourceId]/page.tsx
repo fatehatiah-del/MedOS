@@ -20,6 +20,7 @@ import { ReaderToc } from "@/features/study-guide/reader-toc";
 import { SectionActions } from "@/features/study-guide/section-actions";
 import { SelectionToolbar } from "@/features/study-guide/selection-toolbar";
 import { buildToc, headingLabel } from "@/features/study-guide/structure";
+import { StartTimerButton } from "@/features/timer/start-timer-button";
 import { getWorkspace } from "@/server/workspace";
 
 interface StudyGuidePageProps {
@@ -70,6 +71,9 @@ export default async function StudyGuidePage({ params }: StudyGuidePageProps) {
   const toc = buildToc(document);
   const lecturePage = lectureHref(course.slug, lecture.id);
   const context = { resourceId, marks: reader.marks };
+  const timer = (
+    <StartTimerButton activities={["study-guide"]} lectureId={lecture.id} courseId={course.id} />
+  );
 
   return (
     // `data-layout="wide"` lets the workspace grow beyond its usual width for the three columns.
@@ -148,7 +152,7 @@ export default async function StudyGuidePage({ params }: StudyGuidePageProps) {
         annotations={reader.list}
         initialProgress={progressSnapshot(progress ?? emptyProgress(document.sections.length))}
       >
-        <ReaderBar toc={toc} />
+        <ReaderBar toc={toc} timer={timer} />
         <div className="grid gap-7 @min-[48rem]:grid-cols-[12rem_minmax(0,1fr)] @min-[63rem]:grid-cols-[11.5rem_minmax(0,1fr)_15rem]">
           <div className="hidden @min-[48rem]:block">
             <div className="sticky top-20 max-h-[calc(100dvh-6rem)] overflow-y-auto pr-1 pb-6">
@@ -200,7 +204,7 @@ export default async function StudyGuidePage({ params }: StudyGuidePageProps) {
 
           <div className="hidden @min-[63rem]:block">
             <div className="sticky top-20 max-h-[calc(100dvh-6rem)] overflow-y-auto pb-6">
-              <ContextPanel />
+              <ContextPanel timer={timer} />
             </div>
           </div>
         </div>

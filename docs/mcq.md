@@ -78,8 +78,8 @@ was flagged, and when.
 - Both tables are owned like every study-data table (`user_id`, composite foreign keys, `ON
 DELETE RESTRICT`). Another user's quiz or session behaves exactly like one that does not exist.
 
-Practising never changes lecture completion. The study timer (`study_sessions`) is Phase 13 and is
-not used here.
+Practising never changes lecture completion. A session page offers the study timer (activity
+MCQ); see [`study-timer.md`](study-timer.md).
 
 ## Tests
 

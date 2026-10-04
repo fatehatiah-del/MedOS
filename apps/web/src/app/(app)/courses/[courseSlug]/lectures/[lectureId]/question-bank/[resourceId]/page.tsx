@@ -16,6 +16,7 @@ import {
 } from "@/features/question-bank/recall";
 import { RecallRunner } from "@/features/question-bank/recall-runner";
 import { getWorkspace } from "@/server/workspace";
+import { StartTimerButton } from "@/features/timer/start-timer-button";
 
 interface QuestionBankPageProps {
   params: Promise<{ courseSlug: string; lectureId: string; resourceId: string }>;
@@ -97,6 +98,11 @@ export default async function QuestionBankPracticePage({
         <p className="text-[12.5px] text-fg-subtle">
           From {bank.originalFilename} · {bank.bank.items.length} questions · {practised} practised
         </p>
+        <StartTimerButton
+          activities={["question-bank"]}
+          lectureId={lecture.id}
+          courseId={course.id}
+        />
         {!bank.current ? (
           <Notice tone="warning" icon={<TriangleAlert />} title="The file has changed.">
             These questions were read from an earlier version of the file. They are read again on

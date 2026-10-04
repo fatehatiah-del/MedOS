@@ -2,6 +2,7 @@ import { CURRENT_SEMESTER } from "@medos/shared";
 
 import { ThemeMenu } from "@/components/theme/theme-menu";
 import type { NavCourse } from "@/config/navigation";
+import { TimerPill } from "@/features/timer/timer-pill";
 import { getCurrentUser } from "@/server/session";
 
 import { AccountMenu } from "./account-menu";
@@ -23,6 +24,7 @@ export async function TopBar({ courses }: { courses: readonly NavCourse[] }) {
       <div className="ml-auto flex items-center gap-2 lg:ml-0 lg:flex-1 lg:justify-between">
         <SearchTrigger />
         <div className="flex items-center gap-2">
+          {user ? <TimerPill /> : null}
           <p className="mr-1 hidden text-[13px] text-fg-subtle md:block">
             {CURRENT_SEMESTER.label} · {CURRENT_SEMESTER.name}
           </p>

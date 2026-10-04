@@ -126,4 +126,5 @@ Later item per page.
 - Clickable slide references in Study Guides (prepared above).
 - Searching inside the PDF, highlighting or annotating PDF text.
 - PowerPoint or other slide formats (not parsed).
-- Global annotation pages (Phase 12), the study timer (Phase 13).
+- Global annotation pages (Phase 12). The viewer offers the study timer (activity Original
+  lecture); see [`study-timer.md`](study-timer.md).

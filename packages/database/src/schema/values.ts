@@ -76,6 +76,7 @@ export type ExamKind = (typeof EXAM_KINDS)[number];
 
 export const STUDY_ACTIVITIES = [
   "study-guide",
+  "original-lecture",
   "mcq",
   "question-bank",
   "flashcards",
@@ -83,6 +84,13 @@ export const STUDY_ACTIVITIES = [
   "other",
 ] as const;
 export type StudyActivity = (typeof STUDY_ACTIVITIES)[number];
+
+/**
+ * Why a study session is paused: by the user, or automatically after a stretch
+ * without input, or while the tab was hidden.
+ */
+export const STUDY_PAUSE_REASONS = ["manual", "idle", "hidden"] as const;
+export type StudyPauseReason = (typeof STUDY_PAUSE_REASONS)[number];
 
 /** What a user can attach to a passage or section of a study guide. */
 export const ANNOTATION_KINDS = ["highlight", "note", "bookmark", "review-later"] as const;

@@ -39,7 +39,7 @@ guides, questions, flashcards, annotations and plans are added by their own phas
 | `flashcard_reviews`            | One rating of one card, with the schedule before and after (Phase 11).        |
 | `question_review_items`        | An MCQ or Question Bank question marked Review Later (Phase 12).              |
 | `lecture_progress`             | The user's state for a lecture, including manual completion.                  |
-| `study_sessions`               | A timed stretch of study.                                                     |
+| `study_sessions`               | A timed stretch of study: active time, pauses, last activity (Phase 13).      |
 | `calendar_events`              | Anything scheduled: timetable entries, exams, holidays, study sessions.       |
 | `exam_events`                  | Exam detail attached to a calendar event.                                     |
 | `course_progress`              | _View._ Lectures and completed lectures per course.                           |
@@ -113,6 +113,7 @@ asserts that these two are the only ones.
 | `study_guide_annotations` (partial)    | The same highlight, bookmark or Review Later item twice on one place (notes may repeat). |
 | `lecture_progress (lecture_id)`        | More than one progress row per lecture.                                                  |
 | `exam_events (calendar_event_id)`      | More than one exam detail per event.                                                     |
+| `study_sessions (user_id)` (partial)   | Two open study timers for one user (Phase 13; see [`study-timer.md`](study-timer.md)).   |
 
 **Checks.** Date ranges are ordered; exam periods are either complete or absent; week and lecture
 numbers start at 1; sizes and durations are not negative; content hashes are SHA-256 hex; sync
@@ -177,7 +178,6 @@ weeks at all. See [`academic-hierarchy.md`](academic-hierarchy.md).
 - **Resource versions.** When a source file changes, how the previous original is kept alongside
   the new one is decided with the sync tool (Phase 5). The current schema allows several resources
   per lecture and never overwrites a row's file identity.
-- **One open study session per user** is a timer rule (Phase 13) and is not constrained yet.
 - **Row-level security.** Ownership is enforced by constraints and by the user-scoped data access
   layer. Database-level policies are not used.
 - **Sync corrections screen.** The manifest (`sync_files`) has override columns

@@ -17,6 +17,7 @@ import {
   toClientQuestion,
 } from "@/features/mcq/views";
 import { getWorkspace } from "@/server/workspace";
+import { StartTimerButton } from "@/features/timer/start-timer-button";
 
 interface SessionPageProps {
   params: Promise<{ courseSlug: string; lectureId: string; resourceId: string; sessionId: string }>;
@@ -78,6 +79,7 @@ export default async function McqSessionPage({ params }: SessionPageProps) {
         <h1 className="font-serif text-[1.5rem] leading-tight font-semibold text-fg sm:text-[1.75rem]">
           {quiz.set.title ?? quiz.originalFilename} · {modeLabel}
         </h1>
+        <StartTimerButton activities={["mcq"]} lectureId={lecture.id} courseId={course.id} />
         {questions.length < session.questions.length ? (
           <Notice tone="warning" title="Some questions are no longer in the quiz.">
             The file was imported again and {session.questions.length - questions.length}{" "}

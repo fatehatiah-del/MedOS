@@ -9,13 +9,14 @@ import {
   text,
   timestamp,
   unique,
+  uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
 
 import { courses, lectures } from "./academic";
 import { id, oneOf, timestamps } from "./columns";
 import { ownerId } from "./users";
-import { STUDY_ACTIVITIES } from "./values";
+import { STUDY_ACTIVITIES, STUDY_PAUSE_REASONS } from "./values";
 
 /**
  * The user's state for one lecture.
@@ -45,7 +46,13 @@ export const lectureProgress = pgTable(
 
 /**
  * One timed stretch of study. `ended_at` is empty while the session is open.
- * `active_seconds` counts only active time, so pauses are excluded.
+ *
+ * Time is kept by the server. `active_seconds` holds the active time of every
+ * stretch already closed; while the timer runs, `running_since` marks when the
+ * current stretch began. It is empty while paused or finished, so paused time
+ * is never counted. `last_active_at` is the last moment the user was seen
+ * studying (start, resume, heartbeat): a stretch whose browser went away is
+ * counted only up to it. A user has at most one open session.
  */
 export const studySessions = pgTable(
   "study_sessions",
@@ -58,6 +65,9 @@ export const studySessions = pgTable(
     startedAt: timestamp("started_at", { withTimezone: true }).notNull(),
     endedAt: timestamp("ended_at", { withTimezone: true }),
     activeSeconds: integer("active_seconds").notNull().default(0),
+    runningSince: timestamp("running_since", { withTimezone: true }),
+    lastActiveAt: timestamp("last_active_at", { withTimezone: true }).notNull().defaultNow(),
+    pausedReason: text("paused_reason", { enum: STUDY_PAUSE_REASONS }),
     ...timestamps,
   },
   (table) => [
@@ -75,7 +85,24 @@ export const studySessions = pgTable(
     index("study_sessions_user_started_idx").on(table.userId, table.startedAt),
     index("study_sessions_course_idx").on(table.courseId),
     index("study_sessions_lecture_idx").on(table.lectureId),
+    // No two timers at once.
+    uniqueIndex("study_sessions_one_open_idx")
+      .on(table.userId)
+      .where(sql`${table.endedAt} is null`),
     check("study_sessions_activity_valid", oneOf(table.activity, STUDY_ACTIVITIES)),
+    check(
+      "study_sessions_paused_reason_valid",
+      sql`${table.pausedReason} is null or ${oneOf(table.pausedReason, STUDY_PAUSE_REASONS)}`,
+    ),
+    // A finished session is not running, and a running one has no pause reason.
+    check(
+      "study_sessions_running_state",
+      sql`(${table.endedAt} is null or ${table.runningSince} is null) and (${table.runningSince} is null or ${table.pausedReason} is null)`,
+    ),
+    check(
+      "study_sessions_running_order",
+      sql`${table.runningSince} is null or ${table.runningSince} >= ${table.startedAt}`,
+    ),
     check("study_sessions_active_not_negative", sql`${table.activeSeconds} >= 0`),
     check(
       "study_sessions_time_order",

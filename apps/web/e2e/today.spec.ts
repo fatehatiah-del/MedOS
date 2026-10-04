@@ -62,9 +62,10 @@ test.describe("Today", () => {
     await expect(plan).toContainText("Week 1 — Pharmacodynamics I");
     await expect(plan).toContainText("1h 40m planned");
 
+    // Study time is real (the study timer), not part of the fixture; this account has none.
     const progress = page.getByRole("progressbar", { name: "Study time today" });
-    await expect(progress).toHaveAttribute("aria-valuenow", "53");
-    await expect(progress).toHaveAttribute("aria-valuetext", "1h 20m of 2h 30m");
+    await expect(progress).toHaveAttribute("aria-valuenow", "0");
+    await expect(progress).toHaveAttribute("aria-valuetext", "0m of 2h 30m");
 
     const exams = page.getByRole("region", { name: "Exam periods" });
     await expect(exams).toContainText("12–18 November 2026");
