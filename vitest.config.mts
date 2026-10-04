@@ -17,6 +17,13 @@ export default defineConfig({
       },
       {
         test: {
+          name: "ai",
+          environment: "node",
+          include: ["packages/ai/src/**/*.test.ts"],
+        },
+      },
+      {
+        test: {
           name: "study-engine",
           environment: "node",
           include: ["packages/study-engine/src/**/*.test.ts"],

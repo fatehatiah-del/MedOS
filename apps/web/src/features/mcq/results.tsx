@@ -111,12 +111,14 @@ export function ResultsView({
   resourceId,
   modeLabel,
   reviewLater,
+  aiConfigured,
 }: {
   results: Results;
   resourceId: string;
   modeLabel: string;
   /** Keys of the questions marked Review Later. */
   reviewLater: readonly string[];
+  aiConfigured: boolean;
 }) {
   return (
     <div className="space-y-8">
@@ -196,6 +198,7 @@ export function ResultsView({
                 })}
               </ul>
               <FeedbackPanel
+                aiConfigured={aiConfigured}
                 question={item.question}
                 feedback={item.feedback}
                 selected={item.selected}

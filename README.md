@@ -31,6 +31,7 @@ dashboard.
 | [`docs/statistics.md`](docs/statistics.md)                 | Statistics and weak spots: measures, rules, evidence.         |
 | [`docs/search.md`](docs/search.md)                         | Search: what it covers, matching, the index.                  |
 | [`docs/progress.md`](docs/progress.md)                     | Progress: streak, weekly target, counts. No badges.           |
+| [`docs/ai.md`](docs/ai.md)                                 | AI-ready interfaces: the provider, the features, adding one.  |
 | [`docs/authentication.md`](docs/authentication.md)         | Sign-in, sessions and the private boundary.                   |
 | [`docs/google-auth-setup.md`](docs/google-auth-setup.md)   | Manual steps to enable Google sign-in.                        |
 
@@ -57,7 +58,8 @@ dashboard.
 | 16    | Weakness engine and analytics              | Complete    |
 | 17    | Search                                     | Complete    |
 | 18    | Gamification (restrained progress)         | Complete    |
-| 19–22 | See `BUILD_PLAN.md`                        | Not started |
+| 19    | AI-ready interfaces (no AI)                | Complete    |
+| 20–22 | See `BUILD_PLAN.md`                        | Not started |
 
 What exists today:
 

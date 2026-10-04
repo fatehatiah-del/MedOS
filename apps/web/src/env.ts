@@ -1,3 +1,4 @@
+import { AI_PROVIDER_NAMES } from "@medos/ai";
 import { z } from "zod";
 
 /**
@@ -9,8 +10,8 @@ import { z } from "zod";
  */
 const envSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
-  /** AI is optional. "none" is the only provider until one is implemented. */
-  AI_PROVIDER: z.enum(["none"]).default("none"),
+  /** AI is optional. "none" is the only provider until one is implemented (see @medos/ai). */
+  AI_PROVIDER: z.enum(AI_PROVIDER_NAMES).default("none"),
   /** Public base URL of the deployment. */
   APP_URL: z.url().optional(),
   /**

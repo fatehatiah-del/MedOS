@@ -1,3 +1,4 @@
+import { AI_FEATURES, AI_FEATURE_IDS } from "@medos/ai";
 import { CURRENT_SEMESTER, DEFAULT_STUDY_AVAILABILITY } from "@medos/shared";
 import { Badge, Button, Field, Input, PageHeader, fieldHintId } from "@medos/ui";
 import type { Metadata } from "next";
@@ -5,19 +6,12 @@ import { type ReactNode, useId } from "react";
 
 import { ThemeSetting } from "@/components/theme/theme-setting";
 import { env } from "@/env";
+import { aiConfigured } from "@/server/ai";
 import { SignOutButton } from "@/features/auth/sign-out-button";
 import { ShortcutsDialog } from "@/features/settings/shortcuts-dialog";
 import { requireUser } from "@/server/session";
 
 export const metadata: Metadata = { title: "Settings" };
-
-const AI_FEATURES = [
-  "Ask MedOS",
-  "Explain This",
-  "Generate Flashcards",
-  "Generate USMLE Questions",
-  "Generate Study Guide",
-] as const;
 
 const EXPORT_FORMATS = ["JSON", "CSV", "Markdown"] as const;
 
@@ -155,22 +149,27 @@ export default async function SettingsPage() {
         <SettingsSection
           title="AI provider"
           description="Optional. MedOS works fully without AI, and AI content is always labelled as such."
-          status={<Badge tone="outline">AI provider not configured</Badge>}
+          status={
+            <Badge tone="outline">
+              {aiConfigured() ? "AI provider configured" : "AI provider not configured"}
+            </Badge>
+          }
         >
           <p className="text-sm text-fg-muted">
             Provider: <span className="font-medium text-fg">{env.AI_PROVIDER}</span>
           </p>
           <ul aria-label="AI features, unavailable" className="mt-4 flex flex-wrap gap-2">
-            {AI_FEATURES.map((feature) => (
+            {AI_FEATURE_IDS.map((feature) => (
               <li key={feature}>
                 <Button size="sm" disabled>
-                  {feature}
+                  {AI_FEATURES[feature].label}
                 </Button>
               </li>
             ))}
           </ul>
           <p className="mt-3 text-xs text-fg-subtle">
-            Coming soon. Disabled until a provider is set.
+            Not available: no AI provider is configured (AI_PROVIDER=none). Each feature appears
+            where it would be used, marked &ldquo;Not configured&rdquo;. MedOS makes no AI requests.
           </p>
         </SettingsSection>
 

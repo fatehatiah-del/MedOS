@@ -115,6 +115,8 @@ test.describe("Study Plan: the user's own plan", () => {
   test("changes the study time and shows the plan on Today", async ({ page }) => {
     await signUp(page, uniqueUser("plan-time"));
     await page.goto("/study-plan");
+    // Whatever the day suggests (it depends on the date), only the item added below counts here.
+    await clearSuggestions(page);
     await page.getByLabel("Weekdays (hours)").fill("1");
     await page.getByLabel("Weekends (hours)").fill("2");
     await page.getByRole("button", { name: "Save study time" }).click();

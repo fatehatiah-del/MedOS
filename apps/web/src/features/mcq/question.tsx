@@ -2,6 +2,7 @@ import { cn } from "@medos/ui";
 import { Check, CircleHelp, X } from "lucide-react";
 import type { ReactNode } from "react";
 
+import { AIAction } from "@/features/ai/ai-action";
 import { InlineContent, mediaSrc } from "@/features/study-guide/content";
 import { FigureImage } from "@/features/study-guide/figure-image";
 
@@ -132,11 +133,14 @@ export function FeedbackPanel({
   feedback,
   selected,
   resourceId,
+  aiConfigured,
 }: {
   question: ClientQuestion;
   feedback: Feedback;
   selected: number | null;
   resourceId: string;
+  /** Show "Explain this" (an AI feature), available only with a provider. */
+  aiConfigured?: boolean;
 }) {
   const correctLabel =
     feedback.correctIndex !== null ? question.options[feedback.correctIndex]?.label : null;
@@ -197,6 +201,13 @@ export function FeedbackPanel({
           </ul>
         </div>
       ) : null}
+      {aiConfigured === undefined ? null : (
+        <AIAction
+          feature="explain-this"
+          configured={aiConfigured}
+          context={{ resourceId, questionKey: question.key }}
+        />
+      )}
       {feedback.revealImage ? (
         <div className="max-w-xl">
           <FigureImage

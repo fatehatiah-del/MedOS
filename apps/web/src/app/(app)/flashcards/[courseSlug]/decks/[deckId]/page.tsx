@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { Breadcrumbs } from "@/components/breadcrumbs";
+import { AIAction } from "@/features/ai/ai-action";
 import { lectureHref } from "@/features/courses/progress";
 import { AddCard, CardList } from "@/features/flashcards/deck-manager";
 import {
@@ -13,6 +14,7 @@ import {
   sourceHrefs,
   toDeckCard,
 } from "@/features/flashcards/load";
+import { aiConfigured } from "@/server/ai";
 import { getWorkspace } from "@/server/workspace";
 
 interface DeckPageProps {
@@ -83,6 +85,11 @@ export default async function DeckPage({ params }: DeckPageProps) {
 
       <Section title="Add a card">
         <AddCard deckId={deck.deck.id} />
+        <AIAction
+          feature="generate-flashcards"
+          configured={aiConfigured()}
+          context={{ deckId: deck.deck.id }}
+        />
       </Section>
 
       <Section title={`Cards (${cards.length})`}>

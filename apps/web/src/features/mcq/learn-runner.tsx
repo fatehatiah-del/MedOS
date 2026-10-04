@@ -28,6 +28,7 @@ export function LearnRunner({
   questions,
   answered: initiallyAnswered,
   reviewLater,
+  aiConfigured,
 }: {
   sessionId: string;
   resourceId: string;
@@ -35,6 +36,7 @@ export function LearnRunner({
   answered: Record<string, AnsweredQuestion>;
   /** Keys of the questions marked Review Later. */
   reviewLater: readonly string[];
+  aiConfigured: boolean;
 }) {
   const router = useRouter();
   const [answered, setAnswered] = useState(initiallyAnswered);
@@ -167,6 +169,7 @@ export function LearnRunner({
         <div aria-live="polite">
           {result ? (
             <FeedbackPanel
+              aiConfigured={aiConfigured}
               question={question}
               feedback={result.feedback}
               selected={result.selected}

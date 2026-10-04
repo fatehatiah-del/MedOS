@@ -16,6 +16,7 @@ import {
   sessionQuestions,
   toClientQuestion,
 } from "@/features/mcq/views";
+import { aiConfigured } from "@/server/ai";
 import { getWorkspace } from "@/server/workspace";
 import { StartTimerButton } from "@/features/timer/start-timer-button";
 
@@ -103,6 +104,7 @@ export default async function McqSessionPage({ params }: SessionPageProps) {
             resourceId={resourceId}
             modeLabel={modeLabel}
             reviewLater={reviewLater}
+            aiConfigured={aiConfigured()}
           />
           <Link
             href={quizHref}
@@ -113,6 +115,7 @@ export default async function McqSessionPage({ params }: SessionPageProps) {
         </>
       ) : session.mode === "learn" ? (
         <LearnRunner
+          aiConfigured={aiConfigured()}
           sessionId={session.id}
           resourceId={resourceId}
           questions={questions.map(toClientQuestion)}

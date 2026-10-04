@@ -34,6 +34,8 @@ import { CompletionControl } from "@/features/lectures/completion-control";
 import { materialState } from "@/features/resources/processing";
 import { LecturePerformance } from "@/features/statistics/lecture-performance";
 import { StudyTimeSection } from "@/features/timer/study-time-section";
+import { AIAction } from "@/features/ai/ai-action";
+import { aiConfigured } from "@/server/ai";
 import { getWorkspace } from "@/server/workspace";
 
 interface LecturePageProps {
@@ -268,6 +270,25 @@ export default async function LecturePage({ params }: LecturePageProps) {
           MedOS content by the sync. Study Guides open in the reader, lecture PDFs in the viewer,
           quizzes in MCQ practice and question banks in active recall. Reading and practising never
           mark the lecture complete.
+        </p>
+      </Section>
+
+      <Section title="AI assistance">
+        <div className="flex flex-wrap items-start gap-3">
+          <AIAction
+            feature="ask-medos"
+            configured={aiConfigured()}
+            context={{ lectureId: lecture.id }}
+          />
+          <AIAction
+            feature="generate-study-guide"
+            configured={aiConfigured()}
+            context={{ lectureId: lecture.id }}
+          />
+        </div>
+        <p className="text-xs leading-relaxed text-fg-subtle">
+          Optional. Anything AI writes is always labelled as AI-generated and kept apart from your
+          lecture material, which stays the source of truth.
         </p>
       </Section>
 

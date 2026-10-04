@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   // Workspace packages ship TypeScript source and are compiled by the app.
   transpilePackages: [
+    "@medos/ai",
     "@medos/database",
     "@medos/fsrs",
     "@medos/parsers",

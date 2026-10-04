@@ -13,6 +13,8 @@ import { DiscardButton } from "@/features/mcq/discard-button";
 import { MODE_LABELS, isUsmleQuestion, quizTopics } from "@/features/mcq/selection";
 import { StartForm } from "@/features/mcq/start-form";
 import { buildResults } from "@/features/mcq/views";
+import { AIAction } from "@/features/ai/ai-action";
+import { aiConfigured } from "@/server/ai";
 import { getWorkspace } from "@/server/workspace";
 
 interface McqPageProps {
@@ -107,6 +109,11 @@ export default async function McqPage({ params }: McqPageProps) {
           usmleCount={quiz.set.questions.filter(isUsmleQuestion).length}
           topics={quizTopics(quiz.set)}
           sessionHref={`${base}/session/SESSION`}
+        />
+        <AIAction
+          feature="generate-usmle-questions"
+          configured={aiConfigured()}
+          context={{ lectureId: lecture.id, resourceId }}
         />
       </Section>
 
