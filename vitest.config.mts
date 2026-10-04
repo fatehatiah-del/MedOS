@@ -17,6 +17,13 @@ export default defineConfig({
       },
       {
         test: {
+          name: "study-engine",
+          environment: "node",
+          include: ["packages/study-engine/src/**/*.test.ts"],
+        },
+      },
+      {
+        test: {
           name: "fsrs",
           environment: "node",
           include: ["packages/fsrs/src/**/*.test.ts"],

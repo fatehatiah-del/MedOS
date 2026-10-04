@@ -49,7 +49,8 @@ test.describe("Today", () => {
     const week = semesterWeekFor(today);
     const dateLabel = formatDate(today, { weekday: true });
     await expect(page.getByText(week ? `${dateLabel} · Week ${week}` : dateLabel)).toBeVisible();
-    await expect(page.getByRole("note")).toContainText("Development preview");
+    // Everything on Today is the user's own data now: no development notice.
+    await expect(page.getByText("Development preview")).toHaveCount(0);
 
     const regions = page.getByRole("region");
     await expect(regions).toHaveCount(6);
@@ -93,7 +94,7 @@ test.describe("Today", () => {
     }
   });
 
-  test("shows the real schedule, the sample plan and progress", async ({ page }) => {
+  test("shows the real schedule, the plan and progress", async ({ page }) => {
     await page.goto("/today");
 
     const schedule = page.getByRole("region", { name: "Today's university schedule" });
@@ -110,10 +111,9 @@ test.describe("Today", () => {
       }
     }
 
+    // The real plan, suggested from this account's own study (its contents are tested on the Study Plan).
     const plan = page.getByRole("region", { name: "Recommended study plan" });
-    await expect(plan.getByRole("listitem")).toHaveCount(3);
-    await expect(plan).toContainText("Week 1 — Pharmacodynamics I");
-    await expect(plan).toContainText("1h 40m planned");
+    await expect(plan.getByRole("link", { name: "Open the Study Plan" })).toBeVisible();
 
     // Study time is real (the study timer), not part of the fixture; this account has none.
     const progress = page.getByRole("progressbar", { name: "Study time today" });

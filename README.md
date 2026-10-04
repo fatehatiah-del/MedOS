@@ -27,6 +27,7 @@ dashboard.
 | [`docs/review.md`](docs/review.md)                         | The Review page: notes, highlights, bookmarks, Review Later.  |
 | [`docs/study-timer.md`](docs/study-timer.md)               | Study timer: active time, pauses, one timer, recovery.        |
 | [`docs/calendar.md`](docs/calendar.md)                     | Calendar: Group A timetable, academic dates, exams, views.    |
+| [`docs/study-planner.md`](docs/study-planner.md)           | Study planner: signals, the formula, editing your plan.       |
 | [`docs/authentication.md`](docs/authentication.md)         | Sign-in, sessions and the private boundary.                   |
 | [`docs/google-auth-setup.md`](docs/google-auth-setup.md)   | Manual steps to enable Google sign-in.                        |
 
@@ -49,7 +50,8 @@ dashboard.
 | 12    | Notes, highlights, bookmarks, Review Later | Complete    |
 | 13    | Study timer                                | Complete    |
 | 14    | Calendar and academic schedule             | Complete    |
-| 15–22 | See `BUILD_PLAN.md`                        | Not started |
+| 15    | Study planner                              | Complete    |
+| 16–22 | See `BUILD_PLAN.md`                        | Not started |
 
 What exists today:
 
@@ -85,12 +87,14 @@ What exists today:
   kept on the server across reloads, with study time on each lecture page and on Today;
 - the calendar: the Group A timetable and the academic calendar (holidays, deadlines, midterm and
   final periods) in Day, Week, Month and Semester views, course exams added by hand, your own
-  events, notes on timetable events, and the real schedule on Today.
+  events, notes on timetable events, and the real schedule on Today;
+- the study planner: a daily plan suggested from your lectures, flashcards, weak topics, recall
+  ratings, Review Later items and exams by a transparent formula, fitted to your study time, and
+  then entirely yours to reorder, resize, postpone, add to or clear.
 
 Study Guides and lecture PDFs can be read in MedOS, quizzes practised and question banks used
 for active recall, and flashcards reviewed with FSRS. Until you run a sync, lectures are development placeholders when enabled
-(see [`docs/academic-hierarchy.md`](docs/academic-hierarchy.md)). The Today screen's
-study plan is a clearly labelled sample until the study planner (Phase 15). There is **no AI** (by design,
+(see [`docs/academic-hierarchy.md`](docs/academic-hierarchy.md)). There is **no AI** (by design,
 until a provider is configured).
 
 ### Checkpoints

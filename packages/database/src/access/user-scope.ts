@@ -11,6 +11,7 @@ import type { Database } from "../client";
 import { createCalendarAccess } from "./calendar";
 import { createFlashcardAccess } from "./flashcards";
 import { createMcqAccess } from "./mcq";
+import { createPlannerAccess } from "./planner";
 import { createOriginalLectureAccess } from "./original-lectures";
 import { createQuestionBankAccess } from "./question-bank";
 import { createReviewAccess } from "./review";
@@ -405,6 +406,9 @@ export function createUserScope(db: Database, userId: string) {
 
     /** The calendar: imported university events (notes only), the user's own events and exams. */
     calendar: createCalendarAccess(db, userId),
+
+    /** The study planner: daily plans the user owns, suggested from their study signals. */
+    planner: createPlannerAccess(db, userId),
 
     resources: {
       /**

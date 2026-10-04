@@ -5,6 +5,7 @@ export * from "./content";
 export * from "./flashcards";
 export * from "./lecture-viewer";
 export * from "./mcq";
+export * from "./planner";
 export * from "./progress";
 export * from "./question-bank";
 export * from "./reading";

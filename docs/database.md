@@ -41,6 +41,9 @@ guides, questions, flashcards, annotations and plans are added by their own phas
 | `lecture_progress`             | The user's state for a lecture, including manual completion.                  |
 | `study_sessions`               | A timed stretch of study: active time, pauses, last activity (Phase 13).      |
 | `calendar_events`              | Anything scheduled: timetable entries, exams, holidays, study sessions.       |
+| `user_settings`                | The user's own settings, such as study time per day (Phase 15).               |
+| `daily_plans`                  | One day's study plan; suggested once, then the user's (Phase 15).             |
+| `daily_plan_items`             | A block of a day's plan, with its reasons, order, duration and status.        |
 | `exam_events`                  | Exam detail attached to a calendar event.                                     |
 | `course_progress`              | _View._ Lectures and completed lectures per course.                           |
 

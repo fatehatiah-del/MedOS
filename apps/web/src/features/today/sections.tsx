@@ -7,12 +7,9 @@ import { CourseMark } from "@/components/course-mark";
 import { type NavCourse, courseHref } from "@/config/navigation";
 
 import { type ExamPeriodSummary, describePeriodStatus } from "./summary";
-import {
-  SCHEDULE_KIND_LABELS,
-  STUDY_ACTIVITY_LABELS,
-  type ScheduleEntry,
-  type StudyPlanItem,
-} from "./types";
+import { ACTIVITY_LABELS } from "@/features/timer/clock";
+
+import { SCHEDULE_KIND_LABELS, type ScheduleEntry, type StudyPlanItem } from "./types";
 
 interface SectionProps {
   className?: string;
@@ -87,13 +84,12 @@ export function PlanSection({
           <EmptyState
             size="compact"
             title="Nothing planned"
-            description="Recommended study blocks for today appear here."
+            description="Nothing to suggest from your study so far. Add your own items on the Study Plan."
           />
         ) : (
           <ol className="divide-y divide-border">
             {plan.map((item, index) => {
-              const course = getCourse(item.courseId);
-              const activity = STUDY_ACTIVITY_LABELS[item.activity];
+              const activity = ACTIVITY_LABELS[item.activity];
               return (
                 <li key={item.id} className="flex items-center gap-4 px-5 py-4">
                   <span
@@ -103,20 +99,27 @@ export function PlanSection({
                     {index + 1}
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="flex items-center gap-2.5 text-[15px] font-medium text-fg">
-                      <CourseMark token={course.id} />
-                      <span className="truncate">{course.shortName}</span>
+                    <p
+                      className={cn(
+                        "flex items-center gap-2.5 text-[15px] font-medium text-fg",
+                        item.done && "text-fg-muted line-through",
+                      )}
+                    >
+                      {item.courseToken ? <CourseMark token={item.courseToken} /> : null}
+                      <span className="truncate">{item.title}</span>
+                      {item.done ? <span className="sr-only">(done)</span> : null}
                     </p>
                     {/* On narrow screens the activity joins this line instead of a badge. */}
                     <p
                       className={cn(
-                        "mt-0.5 truncate pl-5 text-[13px] text-fg-muted",
-                        !item.detail && "sm:hidden",
+                        "mt-0.5 truncate text-[13px] text-fg-muted",
+                        item.courseToken && "pl-5",
+                        !item.courseName && "sm:hidden",
                       )}
                     >
-                      {item.detail}
+                      {item.courseName}
                       <span className="sm:hidden">
-                        {item.detail ? " · " : null}
+                        {item.courseName ? " · " : null}
                         {activity}
                       </span>
                     </p>
@@ -131,8 +134,10 @@ export function PlanSection({
           </ol>
         )}
         <p className="border-t border-border px-5 py-3 text-xs leading-relaxed text-fg-subtle">
-          The plan will be yours to reorder, resize, postpone or replace once the Study Planner is
-          built.
+          <Link href="/study-plan" className="font-medium text-accent hover:underline">
+            Open the Study Plan
+          </Link>{" "}
+          to reorder, resize, postpone, add to or replace it, and to see why each item is there.
         </p>
       </Surface>
     </Section>

@@ -92,6 +92,14 @@ export type StudyActivity = (typeof STUDY_ACTIVITIES)[number];
 export const STUDY_PAUSE_REASONS = ["manual", "idle", "hidden"] as const;
 export type StudyPauseReason = (typeof STUDY_PAUSE_REASONS)[number];
 
+/** Where a plan item came from: the planner, the user, or another day by postponing. */
+export const PLAN_ITEM_SOURCES = ["suggested", "manual", "postponed"] as const;
+export type PlanItemSource = (typeof PLAN_ITEM_SOURCES)[number];
+
+/** Dismissed and postponed items stay on their day but are no longer part of its plan. */
+export const PLAN_ITEM_STATUSES = ["planned", "done", "dismissed", "postponed"] as const;
+export type PlanItemStatus = (typeof PLAN_ITEM_STATUSES)[number];
+
 /** What a user can attach to a passage or section of a study guide. */
 export const ANNOTATION_KINDS = ["highlight", "note", "bookmark", "review-later"] as const;
 export type AnnotationKind = (typeof ANNOTATION_KINDS)[number];

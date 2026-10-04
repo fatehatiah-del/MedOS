@@ -2,9 +2,7 @@ import { formatDate } from "@medos/shared";
 import { PageHeader } from "@medos/ui";
 import type { Metadata } from "next";
 
-import { FixtureNotice } from "@/components/fixture-notice";
 import { personalGreeting } from "@/features/auth/messages";
-import { PLAN_FIXTURE_NOTICE } from "@/features/today/fixture";
 import { getTodayOverview } from "@/features/today/get-today-overview";
 import {
   CoursesSection,
@@ -28,7 +26,7 @@ export const metadata: Metadata = { title: "Today" };
 const column = "contents @4xl:block @4xl:space-y-10";
 
 export default async function TodayPage() {
-  // Who is asking, their courses, schedule and study time are real. The plan is still a fixture.
+  // Who is asking comes from the session; everything shown is the user's own data.
   const { user, semester, scope } = await getWorkspace();
   const courses = (await scope.courses.overview(semester.id)).map(({ course }) => course);
   const today = await getTodayOverview(scope);
@@ -41,8 +39,6 @@ export default async function TodayPage() {
         eyebrow={summary.week ? `${dateLabel} · Week ${summary.week}` : dateLabel}
         title={personalGreeting(summary.greeting, user.displayName)}
       />
-
-      {today.planSource === "fixture" ? <FixtureNotice>{PLAN_FIXTURE_NOTICE}</FixtureNotice> : null}
 
       <div className="flex flex-col gap-10 @4xl:grid @4xl:grid-cols-[minmax(0,1fr)_300px] @4xl:gap-14">
         <div className={column}>

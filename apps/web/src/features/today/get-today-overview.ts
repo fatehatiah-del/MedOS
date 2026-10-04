@@ -3,7 +3,6 @@ import { CURRENT_SEMESTER, addDays, isCourseId, zonedInstant } from "@medos/shar
 
 import { clockLabel, localParts } from "@/features/calendar/model";
 
-import { TODAY_FIXTURE } from "./fixture";
 import type { ClockTime, ScheduleEntry, TodayOverview } from "./types";
 
 const ZONE = CURRENT_SEMESTER.timeZone;
@@ -35,24 +34,31 @@ export function scheduleFrom(items: readonly CalendarItem[]): ScheduleEntry[] {
 
 /**
  * The single seam between the Today screen and its data: the campus date and
- * time, the day's university schedule from the calendar, and the study time
- * from the study timer. The study plan is still the development fixture until
- * the study planner (Phase 15) provides it; the page does not need to change.
+ * time, the day's university schedule from the calendar, the day's study plan
+ * (suggested the first time the day is opened) and the study time.
  */
 export async function getTodayOverview(scope: UserScope, now = new Date()): Promise<TodayOverview> {
   const local = localParts(now, ZONE);
   const from = zonedInstant(local.date, "00:00", ZONE);
   const to = zonedInstant(addDays(local.date, 1), "00:00", ZONE);
-  const [events, studied] = await Promise.all([
+  const [events, studied, plan] = await Promise.all([
     scope.calendar.between(from, to),
     scope.studySessions.summary({ from, to }, now),
+    scope.planner.forDate(local.date, now),
   ]);
   return {
-    planSource: "fixture",
     date: local.date,
     time: clockLabel(local.minutes) as ClockTime,
     schedule: scheduleFrom(events),
-    plan: TODAY_FIXTURE.plan,
+    plan: (plan?.items ?? []).map((item) => ({
+      id: item.id,
+      title: item.title,
+      courseToken: item.course?.colorToken ?? null,
+      courseName: item.course?.shortName ?? null,
+      activity: item.activity,
+      minutes: item.minutes,
+      done: item.status === "done",
+    })),
     studiedMinutes: Math.floor(studied.totalSeconds / 60),
   };
 }

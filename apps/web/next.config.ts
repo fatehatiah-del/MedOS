@@ -11,6 +11,7 @@ const nextConfig: NextConfig = {
     "@medos/fsrs",
     "@medos/parsers",
     "@medos/shared",
+    "@medos/study-engine",
     "@medos/storage",
     "@medos/ui",
   ],

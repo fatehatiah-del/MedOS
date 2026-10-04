@@ -1,3 +1,4 @@
+import type { StudyActivity } from "@medos/database";
 import type { CourseId, IsoDate } from "@medos/shared";
 
 /** Wall-clock time, 24-hour, e.g. "11:30". */
@@ -21,44 +22,30 @@ export interface ScheduleEntry {
   location?: string;
 }
 
-export type StudyActivity =
-  "study-guide" | "mcq" | "question-bank" | "flashcards" | "review" | "weak-questions" | "revision";
-
-export const STUDY_ACTIVITY_LABELS: Record<StudyActivity, string> = {
-  "study-guide": "Study Guide",
-  mcq: "MCQ",
-  "question-bank": "Question Bank",
-  flashcards: "Flashcards",
-  review: "Review",
-  "weak-questions": "Weak Questions",
-  revision: "Revision",
-};
-
-/** One recommended block of study. */
+/** One block of today's study plan, as the Study Plan page holds it. */
 export interface StudyPlanItem {
   id: string;
-  courseId: CourseId;
-  /** What the block covers, e.g. "Week 1 — Pharmacodynamics I". */
-  detail?: string;
+  title: string;
+  /** The course's colour token, when the block belongs to a course. */
+  courseToken: string | null;
+  courseName: string | null;
   activity: StudyActivity;
   minutes: number;
+  done: boolean;
 }
 
 /**
- * Everything the Today screen needs. The date, schedule and study time are
- * real; `planSource` records that the study plan is still a development
- * fixture (until the planner, Phase 15), so it can never be mistaken for a
- * real recommendation.
+ * Everything the Today screen needs: the campus date and time, the day's
+ * university schedule, the day's study plan and the time studied.
  *
  * It holds academic data only. Who the user is comes from the session.
  */
 export interface TodayOverview {
-  planSource: "fixture";
   date: IsoDate;
   /** Local time of the snapshot, used for the greeting. */
   time: ClockTime;
   schedule: ScheduleEntry[];
   plan: StudyPlanItem[];
-  /** Active timed study today, from the study timer. Real even while the rest is a fixture. */
+  /** Active timed study today, from the study timer. */
   studiedMinutes: number;
 }

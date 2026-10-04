@@ -92,6 +92,13 @@
       "when": 1791132978645,
       "tag": "0012_university_calendar",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1791138602676,
+      "tag": "0013_study_planner",
+      "breakpoints": true
     }
   ]
 }

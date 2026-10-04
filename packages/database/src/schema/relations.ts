@@ -6,6 +6,7 @@ import { flashcardDecks, flashcardReviews, flashcards } from "./flashcards";
 import { resourceContents, resourceMedia } from "./content";
 import { originalLectureAnnotations, originalLecturePositions } from "./lecture-viewer";
 import { mcqAttempts, mcqSessions } from "./mcq";
+import { dailyPlanItems, dailyPlans } from "./planner";
 import { lectureProgress, studySessions } from "./progress";
 import { questionBankAttempts } from "./question-bank";
 import { studyGuideAnnotations, studyGuideProgress } from "./reading";
@@ -164,4 +165,14 @@ export const questionReviewItemsRelations = relations(questionReviewItems, ({ on
     fields: [questionReviewItems.resourceId],
     references: [resources.id],
   }),
+}));
+
+export const dailyPlansRelations = relations(dailyPlans, ({ many }) => ({
+  items: many(dailyPlanItems),
+}));
+
+export const dailyPlanItemsRelations = relations(dailyPlanItems, ({ one }) => ({
+  plan: one(dailyPlans, { fields: [dailyPlanItems.planId], references: [dailyPlans.id] }),
+  course: one(courses, { fields: [dailyPlanItems.courseId], references: [courses.id] }),
+  lecture: one(lectures, { fields: [dailyPlanItems.lectureId], references: [lectures.id] }),
 }));

@@ -1,19 +1,13 @@
 import type { TodayOverview } from "./types";
 
 /**
- * DEVELOPMENT FIXTURE — not real data.
+ * TEST SAMPLE — not real data.
  *
- * A hand-written snapshot of Wednesday 30 September 2026. Its study plan is
- * what the Today screen shows until the study planner (Phase 15) exists; the
- * rest is a sample for tests. The real date, schedule and study time come
- * from `getTodayOverview`.
+ * A hand-written Today overview for Wednesday 30 September 2026, used by the
+ * unit tests of the Today summary. The Today screen itself always shows the
+ * user's real date, schedule, plan and study time (see `getTodayOverview`).
  */
-
-/** Says which part of Today is not real yet. */
-export const PLAN_FIXTURE_NOTICE =
-  "The recommended study plan is sample data until the study planner arrives. Your schedule, study time and courses are real.";
 export const TODAY_FIXTURE: TodayOverview = {
-  planSource: "fixture",
   date: "2026-09-30",
   time: "15:00",
   schedule: [
@@ -28,26 +22,32 @@ export const TODAY_FIXTURE: TodayOverview = {
   ],
   plan: [
     {
-      id: "fixture-plan-1",
-      courseId: "pharmacology",
-      detail: "Week 1 — Pharmacodynamics I",
-      activity: "review",
+      id: "sample-plan-1",
+      title: "Pharmacology flashcards",
+      courseToken: "pharmacology",
+      courseName: "Pharmacology",
+      activity: "flashcards",
       minutes: 30,
+      done: false,
     },
     {
-      id: "fixture-plan-2",
-      courseId: "pathophysiology",
-      detail: "Week 1",
+      id: "sample-plan-2",
+      title: "Study Guide: Cell injury",
+      courseToken: "pathophysiology",
+      courseName: "Pathophysiology",
       activity: "study-guide",
       minutes: 45,
+      done: false,
     },
     {
-      id: "fixture-plan-3",
-      courseId: "microbiology",
-      activity: "weak-questions",
+      id: "sample-plan-3",
+      title: "Review the receptor table",
+      courseToken: null,
+      courseName: null,
+      activity: "revision",
       minutes: 25,
+      done: true,
     },
   ],
-  // Replaced by the real study time from the study timer (see get-today-overview.ts).
   studiedMinutes: 0,
 };
