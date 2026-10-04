@@ -6,8 +6,13 @@ import { requireUser } from "@/server/session";
 
 export const metadata: Metadata = { title: "Search" };
 
-export default async function SearchPage() {
+interface SearchPageProps {
+  searchParams: Promise<{ q?: string | string[] }>;
+}
+
+export default async function SearchPage({ searchParams }: SearchPageProps) {
   await requireUser();
+  const q = (await searchParams).q;
 
   return (
     <div className="space-y-8">
@@ -15,7 +20,7 @@ export default async function SearchPage() {
         title="Search"
         description="One search across everything you study, always showing its source."
       />
-      <SearchPanel />
+      <SearchPanel initialQuery={(Array.isArray(q) ? q[0] : q) ?? ""} />
     </div>
   );
 }

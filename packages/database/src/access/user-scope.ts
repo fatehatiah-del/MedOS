@@ -15,6 +15,7 @@ import { createPlannerAccess } from "./planner";
 import { createOriginalLectureAccess } from "./original-lectures";
 import { createQuestionBankAccess } from "./question-bank";
 import { createReviewAccess } from "./review";
+import { createSearchAccess } from "./search";
 import { createStatisticsAccess } from "./statistics";
 import { createStudyGuideAccess } from "./study-guides";
 import { createStudySessionAccess } from "./study-sessions";
@@ -413,6 +414,9 @@ export function createUserScope(db: Database, userId: string) {
 
     /** Statistics and weaknesses, from the user's own recorded activity only. */
     statistics: createStatisticsAccess(db, userId),
+
+    /** Search across courses, lectures, parsed material, flashcards, notes and bookmarks. */
+    search: createSearchAccess(db, userId),
 
     resources: {
       /**

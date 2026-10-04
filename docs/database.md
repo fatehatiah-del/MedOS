@@ -45,6 +45,7 @@ guides, questions, flashcards, annotations and plans are added by their own phas
 | `daily_plans`                  | One day's study plan; suggested once, then the user's (Phase 15).             |
 | `daily_plan_items`             | A block of a day's plan, with its reasons, order, duration and status.        |
 | `difficult_concepts`           | A concept the user marked difficult, per course (Phase 16).                   |
+| `search_entries`               | Search index of parsed sections and questions; derived, rebuilt on change.    |
 | `exam_events`                  | Exam detail attached to a calendar event.                                     |
 | `course_progress`              | _View._ Lectures and completed lectures per course.                           |
 

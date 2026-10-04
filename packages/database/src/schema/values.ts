@@ -92,6 +92,10 @@ export type StudyActivity = (typeof STUDY_ACTIVITIES)[number];
 export const STUDY_PAUSE_REASONS = ["manual", "idle", "hidden"] as const;
 export type StudyPauseReason = (typeof STUDY_PAUSE_REASONS)[number];
 
+/** What a row of the search index stands for. */
+export const SEARCH_ENTRY_KINDS = ["study-guide", "mcq", "question-bank"] as const;
+export type SearchEntryKind = (typeof SEARCH_ENTRY_KINDS)[number];
+
 /** Where a plan item came from: the planner, the user, or another day by postponing. */
 export const PLAN_ITEM_SOURCES = ["suggested", "manual", "postponed"] as const;
 export type PlanItemSource = (typeof PLAN_ITEM_SOURCES)[number];

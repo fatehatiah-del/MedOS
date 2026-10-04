@@ -13,5 +13,6 @@ export * from "./reading";
 export * from "./relations";
 export * from "./resources";
 export * from "./review";
+export * from "./search";
 export * from "./users";
 export * from "./values";

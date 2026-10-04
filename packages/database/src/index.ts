@@ -130,3 +130,9 @@ export {
   type TopicRow,
   type WeeklyStudy,
 } from "./access/statistics";
+export {
+  MAX_QUERY_LENGTH,
+  SEARCH_KINDS,
+  type SearchKind,
+  type SearchResult,
+} from "./access/search";
