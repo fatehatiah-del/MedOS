@@ -28,6 +28,7 @@ dashboard.
 | [`docs/study-timer.md`](docs/study-timer.md)               | Study timer: active time, pauses, one timer, recovery.        |
 | [`docs/calendar.md`](docs/calendar.md)                     | Calendar: Group A timetable, academic dates, exams, views.    |
 | [`docs/study-planner.md`](docs/study-planner.md)           | Study planner: signals, the formula, editing your plan.       |
+| [`docs/statistics.md`](docs/statistics.md)                 | Statistics and weak spots: measures, rules, evidence.         |
 | [`docs/authentication.md`](docs/authentication.md)         | Sign-in, sessions and the private boundary.                   |
 | [`docs/google-auth-setup.md`](docs/google-auth-setup.md)   | Manual steps to enable Google sign-in.                        |
 
@@ -51,7 +52,8 @@ dashboard.
 | 13    | Study timer                                | Complete    |
 | 14    | Calendar and academic schedule             | Complete    |
 | 15    | Study planner                              | Complete    |
-| 16–22 | See `BUILD_PLAN.md`                        | Not started |
+| 16    | Weakness engine and analytics              | Complete    |
+| 17–22 | See `BUILD_PLAN.md`                        | Not started |
 
 What exists today:
 
@@ -90,7 +92,9 @@ What exists today:
   events, notes on timetable events, and the real schedule on Today;
 - the study planner: a daily plan suggested from your lectures, flashcards, weak topics, recall
   ratings, Review Later items and exams by a transparent formula, fitted to your study time, and
-  then entirely yours to reorder, resize, postpone, add to or clear.
+  then entirely yours to reorder, resize, postpone, add to or clear;
+- statistics at semester, course and lecture level from your real activity, and weak spots listed
+  with the exact evidence behind them (no mastery scores), including concepts you mark difficult.
 
 Study Guides and lecture PDFs can be read in MedOS, quizzes practised and question banks used
 for active recall, and flashcards reviewed with FSRS. Until you run a sync, lectures are development placeholders when enabled

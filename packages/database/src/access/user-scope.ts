@@ -15,6 +15,7 @@ import { createPlannerAccess } from "./planner";
 import { createOriginalLectureAccess } from "./original-lectures";
 import { createQuestionBankAccess } from "./question-bank";
 import { createReviewAccess } from "./review";
+import { createStatisticsAccess } from "./statistics";
 import { createStudyGuideAccess } from "./study-guides";
 import { createStudySessionAccess } from "./study-sessions";
 import { FIXTURE_LECTURE_PREFIX } from "../seed/development";
@@ -409,6 +410,9 @@ export function createUserScope(db: Database, userId: string) {
 
     /** The study planner: daily plans the user owns, suggested from their study signals. */
     planner: createPlannerAccess(db, userId),
+
+    /** Statistics and weaknesses, from the user's own recorded activity only. */
+    statistics: createStatisticsAccess(db, userId),
 
     resources: {
       /**

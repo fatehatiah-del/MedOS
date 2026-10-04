@@ -1,4 +1,3 @@
-import { type McqQuestion, validateContent } from "@medos/parsers/model";
 import {
   CURRENT_SEMESTER,
   DEFAULT_STUDY_AVAILABILITY,
@@ -8,6 +7,7 @@ import {
   availableMinutesFor,
   isIsoDate,
   semesterWeekRange,
+  zonedDate,
   zonedInstant,
 } from "@medos/shared";
 import { type PlannerSignals, type PlanSuggestion, suggestPlan } from "@medos/study-engine";
@@ -27,14 +27,8 @@ import {
   dailyPlans,
   lectureProgress,
   lectures,
-  mcqAttempts,
-  originalLectureAnnotations,
-  questionBankAttempts,
-  questionReviewItems,
-  resourceContents,
   resources,
   semesters,
-  studyGuideAnnotations,
   studySessions,
   userSettings,
   weeks,
@@ -42,6 +36,7 @@ import {
 
 import { createCalendarAccess } from "./calendar";
 import { createFlashcardAccess } from "./flashcards";
+import { latestRecall, mcqQuestionStats, reviewLaterByLecture } from "./signals";
 
 /*
  * The study planner at the trusted boundary. It gathers the user's study
@@ -222,138 +217,46 @@ export function createPlannerAccess(db: Database, userId: string) {
       )
     ).filter((entry) => entry.due > 0);
 
-    // MCQ accuracy by topic: scored attempts matched to their question's topic.
-    const attemptRows = await db
-      .select({
-        resourceId: mcqAttempts.resourceId,
-        fingerprint: mcqAttempts.questionFingerprint,
-        answered: sql<number>`count(*)::int`,
-        correct: sql<number>`(count(*) filter (where ${mcqAttempts.correct}))::int`,
-      })
-      .from(mcqAttempts)
-      .where(and(eq(mcqAttempts.userId, userId), isNotNull(mcqAttempts.correct)))
-      .groupBy(mcqAttempts.resourceId, mcqAttempts.questionFingerprint);
-    const mcqTopics: PlannerSignals["mcqTopics"][number][] = [];
-    const quizIds = [...new Set(attemptRows.map((row) => row.resourceId))];
-    if (quizIds.length > 0) {
-      const quizzes = await db
-        .select({
-          resourceId: resources.id,
-          lectureId: resources.lectureId,
-          courseId: lectures.courseId,
-          content: resourceContents.content,
-        })
-        .from(resources)
-        .innerJoin(lectures, eq(lectures.id, resources.lectureId))
-        .innerJoin(resourceContents, eq(resourceContents.resourceId, resources.id))
-        .where(and(eq(resources.userId, userId), inArray(resources.id, quizIds)));
-      for (const quiz of quizzes) {
-        const content = validateContent(quiz.content);
-        if (content.format !== "mcq-set") continue;
-        const topicOf = new Map(
-          content.questions.map((question: McqQuestion) => [question.fingerprint, question.topic]),
-        );
-        const byTopic = new Map<string, { answered: number; correct: number }>();
-        for (const row of attemptRows) {
-          if (row.resourceId !== quiz.resourceId) continue;
-          const topic = topicOf.get(row.fingerprint);
-          if (!topic) continue;
-          const total = byTopic.get(topic) ?? { answered: 0, correct: 0 };
-          total.answered += row.answered;
-          total.correct += row.correct;
-          byTopic.set(topic, total);
-        }
-        for (const [topic, total] of byTopic) {
-          mcqTopics.push({
-            courseId: quiz.courseId,
-            lectureId: quiz.lectureId,
-            resourceId: quiz.resourceId,
-            topic,
-            ...total,
-          });
-        }
-      }
+    // MCQ accuracy by topic, Question Bank ratings and Review Later items, as the statistics count them.
+    const [questions, recall, reviewLater] = await Promise.all([
+      mcqQuestionStats(db, userId),
+      latestRecall(db, userId),
+      reviewLaterByLecture(db, userId),
+    ]);
+    const topicTotals = new Map<string, PlannerSignals["mcqTopics"][number]>();
+    for (const question of questions) {
+      if (!question.topic) continue;
+      const key = `${question.resourceId}|${question.topic}`;
+      const total = topicTotals.get(key) ?? {
+        courseId: question.courseId,
+        lectureId: question.lectureId,
+        resourceId: question.resourceId,
+        topic: question.topic,
+        answered: 0,
+        correct: 0,
+      };
+      total.answered += question.answered;
+      total.correct += question.correct;
+      topicTotals.set(key, total);
     }
-
-    // Question Bank items whose most recent rating was Again or Hard.
-    const latestRatings = db
-      .selectDistinctOn([questionBankAttempts.resourceId, questionBankAttempts.itemFingerprint], {
-        resourceId: questionBankAttempts.resourceId,
-        rating: questionBankAttempts.rating,
-      })
-      .from(questionBankAttempts)
-      .where(and(eq(questionBankAttempts.userId, userId), isNotNull(questionBankAttempts.rating)))
-      .orderBy(
-        questionBankAttempts.resourceId,
-        questionBankAttempts.itemFingerprint,
-        sql`${questionBankAttempts.ratedAt} desc`,
-      )
-      .as("latest");
-    const weakRows = await db
-      .select({
-        resourceId: latestRatings.resourceId,
-        lectureId: resources.lectureId,
-        courseId: lectures.courseId,
-        count: sql<number>`count(*)::int`,
-      })
-      .from(latestRatings)
-      .innerJoin(resources, eq(resources.id, latestRatings.resourceId))
-      .innerJoin(lectures, eq(lectures.id, resources.lectureId))
-      .where(sql`${latestRatings.rating} in ('again', 'hard')`)
-      .groupBy(latestRatings.resourceId, resources.lectureId, lectures.courseId);
-
-    // Review Later items per course, from Study Guides, lecture PDFs and questions.
+    const mcqTopics = [...topicTotals.values()];
+    const weakRows = recall.map((bank) => ({
+      resourceId: bank.resourceId,
+      lectureId: bank.lectureId,
+      courseId: bank.courseId,
+      count: bank.again + bank.hard,
+    }));
     const reviewLaterCounts = new Map<string, number>();
-    const countInto = (rows: { courseId: string; count: number }[]) => {
-      for (const row of rows) {
-        reviewLaterCounts.set(row.courseId, (reviewLaterCounts.get(row.courseId) ?? 0) + row.count);
-      }
-    };
-    const courseCount = { courseId: lectures.courseId, count: sql<number>`count(*)::int` };
-    countInto(
-      await db
-        .select(courseCount)
-        .from(studyGuideAnnotations)
-        .innerJoin(resources, eq(resources.id, studyGuideAnnotations.resourceId))
-        .innerJoin(lectures, eq(lectures.id, resources.lectureId))
-        .where(
-          and(
-            eq(studyGuideAnnotations.userId, userId),
-            eq(studyGuideAnnotations.kind, "review-later"),
-          ),
-        )
-        .groupBy(lectures.courseId),
-    );
-    countInto(
-      await db
-        .select(courseCount)
-        .from(originalLectureAnnotations)
-        .innerJoin(resources, eq(resources.id, originalLectureAnnotations.resourceId))
-        .innerJoin(lectures, eq(lectures.id, resources.lectureId))
-        .where(
-          and(
-            eq(originalLectureAnnotations.userId, userId),
-            eq(originalLectureAnnotations.kind, "review-later"),
-          ),
-        )
-        .groupBy(lectures.courseId),
-    );
-    countInto(
-      await db
-        .select(courseCount)
-        .from(questionReviewItems)
-        .innerJoin(resources, eq(resources.id, questionReviewItems.resourceId))
-        .innerJoin(lectures, eq(lectures.id, resources.lectureId))
-        .where(eq(questionReviewItems.userId, userId))
-        .groupBy(lectures.courseId),
-    );
+    for (const row of reviewLater) {
+      reviewLaterCounts.set(row.courseId, (reviewLaterCounts.get(row.courseId) ?? 0) + row.count);
+    }
 
     // Exams: the user's course exams, and the midterm and final periods for every course.
     const upcoming = await calendar.exams.upcoming(day.start);
     const exams: PlannerSignals["exams"] = [
       ...upcoming.flatMap((exam) => {
         if (!exam.course || !exam.exam) return [];
-        const examDate = zonedDate(exam.startsAt);
+        const examDate = zonedDate(exam.startsAt, ZONE);
         const label =
           exam.exam.kind === "midterm"
             ? "Midterm exam"
@@ -758,18 +661,4 @@ export function createPlannerAccess(db: Database, userId: string) {
       },
     },
   };
-}
-
-function zonedDate(instant: Date): IsoDate {
-  const parts = Object.fromEntries(
-    new Intl.DateTimeFormat("en-GB", {
-      timeZone: ZONE,
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    })
-      .formatToParts(instant)
-      .map((part) => [part.type, part.value]),
-  );
-  return `${parts.year}-${parts.month}-${parts.day}` as IsoDate;
 }

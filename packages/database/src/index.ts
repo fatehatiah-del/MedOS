@@ -119,3 +119,14 @@ export {
   type NewPlanItem,
   type PlanItemView,
 } from "./access/planner";
+export {
+  type CourseRow,
+  type CourseStatistics,
+  type LectureRow,
+  type LectureStatistics,
+  MAX_CONCEPT_LABEL,
+  type ScopeMetrics,
+  type SemesterStatistics,
+  type TopicRow,
+  type WeeklyStudy,
+} from "./access/statistics";

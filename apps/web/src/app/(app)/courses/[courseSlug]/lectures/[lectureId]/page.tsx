@@ -32,6 +32,7 @@ import {
 import { OpenLectureDeck } from "@/features/flashcards/deck-manager";
 import { CompletionControl } from "@/features/lectures/completion-control";
 import { materialState } from "@/features/resources/processing";
+import { LecturePerformance } from "@/features/statistics/lecture-performance";
 import { StudyTimeSection } from "@/features/timer/study-time-section";
 import { getWorkspace } from "@/server/workspace";
 
@@ -124,6 +125,8 @@ export default async function LecturePage({ params }: LecturePageProps) {
       </section>
 
       <StudyTimeSection scope={scope} lectureId={lecture.id} courseId={course.id} />
+
+      <LecturePerformance scope={scope} lectureId={lecture.id} course={course} />
 
       <Section title="Study material">
         <ul className="grid gap-4 @xl:grid-cols-2 @4xl:grid-cols-3">

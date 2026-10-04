@@ -56,3 +56,18 @@ export function zonedInstant(date: IsoDate, time: ClockTime, timeZone: string): 
   const second = wall - offsetAt(first, timeZone);
   return new Date(second);
 }
+
+/** The calendar day it is in `timeZone` at `instant`. */
+export function zonedDate(instant: Date, timeZone: string): IsoDate {
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat("en-GB", {
+      timeZone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    })
+      .formatToParts(instant)
+      .map((part) => [part.type, part.value]),
+  ) as Record<"year" | "month" | "day", string>;
+  return `${parts.year}-${parts.month}-${parts.day}` as IsoDate;
+}

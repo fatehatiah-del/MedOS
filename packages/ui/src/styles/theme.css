@@ -32,6 +32,8 @@
   --accent-hover: #2449ab;
   --accent-fg: #ffffff;
   --accent-soft: #e6ecfa;
+  /* Single-series chart fill, validated for lightness and contrast on the surface. */
+  --chart-1: #2c56c4;
 
   --success: #276e4e;
   --success-soft: #e2f1ea;
@@ -80,6 +82,8 @@
   --accent-hover: #a0baf8;
   --accent-fg: #0d0d0f;
   --accent-soft: #1a2238;
+  /* Its own dark step (the dark accent is too light for a fill). */
+  --chart-1: #6489ea;
 
   --success: #6cc39b;
   --success-soft: #12261d;
@@ -130,6 +134,7 @@
   --color-accent-hover: var(--accent-hover);
   --color-accent-fg: var(--accent-fg);
   --color-accent-soft: var(--accent-soft);
+  --color-chart-1: var(--chart-1);
 
   --color-success: var(--success);
   --color-success-soft: var(--success-soft);
