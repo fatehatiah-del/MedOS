@@ -160,6 +160,8 @@ export const lectures = pgTable(
     // Also serves "lectures by week".
     unique("lectures_week_number_unique").on(table.weekId, table.number),
     unique("lectures_id_user_unique").on(table.id, table.userId),
+    // Lets a lecture deck require that its lecture belongs to the deck's course.
+    unique("lectures_id_course_user_unique").on(table.id, table.courseId, table.userId),
     index("lectures_course_idx").on(table.courseId),
     check("lectures_number_positive", sql`${table.number} >= 1`),
   ],

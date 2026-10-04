@@ -13,7 +13,7 @@ this file records how it has been interpreted so far and why.
 - **Packages are created when needed.** `@medos/database` arrived with Phase 2 (see
   [`database.md`](database.md)), `apps/sync` with Phase 5, `@medos/parsers` with Phase 6 and `@medos/storage` (the object store, shared by the sync and
   the web app) with Phase 7
-  (see [`parsing.md`](parsing.md)); `study-engine` and `fsrs` are not scaffolded yet. `@medos/shared` is deliberately free of browser and
+  (see [`parsing.md`](parsing.md)); `@medos/fsrs` (flashcard scheduling) with Phase 11; `study-engine` is not scaffolded yet. `@medos/shared` is deliberately free of browser and
   framework dependencies so the future sync CLI and database package can use it.
 - **One lint, format and unit-test configuration at the root.** Type-checking runs per workspace.
 

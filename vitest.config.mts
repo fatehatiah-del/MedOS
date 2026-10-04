@@ -17,6 +17,13 @@ export default defineConfig({
       },
       {
         test: {
+          name: "fsrs",
+          environment: "node",
+          include: ["packages/fsrs/src/**/*.test.ts"],
+        },
+      },
+      {
+        test: {
           name: "parsers",
           environment: "node",
           include: ["packages/parsers/src/**/*.test.ts"],

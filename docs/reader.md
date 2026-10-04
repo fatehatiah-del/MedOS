@@ -110,9 +110,9 @@ its own.
 | Bookmark     | yes                   | yes (toggle)           | a solid underline             |
 | Review later | yes                   | yes (toggle)           | a wavy underline              |
 
-**Create flashcard** appears in the selection toolbar but is disabled: flashcards arrive in Phase
-11, and Phase 7 creates no flashcard data. The **Study timer** appears in the panel as a later
-feature for the same reason (Phase 13).
+**Create flashcard** (since Phase 11) opens a card editor with the selected passage as the answer
+and an empty question for you to write; see [`flashcards.md`](flashcards.md). The **Study timer**
+appears in the panel as a later feature (Phase 13).
 
 Selecting text in one paragraph, list item, table cell, flow step, caption or heading opens the
 toolbar above it (at the bottom of the screen on touch devices). A selection that spills a little
@@ -213,6 +213,6 @@ Automated tests never use real course material.
 
 - Clickable slide references. The lecture viewer (Phase 8, [`lecture-viewer.md`](lecture-viewer.md)) opens any page by address, but slide links are prepared, not active.
 - MCQ and Question Bank practice (Phases 9 and 10).
-- Flashcards, including creating one from a selection (Phase 11).
+- Flashcards were added in Phase 11 ([`flashcards.md`](flashcards.md)).
 - Global annotation pages and cross-guide management (Phase 12).
 - Study timer (Phase 13). Search (Phase 17).

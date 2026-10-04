@@ -11,6 +11,7 @@ dashboard.
 
 | Document                                                   | Purpose                                                       |
 | ---------------------------------------------------------- | ------------------------------------------------------------- |
+| [`USING-MEDOS.md`](USING-MEDOS.md)                         | **Start here to use MedOS:** start, stop, backups, imports.   |
 | [`CLAUDE.md`](CLAUDE.md)                                   | Product and engineering specification (source of truth).      |
 | [`BUILD_PLAN.md`](BUILD_PLAN.md)                           | Staged implementation roadmap with acceptance gates.          |
 | [`docs/architecture.md`](docs/architecture.md)             | Architecture decisions and assumptions made so far.           |
@@ -22,6 +23,7 @@ dashboard.
 | [`docs/lecture-viewer.md`](docs/lecture-viewer.md)         | Original lecture viewer: PDF rendering, pages, privacy.       |
 | [`docs/mcq.md`](docs/mcq.md)                               | MCQ engine: Learn, Exam and USMLE modes, attempts, results.   |
 | [`docs/question-bank.md`](docs/question-bank.md)           | Question Bank active recall: reveal, rate, record.            |
+| [`docs/flashcards.md`](docs/flashcards.md)                 | Flashcards: decks, Study Guide cards, FSRS review per course. |
 | [`docs/authentication.md`](docs/authentication.md)         | Sign-in, sessions and the private boundary.                   |
 | [`docs/google-auth-setup.md`](docs/google-auth-setup.md)   | Manual steps to enable Google sign-in.                        |
 
@@ -40,7 +42,8 @@ dashboard.
 | 8     | Original lecture viewer               | Complete    |
 | 9     | MCQ engine                            | Complete    |
 | 10    | Question Bank / active recall         | Complete    |
-| 11–22 | See `BUILD_PLAN.md`                   | Not started |
+| 11    | Flashcards and FSRS                   | Complete    |
+| 12–22 | See `BUILD_PLAN.md`                   | Not started |
 
 What exists today:
 
@@ -66,13 +69,15 @@ What exists today:
 - the MCQ engine: imported quizzes practised in Learn, Exam and USMLE modes, marked on the server,
   with a timer, navigator and flags, results by topic and question type, and every attempt kept;
 - Question Bank active recall: reveal the model answer (typing optional), rate Again, Hard, Good or
-  Easy, with every attempt and rating kept, and the sidebar Question Bank page listing your banks.
+  Easy, with every attempt and rating kept, and the sidebar Question Bank page listing your banks;
+- flashcards: decks per course and lecture, cards you write or create from Study Guide text, and
+  FSRS review that always stays within one course.
 
 Study Guides and lecture PDFs can be read in MedOS, quizzes practised and question banks used
-for active recall; flashcards are Phase 11. Until you run a sync, lectures are development placeholders when enabled
+for active recall, and flashcards reviewed with FSRS. Until you run a sync, lectures are development placeholders when enabled
 (see [`docs/academic-hierarchy.md`](docs/academic-hierarchy.md)). The Today screen's
-schedule and plan are a clearly labelled development fixture. There is **no flashcard
-scheduling or AI** yet.
+schedule and plan are a clearly labelled development fixture. There is **no AI** (by design,
+until a provider is configured).
 
 ### Checkpoints
 
@@ -117,8 +122,7 @@ MedOS/
 ```
 
 Packages planned by the specification are added when their phase begins, rather than created
-empty: `packages/fsrs` (Phase 11) and `packages/study-engine`
-(Phase 15).
+empty: `packages/study-engine` (Phase 15). `packages/fsrs` arrived with Phase 11.
 
 ### Stack
 

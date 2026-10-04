@@ -47,8 +47,7 @@ export const LECTURE_CATEGORIES: readonly LectureCategory[] = [
     label: "Flashcards",
     description: "Cards you write or create from the study guide, reviewed within this course.",
     resourceKind: "flashcards",
-    // Imported card files can exist already; writing and reviewing cards comes later.
-    whenEmpty: "later",
+    // Cards are written in MedOS; imported card files are listed but not read.
   },
 ];
 

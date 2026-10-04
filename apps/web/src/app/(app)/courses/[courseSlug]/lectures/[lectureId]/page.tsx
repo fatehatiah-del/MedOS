@@ -29,6 +29,7 @@ import {
   categoryStateLabel,
   lectureCategoryStates,
 } from "@/features/lectures/categories";
+import { OpenLectureDeck } from "@/features/flashcards/deck-manager";
 import { CompletionControl } from "@/features/lectures/completion-control";
 import { materialState } from "@/features/resources/processing";
 import { getWorkspace } from "@/server/workspace";
@@ -78,6 +79,7 @@ export default async function LecturePage({ params }: LecturePageProps) {
     scope.mcq.latestScores(lecture.id),
     scope.questionBanks.banks(),
   ]);
+  const lectureDeck = await scope.flashcards.decks.lectureSummary(lecture.id);
   const practisedBanks = new Map(banks.map((bank) => [bank.resourceId, bank]));
   const position =
     weekLectures.length > 1
@@ -230,6 +232,19 @@ export default async function LecturePage({ params }: LecturePageProps) {
                         );
                       })}
                     </ul>
+                  ) : category.id === "flashcards" ? (
+                    <div className="mt-auto flex flex-wrap items-center gap-x-3 gap-y-2 border-t border-border pt-3">
+                      <OpenLectureDeck
+                        lectureId={lecture.id}
+                        deckHref={`/flashcards/${course.slug}/decks/DECK`}
+                        label={lectureDeck ? "Open deck" : "Start this lecture's deck"}
+                      />
+                      {lectureDeck ? (
+                        <span className="text-xs text-fg-subtle tabular-nums">
+                          {lectureDeck.total} cards · {lectureDeck.due} due
+                        </span>
+                      ) : null}
+                    </div>
                   ) : (
                     <div className="mt-auto pt-1">
                       <Badge tone={available ? "accent" : "outline"}>

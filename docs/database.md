@@ -12,33 +12,36 @@ what was implemented and why. For commands, see the README.
 
 ## Tables
 
-Twenty domain tables and one view, plus four authentication tables added in Phase 3 (described in
+Twenty-three domain tables and one view, plus four authentication tables added in Phase 3 (described in
 [`authentication.md`](authentication.md)). Only the entities listed for Phase 2 in `BUILD_PLAN.md` exist; study
 guides, questions, flashcards, annotations and plans are added by their own phases.
 
-| Table                          | One row is                                                              |
-| ------------------------------ | ----------------------------------------------------------------------- |
-| `users`                        | An owner of study data.                                                 |
-| `semesters`                    | A term with its dates, exam periods and the user's lab group.           |
-| `courses`                      | A course in a semester.                                                 |
-| `weeks`                        | A teaching week of a course.                                            |
-| `lectures`                     | A lecture in a week.                                                    |
-| `resources`                    | An original source file attached to a lecture, with its provenance.     |
-| `sync_files`                   | What the local sync tool knows about one file in the source folder.     |
-| `resource_contents`            | The parsed content of a resource, with its provenance (Phase 6).        |
-| `resource_media`               | An image extracted from a resource (Phase 6).                           |
-| `study_guide_annotations`      | A highlight, note, bookmark or Review Later item on a guide (Phase 7).  |
-| `study_guide_progress`         | How far the user has read a guide (Phase 7). Not completion.            |
-| `original_lecture_annotations` | A bookmark, note or Review Later item on a PDF page (Phase 8).          |
-| `original_lecture_positions`   | The page the user was last on in a PDF (Phase 8). Not completion.       |
-| `mcq_sessions`                 | A practice session on a quiz: mode, questions, time limit (Phase 9).    |
-| `mcq_attempts`                 | One answer to one question in one session (Phase 9). Never overwritten. |
-| `question_bank_attempts`       | One reveal of a Question Bank item, with the user's rating (Phase 10).  |
-| `lecture_progress`             | The user's state for a lecture, including manual completion.            |
-| `study_sessions`               | A timed stretch of study.                                               |
-| `calendar_events`              | Anything scheduled: timetable entries, exams, holidays, study sessions. |
-| `exam_events`                  | Exam detail attached to a calendar event.                               |
-| `course_progress`              | _View._ Lectures and completed lectures per course.                     |
+| Table                          | One row is                                                                    |
+| ------------------------------ | ----------------------------------------------------------------------------- |
+| `users`                        | An owner of study data.                                                       |
+| `semesters`                    | A term with its dates, exam periods and the user's lab group.                 |
+| `courses`                      | A course in a semester.                                                       |
+| `weeks`                        | A teaching week of a course.                                                  |
+| `lectures`                     | A lecture in a week.                                                          |
+| `resources`                    | An original source file attached to a lecture, with its provenance.           |
+| `sync_files`                   | What the local sync tool knows about one file in the source folder.           |
+| `resource_contents`            | The parsed content of a resource, with its provenance (Phase 6).              |
+| `resource_media`               | An image extracted from a resource (Phase 6).                                 |
+| `study_guide_annotations`      | A highlight, note, bookmark or Review Later item on a guide (Phase 7).        |
+| `study_guide_progress`         | How far the user has read a guide (Phase 7). Not completion.                  |
+| `original_lecture_annotations` | A bookmark, note or Review Later item on a PDF page (Phase 8).                |
+| `original_lecture_positions`   | The page the user was last on in a PDF (Phase 8). Not completion.             |
+| `mcq_sessions`                 | A practice session on a quiz: mode, questions, time limit (Phase 9).          |
+| `mcq_attempts`                 | One answer to one question in one session (Phase 9). Never overwritten.       |
+| `question_bank_attempts`       | One reveal of a Question Bank item, with the user's rating (Phase 10).        |
+| `flashcard_decks`              | A deck of one course, optionally of one lecture (Phase 11).                   |
+| `flashcards`                   | A card with its FSRS state; deleted cards are hidden, not removed (Phase 11). |
+| `flashcard_reviews`            | One rating of one card, with the schedule before and after (Phase 11).        |
+| `lecture_progress`             | The user's state for a lecture, including manual completion.                  |
+| `study_sessions`               | A timed stretch of study.                                                     |
+| `calendar_events`              | Anything scheduled: timetable entries, exams, holidays, study sessions.       |
+| `exam_events`                  | Exam detail attached to a calendar event.                                     |
+| `course_progress`              | _View._ Lectures and completed lectures per course.                           |
 
 ## Hierarchy
 

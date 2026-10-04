@@ -16,7 +16,11 @@ import {
 
 const noSubscription = () => () => {};
 
+import { addFlashcardFromStudyGuide } from "@/features/flashcards/actions";
+import { CardEditor } from "@/features/flashcards/card-editor";
+
 import { addStudyGuideAnnotation, editStudyGuideNote, removeStudyGuideAnnotation } from "./actions";
+import type { SelectionAnchor } from "./selection";
 import type { ProgressSnapshot } from "./annotations";
 import type { ReaderAnnotation } from "./reader-model";
 
@@ -59,6 +63,8 @@ interface ReaderState {
   annotate: (kind: AnnotationKind, target: AnnotationTarget) => Promise<boolean>;
   remove: (annotation: ReaderAnnotation) => Promise<boolean>;
   openNoteEditor: (editor: NoteEditor) => void;
+  /** Opens the flashcard editor for a selected passage. Nothing is saved until the user saves. */
+  openFlashcardEditor: (anchor: SelectionAnchor) => void;
   announce: (message: string) => void;
 }
 
@@ -93,6 +99,7 @@ export function ReaderProvider({
   const [progress, setProgress] = useState(initialProgress);
   const [message, setMessage] = useState("");
   const [editor, setEditor] = useState<NoteEditor | null>(null);
+  const [cardSource, setCardSource] = useState<SelectionAnchor | null>(null);
   const [draft, setDraft] = useState("");
   const [editorError, setEditorError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
@@ -178,6 +185,7 @@ export function ReaderProvider({
       annotate: (kind, target) => annotate(kind, target),
       remove,
       openNoteEditor,
+      openFlashcardEditor: setCardSource,
       announce,
     }),
     [
@@ -210,6 +218,37 @@ export function ReaderProvider({
       >
         {message}
       </p>
+      <Dialog
+        open={cardSource !== null}
+        onOpenChange={(open) => (open ? null : setCardSource(null))}
+      >
+        <DialogContent className="max-w-lg">
+          <DialogTitle>Create flashcard</DialogTitle>
+          <DialogDescription>
+            The answer starts as the passage you selected. Write the question, edit either side,
+            then save. It goes into this lecture&apos;s deck.
+          </DialogDescription>
+          {cardSource ? (
+            <div className="mt-4">
+              <CardEditor
+                initialBack={cardSource.quote}
+                submitLabel="Save flashcard"
+                onCancel={() => setCardSource(null)}
+                onSave={async (card) => {
+                  const result = await addFlashcardFromStudyGuide({
+                    resourceId,
+                    ...cardSource,
+                    ...card,
+                  });
+                  if (result.ok) announce(`Flashcard saved to ${result.value.deckName}.`);
+                  return result;
+                }}
+                onSaved={() => setCardSource(null)}
+              />
+            </div>
+          ) : null}
+        </DialogContent>
+      </Dialog>
       <Dialog open={editor !== null} onOpenChange={(open) => (open ? null : setEditor(null))}>
         <DialogContent className="max-w-lg">
           <DialogTitle>{editor?.mode === "edit" ? "Edit note" : "Add note"}</DialogTitle>

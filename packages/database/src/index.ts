@@ -72,3 +72,11 @@ export {
   type QuestionBankView,
   type RevealResult,
 } from "./access/question-bank";
+export {
+  type CardResult,
+  type CardText,
+  DEFAULT_NEW_PER_DAY,
+  type DeckSummary,
+  MAX_CARD_TEXT,
+  type ReviewQueue,
+} from "./access/flashcards";

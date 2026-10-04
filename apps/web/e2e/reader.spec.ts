@@ -240,10 +240,7 @@ test.describe("the Study Guide reader", () => {
     await expect(toolbar(page).getByRole("button", { name: "Highlight" })).toBeFocused();
     await page.keyboard.press("ArrowRight");
     await expect(toolbar(page).getByRole("button", { name: "Add note" })).toBeFocused();
-    await expect(toolbar(page).getByRole("button", { name: "Create flashcard" })).toHaveAttribute(
-      "aria-disabled",
-      "true",
-    );
+    await expect(toolbar(page).getByRole("button", { name: "Create flashcard" })).toBeEnabled();
     await page.keyboard.press("Escape");
     await expect(toolbar(page)).toBeHidden();
   });

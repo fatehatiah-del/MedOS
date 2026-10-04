@@ -123,7 +123,8 @@ test.describe("a lecture", () => {
       "Flashcards",
     ]);
     await expect(material.getByText("No material imported yet")).toHaveCount(4);
-    await expect(material.getByText("Arrives in a later phase")).toHaveCount(1);
+    // Flashcards are written in MedOS: the lecture offers to start its deck.
+    await expect(material.getByRole("button", { name: "Start this lecture's deck" })).toBeVisible();
     // Nothing to open yet, so nothing pretends to be a link.
     await expect(material.getByRole("link")).toHaveCount(0);
 

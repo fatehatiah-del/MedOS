@@ -2,6 +2,7 @@ import { relations } from "drizzle-orm";
 
 import { courses, lectures, semesters, weeks } from "./academic";
 import { calendarEvents, examEvents } from "./calendar";
+import { flashcardDecks, flashcardReviews, flashcards } from "./flashcards";
 import { resourceContents, resourceMedia } from "./content";
 import { originalLectureAnnotations, originalLecturePositions } from "./lecture-viewer";
 import { mcqAttempts, mcqSessions } from "./mcq";
@@ -139,4 +140,19 @@ export const questionBankAttemptsRelations = relations(questionBankAttempts, ({ 
     fields: [questionBankAttempts.resourceId],
     references: [resources.id],
   }),
+}));
+
+export const flashcardDecksRelations = relations(flashcardDecks, ({ one, many }) => ({
+  course: one(courses, { fields: [flashcardDecks.courseId], references: [courses.id] }),
+  lecture: one(lectures, { fields: [flashcardDecks.lectureId], references: [lectures.id] }),
+  cards: many(flashcards),
+}));
+
+export const flashcardsRelations = relations(flashcards, ({ one, many }) => ({
+  deck: one(flashcardDecks, { fields: [flashcards.deckId], references: [flashcardDecks.id] }),
+  reviews: many(flashcardReviews),
+}));
+
+export const flashcardReviewsRelations = relations(flashcardReviews, ({ one }) => ({
+  card: one(flashcards, { fields: [flashcardReviews.cardId], references: [flashcards.id] }),
 }));

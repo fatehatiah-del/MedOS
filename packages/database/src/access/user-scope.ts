@@ -8,6 +8,7 @@ import {
 import { and, asc, eq, like, sql } from "drizzle-orm";
 
 import type { Database } from "../client";
+import { createFlashcardAccess } from "./flashcards";
 import { createMcqAccess } from "./mcq";
 import { createOriginalLectureAccess } from "./original-lectures";
 import { createQuestionBankAccess } from "./question-bank";
@@ -389,6 +390,9 @@ export function createUserScope(db: Database, userId: string) {
 
     /** Question Banks for active recall, with the user's attempts and ratings. */
     questionBanks: createQuestionBankAccess(db, userId),
+
+    /** Flashcard decks, cards and FSRS reviews, always within one course. */
+    flashcards: createFlashcardAccess(db, userId),
 
     resources: {
       /**

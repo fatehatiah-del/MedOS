@@ -17,7 +17,8 @@ import { type SelectionAnchor, anchorFromSelection } from "./selection";
 
 /*
  * The actions offered for selected Study Guide text: Highlight, Add note,
- * Bookmark and Review Later, plus Create flashcard shown as a later feature.
+ * Bookmark and Review Later, and Create flashcard (an editor prefilled with
+ * the passage; the user writes the question and saves).
  *
  * It works with any way of selecting text: mouse, touch, or the keyboard with
  * caret browsing (F7). With text selected, Alt+A moves focus into the
@@ -39,7 +40,7 @@ const ACTIONS: { kind: AnnotationKind; label: string; icon: typeof Bookmark }[] 
 ];
 
 export function SelectionToolbar() {
-  const { annotate, openNoteEditor, pending } = useReader();
+  const { annotate, openNoteEditor, openFlashcardEditor, pending } = useReader();
   const [shown, setShown] = useState<Shown | null>(null);
   const [coarse, setCoarse] = useState(false);
   const toolbar = useRef<HTMLDivElement>(null);
@@ -180,16 +181,17 @@ export function SelectionToolbar() {
           <span aria-hidden="true" className="mx-0.5 h-5 w-px shrink-0 bg-border" />
           <button
             type="button"
-            aria-disabled="true"
-            aria-describedby="sg-flashcard-later"
-            className="flex h-9 shrink-0 cursor-not-allowed items-center gap-1.5 rounded-lg px-2.5 text-[13px] font-medium text-fg-subtle"
+            onClick={() => {
+              if (shown.status !== "anchor") return;
+              const { anchor } = shown;
+              close(true);
+              openFlashcardEditor(anchor);
+            }}
+            className="flex h-9 shrink-0 items-center gap-1.5 rounded-lg px-2.5 text-[13px] font-medium text-fg transition-colors duration-150 hover:bg-hover"
           >
-            <Layers aria-hidden="true" className="size-4" />
+            <Layers aria-hidden="true" className="size-4 text-fg-muted" />
             Create flashcard
           </button>
-          <span id="sg-flashcard-later" className="sr-only">
-            Arrives with Flashcards in a later phase.
-          </span>
         </>
       )}
       <button

@@ -103,3 +103,7 @@ export type McqSessionStatus = (typeof MCQ_SESSION_STATUSES)[number];
 /** How well the user recalled an answer, by their own judgement. */
 export const RECALL_RATINGS = ["again", "hard", "good", "easy"] as const;
 export type RecallRating = (typeof RECALL_RATINGS)[number];
+
+/** Where a flashcard came from. AI-generated cards would be a new, distinct value. */
+export const FLASHCARD_ORIGINS = ["manual", "study-guide"] as const;
+export type FlashcardOrigin = (typeof FLASHCARD_ORIGINS)[number];

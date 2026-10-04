@@ -28,7 +28,7 @@ describe("lecture categories", () => {
       "empty",
       "empty",
       "empty",
-      "later",
+      "empty",
     ]);
     expect(categoryStateLabel({ status: "empty" })).toBe("No material imported yet");
   });
