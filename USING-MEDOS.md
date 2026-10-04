@@ -10,6 +10,11 @@ This guide is for using MedOS day to day, without any development help. MedOS is
 opens MedOS at **http://localhost:3000**. The first page load after starting can take up to a
 minute while MedOS prepares itself; later pages are quick.
 
+Each start first brings your database up to date with the installed version of MedOS (after an
+update this adds what the new version needs; otherwise it takes a moment and changes nothing). If it
+says the database could not be updated, MedOS is probably already open in another black window:
+close that one and start again.
+
 **Keep the black window open** while you use MedOS. **To stop MedOS**, close that window.
 
 **Sign in** with fatehatiah@gmail.com and your password (or Google, if you set it up). Everything is

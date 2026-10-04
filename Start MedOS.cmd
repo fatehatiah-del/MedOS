@@ -16,6 +16,18 @@ if not exist "node_modules" (
   call npm install
 )
 
+rem Brings the database up to date with this version of MedOS. Already-applied
+rem updates are skipped, so this is quick when there is nothing new.
+echo Checking the database is up to date...
+call npm run db:migrate --silent
+if errorlevel 1 (
+  echo.
+  echo The database could not be updated, so MedOS was not started.
+  echo If MedOS is already running in another window, close that window and try again.
+  pause
+  exit /b 1
+)
+
 echo.
 echo Starting MedOS. Your browser opens at http://localhost:3000 in a few seconds.
 echo Keep this window open while you use MedOS. Close it to stop MedOS.
