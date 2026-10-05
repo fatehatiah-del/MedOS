@@ -69,3 +69,41 @@ export const mcqUrl = (fixture: ReaderFixture) =>
 
 export const questionBankUrl = (fixture: ReaderFixture) =>
   `/courses/pharmacology/lectures/${fixture.lectureId}/question-bank/${fixture.questionBankId}`;
+
+/*
+ * The full-workflow ("journey") accounts: one per browser project, so the
+ * desktop and mobile runs never share state, each with its own lecture of
+ * synthetic material imported through MedOS Sync (see reader-fixture.ts).
+ */
+
+export const JOURNEY_USERS = {
+  desktop: {
+    name: "Journey Desktop",
+    email: "journey-desktop@e2e.test",
+    password: READER_USER.password,
+  },
+  mobile: {
+    name: "Journey Mobile",
+    email: "journey-mobile@e2e.test",
+    password: READER_USER.password,
+  },
+} as const satisfies Record<string, TestUser>;
+
+export type JourneyProject = keyof typeof JOURNEY_USERS;
+
+export interface JourneyFixture {
+  lectureId: string;
+  guideId: string;
+  mcqId: string;
+  questionBankId: string;
+}
+
+export const JOURNEY_FIXTURE_FILE = path.join(__dirname, "..", "..", ".e2e", "journey.json");
+
+export function journeyFixture(project: JourneyProject): JourneyFixture {
+  const all = JSON.parse(readFileSync(JOURNEY_FIXTURE_FILE, "utf8")) as Record<
+    JourneyProject,
+    JourneyFixture
+  >;
+  return all[project];
+}

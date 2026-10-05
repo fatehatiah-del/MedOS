@@ -66,6 +66,11 @@ describe("EmptyState", () => {
     expect(screen.getByRole("heading", { level: 2, name: "No lectures yet" })).toBeInTheDocument();
     expect(screen.getByText("Sync to begin.")).toBeInTheDocument();
   });
+
+  it("can be the main heading of a page", () => {
+    render(<EmptyState title="Page not found" headingLevel={1} />);
+    expect(screen.getByRole("heading", { level: 1, name: "Page not found" })).toBeInTheDocument();
+  });
 });
 
 describe("Field", () => {

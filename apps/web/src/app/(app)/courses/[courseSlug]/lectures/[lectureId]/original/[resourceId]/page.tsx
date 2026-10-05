@@ -17,7 +17,11 @@ interface OriginalLecturePageProps {
   searchParams: Promise<{ page?: string | string[] }>;
 }
 
-const megabytes = (bytes: number) => `${(bytes / 1_000_000).toFixed(1)} MB`;
+/** "4.2 MB", or "380 KB" under a megabyte, so a small file never reads "0.0 MB". */
+const fileSize = (bytes: number) =>
+  bytes >= 1_000_000
+    ? `${(bytes / 1_000_000).toFixed(1)} MB`
+    : `${Math.max(1, Math.round(bytes / 1_000))} KB`;
 
 /**
  * The address must name the user's own lecture in its own course, and an
@@ -84,7 +88,7 @@ export default async function OriginalLecturePage({
             <FileText aria-hidden="true" className="size-3.5 shrink-0" />
             <span>
               PDF · {original.pageCount} {original.pageCount === 1 ? "page" : "pages"} ·{" "}
-              {megabytes(original.sizeBytes)}
+              {fileSize(original.sizeBytes)}
               {original.pagesWithoutText.length > 0
                 ? ` · ${original.pagesWithoutText.length} without selectable text`
                 : null}

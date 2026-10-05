@@ -61,7 +61,8 @@ dashboard.
 | 18    | Gamification (restrained progress)         | Complete    |
 | 19    | AI-ready interfaces (no AI)                | Complete    |
 | 20    | Export / backup                            | Complete    |
-| 21–22 | See `BUILD_PLAN.md`                        | Not started |
+| 21    | Final integration and UX pass              | Complete    |
+| 22    | See `BUILD_PLAN.md`                        | Not started |
 
 What exists today:
 
@@ -230,7 +231,12 @@ Extra arguments are forwarded, for example `npm run dev -- --port 4000`.
   and a mobile viewport. Each run starts from an empty scratch database and signs up through the
   real screens; there is no test-only way past authentication. They cover the login boundary,
   sign-in and sign-out, every route, navigation, theming, keyboard use, horizontal overflow, and
-  automated accessibility checks (including colour contrast) in both themes.
+  automated accessibility checks (including colour contrast) in both themes. `journey.spec.ts`
+  walks the whole workflow in one session (Login → Today → Course → Week → Lecture → Study Guide →
+  annotation → flashcard → MCQ → Question Bank → timer → completion → planner → statistics) and
+  checks each result where it should appear (Review, the deck, Statistics, the export), on its own
+  synthetic account per viewport. The server under test uses one embedded database, so
+  assertions wait up to 10 s (see `playwright.config.ts`).
 
 ## Database
 

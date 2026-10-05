@@ -11,8 +11,11 @@ export interface EmptyStateProps {
   children?: ReactNode;
   /** `compact` suits panels; `default` suits a whole page region. */
   size?: "default" | "compact";
-  /** Heading level for the title. Defaults to 3 (inside a labelled section). */
-  headingLevel?: 2 | 3;
+  /**
+   * Heading level for the title. Defaults to 3 (inside a labelled section); 1 when the empty
+   * state is the whole page, such as "Page not found", so the page still has its main heading.
+   */
+  headingLevel?: 1 | 2 | 3;
   className?: string;
 }
 
@@ -26,7 +29,7 @@ export function EmptyState({
   headingLevel = 3,
   className,
 }: EmptyStateProps) {
-  const Heading = headingLevel === 2 ? "h2" : "h3";
+  const Heading = (["h1", "h2", "h3"] as const)[headingLevel - 1] ?? "h3";
   const compact = size === "compact";
   return (
     <div

@@ -4,7 +4,7 @@ import path from "node:path";
 import { connect, parseDatabaseUrl } from "@medos/database";
 import { migrate } from "@medos/database/migrate";
 
-import { prepareReaderFixture } from "./reader-fixture";
+import { prepareJourneyFixture, prepareReaderFixture } from "./reader-fixture";
 
 /*
  * Runs before the server under test starts: gives every E2E run a brand-new
@@ -27,6 +27,7 @@ const connection = await connect(process.env.DATABASE_URL);
 try {
   await migrate(connection);
   await prepareReaderFixture(connection.db, path.dirname(target.dataDir));
+  await prepareJourneyFixture(connection.db, path.dirname(target.dataDir));
 } finally {
   // Closed before the server opens it: an embedded database allows one process at a time.
   await connection.close();

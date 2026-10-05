@@ -24,6 +24,10 @@ export default defineConfig({
   forbidOnly: isCI,
   retries: isCI ? 1 : 0,
   reporter: isCI ? [["github"], ["html", { open: "never" }]] : [["list"]],
+  // The server under test uses one embedded database, which answers one query at a time.
+  // With every browser project running in parallel, a save can wait its turn for several
+  // seconds, so assertions that follow a server round trip get 10 s instead of 5 s.
+  expect: { timeout: 10_000 },
   use: {
     baseURL,
     trace: "on-first-retry",

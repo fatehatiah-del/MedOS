@@ -21,6 +21,8 @@ import { type TimedBlock, allDayOn, hourBounds, layoutDay } from "./model";
  */
 
 const PX_PER_MINUTE = 0.8;
+/** Height at which a block shows title, time and place whole (an hour fits; 50 minutes clips the place). */
+const THREE_LINES_PX = 46;
 
 type Block =
   | (TimedBlock & { kind: "event"; event: DisplayEvent })
@@ -189,7 +191,8 @@ export function TimeGrid({
                           {event.start}–{event.end}
                           {event.origin === "personal" ? ` · ${event.typeLabel}` : ""}
                         </span>
-                        {event.location ? (
+                        {/* A third line only where it fits whole; the label and the details keep the place. */}
+                        {event.location && blockHeight >= THREE_LINES_PX ? (
                           <span className="block truncate text-fg-muted">{event.location}</span>
                         ) : null}
                       </button>

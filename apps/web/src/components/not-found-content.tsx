@@ -7,7 +7,7 @@ import { HOME_HREF } from "@/config/navigation";
 export function NotFoundContent() {
   return (
     <EmptyState
-      headingLevel={2}
+      headingLevel={1}
       icon={<Compass />}
       title="Page not found"
       description="There is nothing at this address. It may have moved, or the link may be incomplete."

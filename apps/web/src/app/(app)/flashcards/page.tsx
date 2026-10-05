@@ -33,6 +33,13 @@ export default async function FlashcardsPage() {
 
       <Notice icon={<Layers />} title="One course per session.">
         Review always stays within a single course. MedOS never mixes courses into one session.
+        {decks.length === 0 ? (
+          <>
+            {" "}
+            To make cards, open a lecture and start its deck, select Study Guide text and choose
+            Create flashcard, or name a course deck below.
+          </>
+        ) : null}
       </Notice>
 
       {semesterCourses.map((course) => {
@@ -80,10 +87,7 @@ export default async function FlashcardsPage() {
                 ))}
               </ul>
             ) : (
-              <p className="text-[13px] text-fg-subtle">
-                No decks yet. Open a lecture to start its deck, select Study Guide text and choose
-                Create flashcard, or make a course deck.
-              </p>
+              <p className="text-[13px] text-fg-subtle">No decks yet.</p>
             )}
             <NewDeck courseId={course.id} courseName={course.shortName} />
           </Section>

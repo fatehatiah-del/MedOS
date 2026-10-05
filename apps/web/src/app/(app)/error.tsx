@@ -18,7 +18,7 @@ export default function AppError({
   return (
     <div role="alert">
       <EmptyState
-        headingLevel={2}
+        headingLevel={1}
         icon={<TriangleAlert />}
         title="This page could not be displayed"
         description={

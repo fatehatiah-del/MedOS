@@ -42,3 +42,16 @@ test("dialogs are accessible when open", async ({ page }) => {
   await expect(dialog).toBeHidden();
   await expect(page.getByRole("button", { name: "View shortcuts" })).toBeFocused();
 });
+
+for (const path of ["/courses/no-such-course", "/no-such-page"]) {
+  test(`the not-found page at ${path} has its main heading and no violations`, async ({ page }) => {
+    const response = await page.goto(path);
+    // Outside the workspace the status is 404. Inside it the page streams behind the loading
+    // skeleton, so the 200 is already sent; Next.js marks that page noindex instead.
+    if (!path.startsWith("/courses/")) expect(response?.status()).toBe(404);
+    await expect(page.getByRole("heading", { level: 1, name: "Page not found" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Go to Today", exact: true })).toBeVisible();
+    const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
+    expect(results.violations.map((violation) => violation.id)).toEqual([]);
+  });
+}

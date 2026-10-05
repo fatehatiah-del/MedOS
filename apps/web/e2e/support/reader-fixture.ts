@@ -21,7 +21,15 @@ import { and, eq } from "drizzle-orm";
 import { resolveAuthConfig } from "../../src/server/auth/config";
 import { createAuth } from "../../src/server/auth/create-auth";
 
-import { LECTURE_PAGES, QUIZ_QUESTIONS, READER_USER, type ReaderFixture } from "./reader";
+import {
+  JOURNEY_USERS,
+  type JourneyFixture,
+  type JourneyProject,
+  LECTURE_PAGES,
+  QUIZ_QUESTIONS,
+  READER_USER,
+  type ReaderFixture,
+} from "./reader";
 
 /*
  * The Study Guide reader's E2E material: a synthetic study folder (invented
@@ -222,4 +230,67 @@ export async function prepareReaderFixture(db: Database, e2eDir: string): Promis
     secondGuideImages: await mediaOf(second.id),
   };
   writeFileSync(path.join(e2eDir, "reader.json"), JSON.stringify(fixture, null, 2));
+}
+
+/** A short guide for the full-workflow test: one section to read, annotate and make a card from. */
+function journeyGuide(): Uint8Array {
+  return buildDocx(
+    [
+      paragraph("Journey Study Guide", { style: "Title" }),
+      heading("1 Receptor basics"),
+      paragraph("Agonists activate receptors and antagonists block them."),
+      paragraph("Synthetic closing sentence of the journey guide."),
+    ].join(""),
+  );
+}
+
+/**
+ * One account per browser project for the full-workflow test, each with one
+ * lecture (Study Guide, quiz, Question Bank) imported through MedOS Sync.
+ * Called after the reader fixture, whose object store it shares.
+ */
+export async function prepareJourneyFixture(db: Database, e2eDir: string): Promise<void> {
+  const storage = path.join(e2eDir, "objects");
+  const fixtures = {} as Record<JourneyProject, JourneyFixture>;
+
+  for (const [project, account] of Object.entries(JOURNEY_USERS) as [
+    JourneyProject,
+    (typeof JOURNEY_USERS)[JourneyProject],
+  ][]) {
+    const source = path.join(e2eDir, `journey-source-${project}`);
+    rmSync(source, { recursive: true, force: true });
+    const week = path.join(source, "Pharma", "w1");
+    mkdirSync(week, { recursive: true });
+    writeFileSync(path.join(week, "StudyGuide.docx"), journeyGuide());
+    writeFileSync(path.join(week, "Quiz.html"), readerQuiz());
+    writeFileSync(path.join(week, "QuestionBank.docx"), sampleQuestionBank());
+
+    const auth = createAuth(db, resolveAuthConfig(process.env));
+    await auth.api.signUpEmail({ body: account });
+    const [user] = await db.select().from(users).where(eq(users.email, account.email));
+    if (!user) throw new Error(`The ${project} journey account was not created.`);
+
+    const sync = await runSync(db, user.id, source, {
+      store: new LocalObjectStore(storage),
+      dryRun: false,
+    });
+    const failed = sync.processing.processed.filter((resource) => resource.outcome !== "parsed");
+    if (failed.length > 0)
+      throw new Error(`Journey fixture did not parse: ${JSON.stringify(failed)}`);
+
+    const rows = await db.select().from(resources).where(eq(resources.userId, user.id));
+    const byName = (name: string) => {
+      const row = rows.find((resource) => resource.originalFilename === name);
+      if (!row) throw new Error(`Journey fixture is missing ${name}.`);
+      return row;
+    };
+    const guide = byName("StudyGuide.docx");
+    fixtures[project] = {
+      lectureId: guide.lectureId,
+      guideId: guide.id,
+      mcqId: byName("Quiz.html").id,
+      questionBankId: byName("QuestionBank.docx").id,
+    };
+  }
+  writeFileSync(path.join(e2eDir, "journey.json"), JSON.stringify(fixtures, null, 2));
 }

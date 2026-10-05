@@ -43,9 +43,10 @@ flashcard's answer, 1–4 to rate).
 
 ## What is not built yet
 
-The study timer, Calendar, Study Plan, Search, Statistics and export are built (Phases 13–20). What
-remains is a final polish pass and deployment (Phases 21–22 in `BUILD_PLAN.md`). In **Settings**,
-study availability and Sync are shown but not editable there yet. There is no AI, by design, until a
+Everything up to the final polish pass is built (Phases 1–21). What remains is deployment (Phase 22
+in `BUILD_PLAN.md`), which will make MedOS reachable from other devices. In **Settings**, study
+availability and Sync are shown but not editable there yet (set your study time on the **Study
+Plan** page). There is no AI, by design, until a
 provider is configured.
 
 ## Your data and backups
