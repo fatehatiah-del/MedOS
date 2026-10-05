@@ -9,8 +9,24 @@ let sequence = 0;
  * address, the way separate visitors would. The server's sign-in rate limit
  * is per address, so tests do not throttle one another, and the limiter stays
  * fully enabled (one test exercises it on purpose).
+ *
+ * Every test also fails if the browser blocked anything under the Content
+ * Security Policy, so the whole suite checks the policy on every page it visits.
  */
-export const test = base.extend({
+export const test = base.extend<{ contentSecurityPolicy: void }>({
+  contentSecurityPolicy: [
+    async ({ page }, use) => {
+      const violations: string[] = [];
+      page.on("console", (message) => {
+        if (message.type() === "error" && /Content Security Policy/i.test(message.text())) {
+          violations.push(message.text());
+        }
+      });
+      await use();
+      expect(violations, "Content Security Policy violations").toEqual([]);
+    },
+    { auto: true },
+  ],
   // Playwright requires the first argument to be a destructuring pattern, even when empty.
   extraHTTPHeaders: async ({}, provide, testInfo) => {
     sequence += 1;

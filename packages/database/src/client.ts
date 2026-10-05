@@ -3,7 +3,7 @@ import path from "node:path";
 
 import type { PgDatabase, PgQueryResultHKT } from "drizzle-orm/pg-core";
 
-import { type DatabaseTarget, parseDatabaseUrl } from "./config";
+import { type DatabaseTarget, parseDatabaseUrl, postgresConnection } from "./config";
 import { acquireDatabaseLock } from "./lock";
 import * as schema from "./schema";
 
@@ -58,7 +58,8 @@ export async function connect(databaseUrl: string | undefined): Promise<Database
     import("drizzle-orm/postgres-js"),
   ]);
   // Notices (e.g. "relation already exists, skipping") are not errors; keep output quiet.
-  const client = postgres(target.url, { onnotice: () => {} });
+  const { url, prepare } = postgresConnection(target.url);
+  const client = postgres(url, { onnotice: () => {}, prepare });
   return {
     db: drizzle(client, { schema }),
     driver: "postgres",

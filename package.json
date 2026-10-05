@@ -15,6 +15,7 @@
     "dev": "npm run dev --workspace @medos/web --",
     "build": "npm run build --workspace @medos/web --",
     "start": "npm run start --workspace @medos/web --",
+    "check:production": "npm run check:production --workspace @medos/web --",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "lint": "eslint .",
     "format": "prettier --write .",

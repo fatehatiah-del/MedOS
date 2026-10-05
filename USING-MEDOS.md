@@ -21,7 +21,7 @@ close that one and start again.
 stored on this computer only.
 
 MedOS runs on this computer, so it is not reachable from your phone or another computer yet; that
-comes with deployment (the last phase).
+comes once you deploy it (see `docs/deployment.md`).
 
 ## What you can do
 
@@ -43,11 +43,12 @@ flashcard's answer, 1–4 to rate).
 
 ## What is not built yet
 
-Everything up to the final polish pass is built (Phases 1–21). What remains is deployment (Phase 22
-in `BUILD_PLAN.md`), which will make MedOS reachable from other devices. In **Settings**, study
-availability and Sync are shown but not editable there yet (set your study time on the **Study
-Plan** page). There is no AI, by design, until a
-provider is configured.
+All 22 phases in `BUILD_PLAN.md` are built. MedOS is ready to be put online, but it is not online
+yet: that is a step you take when you choose, following `docs/deployment.md` (a database, a file
+bucket and a host; your existing history moves over with a step still to be built). Until then it
+runs on this computer only. In **Settings**, study availability and Sync are shown but not
+editable there yet (set your study time on the **Study Plan** page). There is no AI, by design,
+until a provider is configured.
 
 ## Your data and backups
 

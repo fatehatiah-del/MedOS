@@ -2,7 +2,12 @@ import path from "node:path";
 
 import { describe, expect, it } from "vitest";
 
-import { DatabaseConfigError, findWorkspaceRoot, parseDatabaseUrl } from "./config";
+import {
+  DatabaseConfigError,
+  findWorkspaceRoot,
+  parseDatabaseUrl,
+  postgresConnection,
+} from "./config";
 
 const root = path.resolve("/workspace");
 
@@ -50,5 +55,21 @@ describe("findWorkspaceRoot", () => {
     const found = findWorkspaceRoot(import.meta.dirname);
     expect(path.basename(path.join(found, "packages", "database"))).toBe("database");
     expect(found).toBe(findWorkspaceRoot(found));
+  });
+});
+
+describe("postgresConnection", () => {
+  it("keeps prepared statements for a direct connection", () => {
+    const url = "postgres://user:secret@db.example:5432/medos?sslmode=require";
+    expect(postgresConnection(url)).toEqual({ url, prepare: true });
+  });
+
+  it("turns them off behind a transaction pooler, and drops the marker", () => {
+    expect(
+      postgresConnection("postgres://user:secret@pooler.example:6543/postgres?pgbouncer=true"),
+    ).toEqual({ url: "postgres://user:secret@pooler.example:6543/postgres", prepare: false });
+    expect(
+      postgresConnection("postgres://u:p@pooler.example:6543/db?sslmode=require&pgbouncer=false"),
+    ).toEqual({ url: "postgres://u:p@pooler.example:6543/db?sslmode=require", prepare: true });
   });
 });

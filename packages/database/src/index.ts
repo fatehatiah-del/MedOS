@@ -19,6 +19,7 @@ export {
   findWorkspaceRoot,
   loadLocalEnv,
   parseDatabaseUrl,
+  postgresConnection,
 } from "./config";
 export { DatabaseInUseError } from "./lock";
 export {

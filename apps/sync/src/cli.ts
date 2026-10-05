@@ -9,14 +9,34 @@ import {
   syncFiles,
 } from "@medos/database";
 import { migrate } from "@medos/database/migrate";
+import {
+  type ObjectStore,
+  StorageConfigError,
+  createObjectStore,
+  storageConfigFromEnv,
+} from "@medos/storage";
 import { eq } from "drizzle-orm";
 
 import { ConfigError, resolveSourceDir, resolveStorageDir, resolveUserEmail } from "./config";
 import { processResources } from "./process/process";
 import { formatScanReport, formatSyncReport, processLines } from "./report";
 import { SyncError, findUserId } from "./state";
-import { LocalObjectStore } from "@medos/storage";
 import { runSync, scanAndClassify } from "./sync";
+
+/**
+ * The object store the web app reads: a local folder (never inside the source
+ * folder), or the hosted S3-compatible bucket when STORAGE_PROVIDER=s3.
+ */
+function openStore(sourceDir?: string): ObjectStore {
+  try {
+    return createObjectStore(storageConfigFromEnv(process.env), (configured) =>
+      resolveStorageDir(configured ?? undefined, sourceDir),
+    );
+  } catch (error) {
+    if (error instanceof StorageConfigError) throw new ConfigError(error.message);
+    throw error;
+  }
+}
 
 const HELP = `MedOS Sync — bring your study folder into MedOS, read-only.
 
@@ -98,34 +118,31 @@ async function main(argv: readonly string[]): Promise<void> {
 
     case "sync": {
       const source = resolveSourceDir(values.source ?? process.env.MEDOS_SOURCE_DIR);
-      const storage = resolveStorageDir(process.env.MEDOS_STORAGE_DIR, source);
+      const store = openStore(source);
       const email = resolveUserEmail(values.user ?? process.env.MEDOS_SYNC_USER);
       const dryRun = values["dry-run"];
       await withDatabase(async ({ db }) => {
         const userId = await findUserId(db, email);
         const run = await runSync(db, userId, source, {
-          store: new LocalObjectStore(storage),
+          store,
           dryRun,
           removePlaceholders: values["remove-placeholders"],
           onUnexpectedError: reportUnexpected,
         });
-        console.log(formatSyncReport({ ...run, dryRun, verbose, storage }));
+        console.log(formatSyncReport({ ...run, dryRun, verbose, storage: store.describe() }));
       });
       return;
     }
 
     case "process": {
       const sourceValue = values.source ?? process.env.MEDOS_SOURCE_DIR;
-      const storage = resolveStorageDir(
-        process.env.MEDOS_STORAGE_DIR,
-        sourceValue ? resolveSourceDir(sourceValue) : undefined,
-      );
+      const store = openStore(sourceValue ? resolveSourceDir(sourceValue) : undefined);
       const email = resolveUserEmail(values.user ?? process.env.MEDOS_SYNC_USER);
       const dryRun = values["dry-run"];
       await withDatabase(async ({ db }) => {
         const userId = await findUserId(db, email);
         const report = await processResources(db, userId, {
-          store: new LocalObjectStore(storage),
+          store,
           dryRun,
           reprocessAll: values.all,
           onUnexpectedError: reportUnexpected,
@@ -134,7 +151,7 @@ async function main(argv: readonly string[]): Promise<void> {
           [
             dryRun ? "MedOS Sync — process, dry run (nothing is changed)" : "MedOS Sync — process",
             "",
-            `Storage: ${storage}`,
+            `Storage: ${store.describe()}`,
             "",
             ...processLines(report),
           ].join("\n"),

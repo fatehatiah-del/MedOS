@@ -81,3 +81,19 @@ export function loadLocalEnv(root: string = findWorkspaceRoot()): void {
   const file = path.join(root, "apps", "web", ".env.local");
   if (existsSync(file)) process.loadEnvFile(file);
 }
+
+/**
+ * Connection settings for a PostgreSQL server. A connection pooler in
+ * transaction mode (Supabase's pooler, PgBouncer), which hosted and serverless
+ * deployments use, cannot keep prepared statements between queries: mark its
+ * URL with `?pgbouncer=true` (Supabase's own convention) to turn them off. The
+ * marker is removed before connecting, since the server does not know it.
+ */
+export function postgresConnection(url: string): { url: string; prepare: boolean } {
+  if (!URL.canParse(url)) return { url, prepare: true };
+  const parsed = new URL(url);
+  const pooled = parsed.searchParams.get("pgbouncer") === "true";
+  if (!parsed.searchParams.has("pgbouncer")) return { url, prepare: true };
+  parsed.searchParams.delete("pgbouncer");
+  return { url: parsed.toString(), prepare: !pooled };
+}

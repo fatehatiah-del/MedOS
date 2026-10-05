@@ -24,6 +24,13 @@ export default defineConfig({
       },
       {
         test: {
+          name: "storage",
+          environment: "node",
+          include: ["packages/storage/src/**/*.test.ts"],
+        },
+      },
+      {
+        test: {
           name: "export",
           environment: "node",
           include: ["packages/export/src/**/*.test.ts"],

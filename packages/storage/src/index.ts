@@ -113,3 +113,14 @@ export class LocalObjectStore implements ObjectStore {
     }
   }
 }
+
+export { S3ObjectStore, type S3StoreConfig } from "./s3";
+export {
+  STORAGE_PROVIDERS,
+  type StorageConfig,
+  StorageConfigError,
+  type StorageProvider,
+  createObjectStore,
+  isLocalHost,
+  storageConfigFromEnv,
+} from "./config";

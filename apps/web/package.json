@@ -10,7 +10,8 @@
     "typecheck": "next typegen && tsc --noEmit",
     "test:e2e": "next build && playwright test",
     "test:e2e:install": "playwright install chromium",
-    "e2e:serve": "tsx e2e/support/prepare-database.mts && next start"
+    "e2e:serve": "tsx e2e/support/prepare-database.mts && next start",
+    "check:production": "tsx scripts/check-production.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

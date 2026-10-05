@@ -33,36 +33,39 @@ dashboard.
 | [`docs/progress.md`](docs/progress.md)                     | Progress: streak, weekly target, counts. No badges.           |
 | [`docs/ai.md`](docs/ai.md)                                 | AI-ready interfaces: the provider, the features, adding one.  |
 | [`docs/export.md`](docs/export.md)                         | Export and backup: formats, provenance, Anki.                 |
+| [`docs/deployment.md`](docs/deployment.md)                 | Deploying: variables, Supabase and Vercel, migrations, sync.  |
+| [`docs/backup.md`](docs/backup.md)                         | Backup and restore, here and hosted.                          |
+| [`docs/security.md`](docs/security.md)                     | Security checklist: what is built in, what to confirm.        |
 | [`docs/authentication.md`](docs/authentication.md)         | Sign-in, sessions and the private boundary.                   |
 | [`docs/google-auth-setup.md`](docs/google-auth-setup.md)   | Manual steps to enable Google sign-in.                        |
 
 ## Current status
 
-| Phase | Scope                                      | Status      |
-| ----- | ------------------------------------------ | ----------- |
-| 0     | Repository and engineering foundation      | Complete    |
-| 1     | Design system and application shell        | Complete    |
-| 2     | Database foundation                        | Complete    |
-| 3     | Authentication and privacy                 | Complete    |
-| 4     | Course / week / lecture system             | Complete    |
-| 5     | Local MedOS sync CLI                       | Complete    |
-| 6     | Parsing and resource pipeline              | Complete    |
-| 7     | Study Guide reader                         | Complete    |
-| 8     | Original lecture viewer                    | Complete    |
-| 9     | MCQ engine                                 | Complete    |
-| 10    | Question Bank / active recall              | Complete    |
-| 11    | Flashcards and FSRS                        | Complete    |
-| 12    | Notes, highlights, bookmarks, Review Later | Complete    |
-| 13    | Study timer                                | Complete    |
-| 14    | Calendar and academic schedule             | Complete    |
-| 15    | Study planner                              | Complete    |
-| 16    | Weakness engine and analytics              | Complete    |
-| 17    | Search                                     | Complete    |
-| 18    | Gamification (restrained progress)         | Complete    |
-| 19    | AI-ready interfaces (no AI)                | Complete    |
-| 20    | Export / backup                            | Complete    |
-| 21    | Final integration and UX pass              | Complete    |
-| 22    | See `BUILD_PLAN.md`                        | Not started |
+| Phase | Scope                                      | Status   |
+| ----- | ------------------------------------------ | -------- |
+| 0     | Repository and engineering foundation      | Complete |
+| 1     | Design system and application shell        | Complete |
+| 2     | Database foundation                        | Complete |
+| 3     | Authentication and privacy                 | Complete |
+| 4     | Course / week / lecture system             | Complete |
+| 5     | Local MedOS sync CLI                       | Complete |
+| 6     | Parsing and resource pipeline              | Complete |
+| 7     | Study Guide reader                         | Complete |
+| 8     | Original lecture viewer                    | Complete |
+| 9     | MCQ engine                                 | Complete |
+| 10    | Question Bank / active recall              | Complete |
+| 11    | Flashcards and FSRS                        | Complete |
+| 12    | Notes, highlights, bookmarks, Review Later | Complete |
+| 13    | Study timer                                | Complete |
+| 14    | Calendar and academic schedule             | Complete |
+| 15    | Study planner                              | Complete |
+| 16    | Weakness engine and analytics              | Complete |
+| 17    | Search                                     | Complete |
+| 18    | Gamification (restrained progress)         | Complete |
+| 19    | AI-ready interfaces (no AI)                | Complete |
+| 20    | Export / backup                            | Complete |
+| 21    | Final integration and UX pass              | Complete |
+| 22    | Deployment readiness                       | Complete |
 
 What exists today:
 
@@ -151,7 +154,7 @@ MedOS/
 │   │   ├── migrations/      Generated SQL migrations (tracked)
 │   │   └── src/             schema/, seed/, cli/, client.ts, config.ts
 │   ├── shared/              Domain constants and pure helpers (courses, semester, dates, study time)
-│   ├── storage/             Content-addressed object storage, shared by the sync and the web app
+│   ├── storage/             Content-addressed object storage (local folder or S3), shared by sync and web app
 │   └── ui/                  Design tokens and reusable, accessible UI primitives
 ├── docs/
 ├── CLAUDE.md
@@ -200,18 +203,19 @@ password of at least 10 characters. No email is sent. To run the E2E tests, also
 
 Run from the repository root.
 
-| Command               | What it does                                                |
-| --------------------- | ----------------------------------------------------------- |
-| `npm run dev`         | Start the development server.                               |
-| `npm run build`       | Create the production build.                                |
-| `npm run start`       | Serve the production build.                                 |
-| `npm run typecheck`   | Type-check every workspace.                                 |
-| `npm run lint`        | Lint the repository with ESLint.                            |
-| `npm run format`      | Format with Prettier (`format:check` verifies only).        |
-| `npm run test`        | Run unit and component tests once (`test:watch` to watch).  |
-| `npm run test:e2e`    | Build for production, then run the Playwright suite.        |
-| `npm run validate`    | Typecheck, lint, format check, migration check, tests, E2E. |
-| `npm run auth:secret` | Print a new random value for `AUTH_SECRET`.                 |
+| Command                    | What it does                                                                              |
+| -------------------------- | ----------------------------------------------------------------------------------------- |
+| `npm run dev`              | Start the development server.                                                             |
+| `npm run build`            | Create the production build.                                                              |
+| `npm run start`            | Serve the production build.                                                               |
+| `npm run typecheck`        | Type-check every workspace.                                                               |
+| `npm run lint`             | Lint the repository with ESLint.                                                          |
+| `npm run format`           | Format with Prettier (`format:check` verifies only).                                      |
+| `npm run test`             | Run unit and component tests once (`test:watch` to watch).                                |
+| `npm run test:e2e`         | Build for production, then run the Playwright suite.                                      |
+| `npm run validate`         | Typecheck, lint, format check, migration check, tests, E2E.                               |
+| `npm run auth:secret`      | Print a new random value for `AUTH_SECRET`.                                               |
+| `npm run check:production` | Check a deployment's variables (`-- --env <file>`); see [deployment](docs/deployment.md). |
 
 Extra arguments are forwarded, for example `npm run dev -- --port 4000`.
 
@@ -334,22 +338,27 @@ Invalid values stop the affected feature with a clear message. The database comm
 cp .env.example apps/web/.env.local
 ```
 
-| Variable                    | Required      | Default          | Notes                                                                          |
-| --------------------------- | ------------- | ---------------- | ------------------------------------------------------------------------------ |
-| `DATABASE_URL`              | Yes           | —                | See [Database](#database).                                                     |
-| `AUTH_SECRET`               | Yes           | —                | Signs session cookies. At least 32 characters; `npm run auth:secret`.          |
-| `APP_URL`                   | In production | —                | Public address of the app, e.g. `https://medos.example`.                       |
-| `AUTH_GOOGLE_CLIENT_ID`     | No            | —                | Set together with the secret to enable Google sign-in.                         |
-| `AUTH_GOOGLE_CLIENT_SECRET` | No            | —                | Server-only.                                                                   |
-| `AUTH_ALLOWED_EMAILS`       | No            | —                | Comma-separated addresses allowed to create an account.                        |
-| `MEDOS_SOURCE_DIR`          | For sync      | —                | Your study folder. Read only.                                                  |
-| `MEDOS_SYNC_USER`           | For sync      | —                | Email of the MedOS account to import into.                                     |
-| `MEDOS_STORAGE_DIR`         | No            | `.medos/objects` | Copies of originals and extracted images; read by the sync and the web app.    |
-| `DEV_FIXTURE_LECTURES`      | No            | `false`          | `true` adds placeholder weeks and lectures to a new account. Development only. |
-| `AI_PROVIDER`               | No            | `none`           | `none` is the only supported value.                                            |
+| Variable                                                                                                     | Required      | Default          | Notes                                                                               |
+| ------------------------------------------------------------------------------------------------------------ | ------------- | ---------------- | ----------------------------------------------------------------------------------- |
+| `DATABASE_URL`                                                                                               | Yes           | —                | See [Database](#database).                                                          |
+| `AUTH_SECRET`                                                                                                | Yes           | —                | Signs session cookies. At least 32 characters; `npm run auth:secret`.               |
+| `APP_URL`                                                                                                    | In production | —                | Public address of the app, e.g. `https://medos.example`.                            |
+| `AUTH_GOOGLE_CLIENT_ID`                                                                                      | No            | —                | Set together with the secret to enable Google sign-in.                              |
+| `AUTH_GOOGLE_CLIENT_SECRET`                                                                                  | No            | —                | Server-only.                                                                        |
+| `AUTH_ALLOWED_EMAILS`                                                                                        | No            | —                | Comma-separated addresses allowed to create an account.                             |
+| `MEDOS_SOURCE_DIR`                                                                                           | For sync      | —                | Your study folder. Read only.                                                       |
+| `MEDOS_SYNC_USER`                                                                                            | For sync      | —                | Email of the MedOS account to import into.                                          |
+| `MEDOS_STORAGE_DIR`                                                                                          | No            | `.medos/objects` | Copies of originals and extracted images; read by the sync and the web app.         |
+| `STORAGE_PROVIDER`                                                                                           | No            | `local`          | `s3` for an S3-compatible bucket; required on hosts without a lasting disk.         |
+| `STORAGE_BUCKET`, `STORAGE_ENDPOINT`, `STORAGE_REGION`, `STORAGE_ACCESS_KEY_ID`, `STORAGE_SECRET_ACCESS_KEY` | With `s3`     | Region `auto`    | The private bucket and a key limited to it. Server-only.                            |
+| `MEDOS_EPHEMERAL_DISK`                                                                                       | No            | `false`          | `true` on a serverless host other than Vercel; then PostgreSQL and S3 are required. |
+| `DEV_FIXTURE_LECTURES`                                                                                       | No            | `false`          | `true` adds placeholder weeks and lectures to a new account. Development only.      |
+| `AI_PROVIDER`                                                                                                | No            | `none`           | `none` is the only supported value.                                                 |
 
-None of these is exposed to the browser. Variables for storage are listed in `.env.example` as
-reserved and are not read yet. Real `.env` files are git-ignored; never commit secrets.
+None of these is exposed to the browser. Real `.env` files are git-ignored; never commit secrets.
+In production the server checks the whole configuration when it starts and refuses to run while
+anything is unsafe or missing; `npm run check:production` runs the same check beforehand (see
+[`docs/deployment.md`](docs/deployment.md)).
 
 ## Design system
 
@@ -372,6 +381,8 @@ MedOS holds private study data.
 - Data access is bound to the signed-in user; another user's record is indistinguishable from one
   that does not exist.
 - Indexing is disabled through `robots.txt`, a `robots` meta tag and an `X-Robots-Tag` header.
+- A Content Security Policy with a per-request nonce, HSTS and the other security headers are on
+  every response; see the [security checklist](docs/security.md).
 - No analytics, advertising or telemetry is added by MedOS. Next.js's own anonymous telemetry can
   be switched off with `npx next telemetry disable`.
 

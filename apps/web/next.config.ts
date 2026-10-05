@@ -2,6 +2,8 @@ import path from "node:path";
 
 import type { NextConfig } from "next";
 
+import { SECURITY_HEADERS } from "./src/server/security-headers";
+
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
@@ -26,9 +28,10 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        // All study data is private: never allow indexing, on any host.
+        // On every response, static files included. The Content Security Policy,
+        // which needs a nonce per request, is added by the proxy (src/proxy.ts).
         source: "/:path*",
-        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
+        headers: [...SECURITY_HEADERS],
       },
     ];
   },
