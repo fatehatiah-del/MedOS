@@ -9,6 +9,7 @@ const nextConfig: NextConfig = {
   transpilePackages: [
     "@medos/ai",
     "@medos/database",
+    "@medos/export",
     "@medos/fsrs",
     "@medos/parsers",
     "@medos/shared",

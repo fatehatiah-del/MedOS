@@ -9,6 +9,7 @@ import { and, asc, eq, like, sql } from "drizzle-orm";
 
 import type { Database } from "../client";
 import { createCalendarAccess } from "./calendar";
+import { createExportAccess } from "./export";
 import { createFlashcardAccess } from "./flashcards";
 import { createMcqAccess } from "./mcq";
 import { createPlannerAccess } from "./planner";
@@ -421,6 +422,9 @@ export function createUserScope(db: Database, userId: string) {
 
     /** Streak, weekly target and progress counts, from real sessions and activity. */
     progress: createProgressAccess(db, userId),
+
+    /** Everything the user made or recorded, as one snapshot in the open MedOS export format. */
+    export: createExportAccess(db, userId),
 
     resources: {
       /**

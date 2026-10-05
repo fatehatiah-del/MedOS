@@ -35,6 +35,7 @@ comes with deployment (the last phase).
 | Lecture → **Open deck** / **Flashcards**    | Write flashcards (or create them from Study Guide text), then **Review** one course at a time. Scheduling is automatic (FSRS).                                                               |
 | Sidebar → **Review**                        | Everything you marked: Review later, Notes, Highlights, Bookmarks, by course. **Open** goes to the exact place; **Done** clears a Review later item.                                         |
 | Sidebar → **Question Bank**, **Flashcards** | All your banks and decks by course.                                                                                                                                                          |
+| Sidebar → **Settings** → Export and backup  | Download everything you made or recorded: **Everything (.zip)**, or JSON, CSV, Markdown (your notes to read) or an Anki file. See "Your data and backups" below.                             |
 | Top right → theme                           | Light, dark or system theme.                                                                                                                                                                 |
 
 Keyboard shortcuts are shown under each practice screen (for example A–D to answer, Space to show a
@@ -42,10 +43,10 @@ flashcard's answer, 1–4 to rate).
 
 ## What is not built yet
 
-These pages exist but are placeholders or show sample data: **Today** (the schedule and plan shown
-are sample data), **Calendar**, **Study Plan**, **Search**, **Statistics**, and parts of
-**Settings**. There is no study timer, no export, and no AI.
-They are the remaining phases (13–22) in `BUILD_PLAN.md`.
+The study timer, Calendar, Study Plan, Search, Statistics and export are built (Phases 13–20). What
+remains is a final polish pass and deployment (Phases 21–22 in `BUILD_PLAN.md`). In **Settings**,
+study availability and Sync are shown but not editable there yet. There is no AI, by design, until a
+provider is configured.
 
 ## Your data and backups
 
@@ -57,6 +58,13 @@ They are the remaining phases (13–22) in `BUILD_PLAN.md`.
 
 **Backups made so far** (one before each upgrade) are in `.medos\backups`, for example
 `pgdata-before-phase12`.
+
+**To export your data** (any time, while MedOS runs): **Settings → Export and backup →
+Everything (.zip)**. The zip holds a `README.txt` explaining each file; the JSON file is the
+complete record, the `csv` folder opens in Excel, `medos-notes.md` is your notes and highlights to
+read, and `flashcards-anki.txt` imports into Anki (File → Import). Each item names the course, week,
+lecture and file it came from. An export is a copy to keep or use elsewhere; it cannot be loaded
+back into MedOS, so for a full restore keep the database backups below.
 
 **To make your own backup:** stop MedOS (close the black window), then copy the folder
 `.medos\pgdata` to somewhere safe (for example `.medos\backups\pgdata-my-backup-<date>`, or a USB

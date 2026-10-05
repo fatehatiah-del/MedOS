@@ -1,4 +1,5 @@
 import { AI_FEATURES, AI_FEATURE_IDS } from "@medos/ai";
+import type { ExportKind } from "@medos/export";
 import { CURRENT_SEMESTER, DEFAULT_STUDY_AVAILABILITY } from "@medos/shared";
 import { Badge, Button, Field, Input, PageHeader, fieldHintId } from "@medos/ui";
 import type { Metadata } from "next";
@@ -13,7 +14,22 @@ import { requireUser } from "@/server/session";
 
 export const metadata: Metadata = { title: "Settings" };
 
-const EXPORT_FORMATS = ["JSON", "CSV", "Markdown"] as const;
+/** The downloads, each a GET of /api/export. CSV comes as a zip of one file per kind. */
+const EXPORT_OPTIONS = [
+  {
+    format: "all",
+    label: "Everything (.zip)",
+    description: "JSON, CSV, Markdown and the Anki file together.",
+  },
+  { format: "json", label: "JSON", description: "Every record, exactly as stored." },
+  { format: "csv", label: "CSV (.zip)", description: "Spreadsheets, one per kind of record." },
+  {
+    format: "markdown",
+    label: "Markdown",
+    description: "Notes, highlights and flashcards to read.",
+  },
+  { format: "anki", label: "Anki (.txt)", description: "Flashcards to import into Anki." },
+] as const satisfies readonly { format: ExportKind; label: string; description: string }[];
 
 interface SettingsSectionProps {
   title: string;
@@ -175,18 +191,32 @@ export default async function SettingsPage() {
 
         <SettingsSection
           title="Export and backup"
-          description="Your notes, flashcards, history and progress stay yours, in open formats."
-          status={<Badge tone="outline">Coming soon</Badge>}
+          description="Your notes, flashcards, history and progress stay yours, in open formats any program can read."
         >
-          <ul aria-label="Export formats, unavailable" className="flex flex-wrap gap-2">
-            {EXPORT_FORMATS.map((format) => (
-              <li key={format}>
-                <Button size="sm" disabled>
-                  Export {format}
+          <ul aria-label="Export downloads" className="grid max-w-xl gap-3">
+            {EXPORT_OPTIONS.map((option) => (
+              <li
+                key={option.format}
+                className="grid gap-1.5 sm:grid-cols-[10rem_minmax(0,1fr)] sm:items-center sm:gap-4"
+              >
+                <Button
+                  asChild
+                  size="sm"
+                  variant={option.format === "all" ? "primary" : "secondary"}
+                  className="w-full"
+                >
+                  <a href={`/api/export?format=${option.format}`} download>
+                    {option.label}
+                  </a>
                 </Button>
+                <span className="text-[13px] text-fg-muted">{option.description}</span>
               </li>
             ))}
           </ul>
+          <p className="mt-4 max-w-xl text-xs leading-relaxed text-fg-subtle">
+            Every item names the course, week, lecture and file it came from. Your original lecture
+            files are not included; they stay in your own folders.
+          </p>
         </SettingsSection>
 
         <SettingsSection

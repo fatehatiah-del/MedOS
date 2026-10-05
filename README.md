@@ -32,6 +32,7 @@ dashboard.
 | [`docs/search.md`](docs/search.md)                         | Search: what it covers, matching, the index.                  |
 | [`docs/progress.md`](docs/progress.md)                     | Progress: streak, weekly target, counts. No badges.           |
 | [`docs/ai.md`](docs/ai.md)                                 | AI-ready interfaces: the provider, the features, adding one.  |
+| [`docs/export.md`](docs/export.md)                         | Export and backup: formats, provenance, Anki.                 |
 | [`docs/authentication.md`](docs/authentication.md)         | Sign-in, sessions and the private boundary.                   |
 | [`docs/google-auth-setup.md`](docs/google-auth-setup.md)   | Manual steps to enable Google sign-in.                        |
 
@@ -59,7 +60,8 @@ dashboard.
 | 17    | Search                                     | Complete    |
 | 18    | Gamification (restrained progress)         | Complete    |
 | 19    | AI-ready interfaces (no AI)                | Complete    |
-| 20–22 | See `BUILD_PLAN.md`                        | Not started |
+| 20    | Export / backup                            | Complete    |
+| 21–22 | See `BUILD_PLAN.md`                        | Not started |
 
 What exists today:
 
@@ -104,7 +106,9 @@ What exists today:
 - search (Ctrl+K) across courses, lectures, Study Guide sections, MCQs, Question Bank items,
   flashcards, notes and bookmarks, each result opening at its source;
 - restrained progress: a study streak, a weekly target from your own study time, questions
-  answered, flashcards mastered, retention and course completion. No badges or points.
+  answered, flashcards mastered, retention and course completion. No badges or points;
+- export and backup: everything you made or recorded as JSON, CSV, Markdown and an Anki file
+  (or all together as a zip) from Settings, each item naming its course, week, lecture and file.
 
 Study Guides and lecture PDFs can be read in MedOS, quizzes practised and question banks used
 for active recall, and flashcards reviewed with FSRS. Until you run a sync, lectures are development placeholders when enabled
@@ -142,6 +146,7 @@ MedOS/
 ├── packages/
 │   ├── parsers/             Source files → typed, source-faithful content (DOCX, HTML quiz, PDF)
 │   ├── database/            PostgreSQL schema, migrations, client and development seed
+│   ├── export/              The open export format and its writers (JSON, CSV, Markdown, Anki, zip)
 │   │   ├── migrations/      Generated SQL migrations (tracked)
 │   │   └── src/             schema/, seed/, cli/, client.ts, config.ts
 │   ├── shared/              Domain constants and pure helpers (courses, semester, dates, study time)

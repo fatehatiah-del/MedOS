@@ -1,0 +1,17 @@
+{
+  "name": "@medos/export",
+  "version": "0.1.0",
+  "private": true,
+  "description": "The open MedOS export format and its writers: JSON, CSV, Markdown, Anki text and a zip of them all.",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "fflate": "^0.8.3"
+  }
+}

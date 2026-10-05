@@ -20,6 +20,7 @@
     "@fontsource-variable/source-serif-4": "^5.3.0",
     "@medos/ai": "*",
     "@medos/database": "*",
+    "@medos/export": "*",
     "@medos/fsrs": "*",
     "@medos/parsers": "*",
     "@medos/shared": "*",
@@ -41,6 +42,7 @@
     "@medos/sync": "*",
     "@playwright/test": "^1.63.0",
     "@tailwindcss/postcss": "^4.3.3",
+    "fflate": "^0.8.3",
     "tailwindcss": "^4.3.3",
     "tsx": "^4.23.15"
   }

@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.5.8",
+    "@medos/export": "*",
     "@medos/fsrs": "*",
     "@medos/parsers": "*",
     "@medos/shared": "*",
