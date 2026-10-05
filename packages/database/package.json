@@ -17,6 +17,7 @@
     "db:check": "drizzle-kit check",
     "db:migrate": "tsx src/cli/migrate.ts",
     "db:seed": "tsx src/cli/seed.ts",
+    "db:transfer": "tsx src/cli/transfer.ts",
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
@@ -25,6 +26,7 @@
     "@medos/fsrs": "*",
     "@medos/parsers": "*",
     "@medos/shared": "*",
+    "@medos/storage": "*",
     "@medos/study-engine": "*",
     "drizzle-orm": "^0.45.3",
     "postgres": "^3.4.9",

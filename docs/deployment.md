@@ -86,6 +86,54 @@ A variable set in the shell takes precedence over `apps/web/.env.local`, so your
 untouched. Run this again before each new version goes live: migrations already applied are
 skipped, and they only ever add.
 
+If you are bringing your existing data across (next step), you may skip this: the transfer creates
+the tables in an empty database itself.
+
+### 2a. Bring your existing data across (`db:transfer`)
+
+Your study history so far (account, progress, notes, highlights, bookmarks, flashcards with their
+FSRS schedule and review history, MCQ and Question Bank attempts, study sessions, calendar, plans)
+is in the local database. `db:transfer` copies all of it into the hosted one, and with `--files`
+the lecture files into the bucket. Do this **before** anyone signs in to the hosted app: the target
+must be completely empty, because MedOS never merges two databases.
+
+Close MedOS first (its black window): the local database cannot be read while it is open. Then, in
+PowerShell, from the repository:
+
+```powershell
+$env:TARGET_DATABASE_URL = "postgres://postgres:<password>@db.<project>.supabase.co:5432/postgres"
+$env:TARGET_STORAGE_PROVIDER = "s3"
+$env:TARGET_STORAGE_BUCKET = "medos"
+$env:TARGET_STORAGE_ENDPOINT = "https://<project>.supabase.co/storage/v1/s3"
+$env:TARGET_STORAGE_REGION = "eu-central-1"
+$env:TARGET_STORAGE_ACCESS_KEY_ID = "…"
+$env:TARGET_STORAGE_SECRET_ACCESS_KEY = "…"
+
+npm run db:transfer                   # check: what would be copied, and anything in the way
+npm run db:transfer -- --yes --files  # copy and verify the data, then the files
+```
+
+Close the window afterwards so the variables are gone. What it does:
+
+- **Checks first, changes nothing**: without `--yes` it only reports, table by table, what would be
+  copied and what stays behind: sign-in sessions (sign in again on the new server), one-time tokens
+  and sign-in rate-limit counters.
+- **Refuses** a target that holds any data, a target at a different MedOS version, and the source
+  database itself as the target.
+- **Copies exactly**: rows travel as PostgreSQL's own representation of them, so ids, timestamps
+  (to the microsecond), JSON and numbers arrive unchanged. Your password works on the new server
+  as before.
+- **Verifies before keeping anything**: the copy is a single transaction. Before it commits, every
+  table's row count and a checksum of all its values must equal the source's; if one differs, it
+  rolls back and the target holds no data. (An empty target keeps the empty tables it was given.)
+- **Files**: each file the database names is checked against its SHA-256 as it is stored; files
+  already in the bucket are skipped, so `-- --yes --files-only` can be run again safely.
+- **The local database is only read.** It stays as it is; you can keep using MedOS on this
+  computer.
+
+Use the **direct** connection (port 5432), not the transaction pooler: the copy is one long
+transaction.
+
 ### 3. The app (Vercel)
 
 1. Import the GitHub repository as a new project.
@@ -93,8 +141,8 @@ skipped, and they only ever add.
    Root Directory" on: the app uses the workspace packages. Install and build commands: the
    defaults. Node.js: 22 or newer.
 3. **Environment Variables**: everything in the table above, for Production.
-4. Deploy. Then open the address, create your account (only `AUTH_ALLOWED_EMAILS` can) and sign
-   in.
+4. Deploy. Then open the address and sign in: with your existing account if you transferred your
+   data, otherwise create it (only `AUTH_ALLOWED_EMAILS` can).
 
 Any other Node.js host: `npm ci`, `npm run build`, then `npm start` (port 3000, or `PORT`), with
 the same variables, behind HTTPS. An always-on server with a lasting disk may use the embedded
@@ -106,9 +154,10 @@ In the Google Cloud console (see [google-auth-setup.md](google-auth-setup.md)), 
 `<APP_URL>/api/auth/callback/google` as an authorised redirect URI and `<APP_URL>` as an authorised
 JavaScript origin. `npm run check:production` prints the exact address.
 
-### 5. Material: MedOS Sync to the hosted app
+### 5. New material: MedOS Sync to the hosted app
 
-On your computer, point MedOS Sync at the hosted database (direct connection) and bucket for the
+If you transferred with `--files`, the hosted app already has everything you had imported. For new
+material afterwards, point MedOS Sync at the hosted database (direct connection) and bucket for the
 run (PowerShell), then sync as usual:
 
 ```powershell
@@ -125,9 +174,8 @@ npm run medos-sync -- sync
 
 Close the window afterwards so the variables are gone. Your S5 folder is only read, as always.
 
-Your existing local study history (notes, highlights, answers, flashcards and their schedule) is in
-the local database; a sync brings material, not history. Moving the history to the hosted database
-is a separate step, still to be built.
+Once the hosted app is in use, it holds your history from then on: keep studying there, not in the
+local copy, which no longer receives what you do online.
 
 ## After deploying
 

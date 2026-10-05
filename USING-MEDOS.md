@@ -45,7 +45,7 @@ flashcard's answer, 1–4 to rate).
 
 All 22 phases in `BUILD_PLAN.md` are built. MedOS is ready to be put online, but it is not online
 yet: that is a step you take when you choose, following `docs/deployment.md` (a database, a file
-bucket and a host; your existing history moves over with a step still to be built). Until then it
+bucket and a host; `npm run db:transfer` brings your existing history across). Until then it
 runs on this computer only. In **Settings**, study availability and Sync are shown but not
 editable there yet (set your study time on the **Study Plan** page). There is no AI, by design,
 until a provider is configured.

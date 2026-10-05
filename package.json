@@ -28,6 +28,7 @@
     "db:check": "npm run db:check --workspace @medos/database",
     "db:migrate": "npm run db:migrate --workspace @medos/database",
     "db:seed": "npm run db:seed --workspace @medos/database",
+    "db:transfer": "npm run db:transfer --workspace @medos/database --",
     "db:studio": "npm run db:studio --workspace @medos/database --",
     "medos-sync": "npm run cli --workspace @medos/sync --",
     "auth:secret": "node -e \"console.log(require('node:crypto').randomBytes(32).toString('base64url'))\"",

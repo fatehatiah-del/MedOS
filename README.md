@@ -266,13 +266,14 @@ npm run db:migrate                    # create or update the schema
 npm run db:seed                       # development data (safe to repeat)
 ```
 
-| Command               | What it does                                                       |
-| --------------------- | ------------------------------------------------------------------ |
-| `npm run db:generate` | Write a new SQL migration from changes to the schema files.        |
-| `npm run db:check`    | Verify the migration history is consistent.                        |
-| `npm run db:migrate`  | Apply pending migrations to the database in `DATABASE_URL`.        |
-| `npm run db:seed`     | Insert development data. Idempotent; refuses to run in production. |
-| `npm run db:studio`   | Browse the database with Drizzle Studio.                           |
+| Command               | What it does                                                                                                                                                                                                                         |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `npm run db:generate` | Write a new SQL migration from changes to the schema files.                                                                                                                                                                          |
+| `npm run db:check`    | Verify the migration history is consistent.                                                                                                                                                                                          |
+| `npm run db:migrate`  | Apply pending migrations to the database in `DATABASE_URL`.                                                                                                                                                                          |
+| `npm run db:transfer` | Copy every table, verified, into an empty database (`TARGET_DATABASE_URL`). Checks only, unless `-- --yes`; `--files` also copies lecture files. See [deployment](docs/deployment.md#2a-bring-your-existing-data-across-dbtransfer). |
+| `npm run db:seed`     | Insert development data. Idempotent; refuses to run in production.                                                                                                                                                                   |
+| `npm run db:studio`   | Browse the database with Drizzle Studio.                                                                                                                                                                                             |
 
 Schema changes always go through a migration: edit `packages/database/src/schema`, run
 `db:generate`, review and commit the generated SQL. A test fails if the schema and the migrations
