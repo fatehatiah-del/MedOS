@@ -36,12 +36,15 @@ export function StartForm({
   resourceId,
   total,
   usmleCount,
+  missed,
   topics,
   sessionHref,
 }: {
   resourceId: string;
   total: number;
   usmleCount: number;
+  /** Questions answered wrong last time in a finished session: all, and those USMLE mode uses. */
+  missed: { total: number; usmle: number };
   topics: { topic: string; count: number }[];
   /** The address of a session, from its id. */
   sessionHref: string;
@@ -50,13 +53,20 @@ export function StartForm({
   const [mode, setMode] = useState<McqMode>("learn");
   const [topic, setTopic] = useState("");
   const [count, setCount] = useState("all");
+  const [missedOnly, setMissedOnly] = useState(false);
   const [shuffle, setShuffle] = useState(false);
   const [timing, setTiming] = useState<"default" | "untimed" | "custom">("default");
   const [minutes, setMinutes] = useState("30");
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
-  const available = mode === "usmle" ? usmleCount : total;
+  const available = missedOnly
+    ? mode === "usmle"
+      ? missed.usmle
+      : missed.total
+    : mode === "usmle"
+      ? usmleCount
+      : total;
   const exam = mode !== "learn";
 
   const submit = (event: FormEvent) => {
@@ -71,6 +81,7 @@ export function StartForm({
         shuffle: exam && shuffle,
         timing,
         minutes: timing === "custom" ? Number(minutes) || null : null,
+        missedOnly,
       });
       if (result.ok) router.push(sessionHref.replace("SESSION", result.value.sessionId));
       else setError(result.error);
@@ -155,6 +166,24 @@ export function StartForm({
               ))}
           </select>
         </div>
+      </div>
+
+      <div className="space-y-1">
+        <label className="flex items-center gap-2 text-sm text-fg">
+          <input
+            type="checkbox"
+            checked={missedOnly}
+            disabled={missed.total === 0}
+            onChange={(event) => setMissedOnly(event.target.checked)}
+            className="accent-[var(--accent)]"
+          />
+          Only questions I got wrong ({missed.total})
+        </label>
+        <p className="text-[12.5px] text-fg-subtle">
+          {missed.total === 0
+            ? "Nothing to retry yet: wrong answers appear here once you finish a session."
+            : "Your latest answer to each question in a finished session. Get one right and it drops off the list."}
+        </p>
       </div>
 
       {exam ? (

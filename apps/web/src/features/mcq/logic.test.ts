@@ -245,6 +245,38 @@ describe("MCQ actions", () => {
     expect((await discardSession(a.scope, { sessionId: other.value.sessionId })).ok).toBe(true);
   });
 
+  it("practise only the questions answered wrong last time in a finished session", async () => {
+    const ownStart = (overrides: Record<string, unknown> = {}) =>
+      start(b.scope, { resourceId: b.quiz.id, missedOnly: true, ...overrides });
+    const answer = (sessionId: string, key: string, optionIndex: number) =>
+      answerLearnQuestion(b.scope, { sessionId, key, optionIndex, timeMs: 1 });
+    const keysOf = async (sessionId: string) =>
+      (await b.scope.mcq.sessions.get(sessionId))?.session.questions.map((q) => q.key);
+
+    expect(await ownStart()).toEqual({ ok: false, error: MESSAGES.noMissed });
+
+    const first = await ownStart({ missedOnly: false });
+    if (!first.ok) throw new Error(first.error);
+    await answer(first.value.sessionId, "q1", 1); // wrong
+    await answer(first.value.sessionId, "q2", 0); // right
+    await answer(first.value.sessionId, "q3", 2); // wrong; q4 left unanswered
+    // An unfinished session does not count yet.
+    expect(await ownStart()).toEqual({ ok: false, error: MESSAGES.noMissed });
+    await finishSession(b.scope, { sessionId: first.value.sessionId });
+    expect(await b.scope.mcq.sessions.missed(b.quiz.id)).toEqual(["q1", "q3"]);
+    // Never another user's history.
+    expect(await a.scope.mcq.sessions.missed(b.quiz.id)).toEqual([]);
+
+    const retry = await ownStart();
+    if (!retry.ok) throw new Error(retry.error);
+    expect(await keysOf(retry.value.sessionId)).toEqual(["q1", "q3"]);
+    await answer(retry.value.sessionId, "q1", 0); // now right
+    await finishSession(b.scope, { sessionId: retry.value.sessionId });
+    expect(await b.scope.mcq.sessions.missed(b.quiz.id)).toEqual(["q3"]);
+    // Combined with a mode: q3 is not a USMLE question.
+    expect(await ownStart({ mode: "usmle" })).toEqual({ ok: false, error: MESSAGES.noQuestions });
+  });
+
   it("never complete the lecture", async () => {
     const rows = await db
       .select()

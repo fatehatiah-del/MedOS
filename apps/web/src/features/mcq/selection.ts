@@ -49,6 +49,8 @@ export interface SelectionOptions {
   /** At most this many questions, or all. */
   count: number | null;
   shuffle: boolean;
+  /** Only these questions (e.g. the ones the user got wrong), or all. */
+  only?: ReadonlySet<string> | null;
   /** Source of randomness for shuffling (injectable for tests). */
   random?: () => number;
 }
@@ -66,7 +68,9 @@ function shuffled<T>(items: T[], random: () => number): T[] {
 export function selectQuestions(set: McqSet, options: SelectionOptions): string[] {
   const random = options.random ?? Math.random;
   let questions = set.questions.filter(
-    (question) => options.topic === null || question.topic === options.topic,
+    (question) =>
+      (options.topic === null || question.topic === options.topic) &&
+      (!options.only || options.only.has(question.key)),
   );
   if (options.mode === "usmle") {
     questions = questions

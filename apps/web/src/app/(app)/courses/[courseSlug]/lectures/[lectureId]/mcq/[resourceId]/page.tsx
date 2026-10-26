@@ -52,6 +52,8 @@ export default async function McqPage({ params }: McqPageProps) {
   const base = mcqHref(course.slug, lecture.id, resourceId);
 
   const sessions = await scope.mcq.sessions.list(resourceId);
+  const missedKeys = new Set(await scope.mcq.sessions.missed(resourceId));
+  const missedQuestions = quiz.set.questions.filter((question) => missedKeys.has(question.key));
   const history = await Promise.all(
     sessions.slice(0, 20).map(async (session) => {
       if (session.status !== "submitted") return { session, percent: null as number | null };
@@ -107,6 +109,10 @@ export default async function McqPage({ params }: McqPageProps) {
           resourceId={resourceId}
           total={quiz.set.questions.length}
           usmleCount={quiz.set.questions.filter(isUsmleQuestion).length}
+          missed={{
+            total: missedQuestions.length,
+            usmle: missedQuestions.filter(isUsmleQuestion).length,
+          }}
           topics={quizTopics(quiz.set)}
           sessionHref={`${base}/session/SESSION`}
         />

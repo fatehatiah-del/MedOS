@@ -181,6 +181,37 @@ export function createMcqAccess(db: Database, userId: string) {
           .orderBy(desc(mcqSessions.startedAt));
       },
 
+      /**
+       * The questions the user got wrong the last time they answered them in a
+       * finished session, as keys of the quiz as it is now, in source order. A
+       * question answered right later drops out; unanswered and unscored
+       * questions never count.
+       */
+      async missed(resourceId: string): Promise<string[]> {
+        const set = await loadSet(resourceId);
+        if (!set) return [];
+        const attempts = await db
+          .select({ fingerprint: mcqAttempts.questionFingerprint, correct: mcqAttempts.correct })
+          .from(mcqAttempts)
+          .innerJoin(mcqSessions, eq(mcqSessions.id, mcqAttempts.sessionId))
+          .where(
+            and(
+              eq(mcqAttempts.userId, userId),
+              eq(mcqAttempts.resourceId, resourceId),
+              eq(mcqSessions.userId, userId),
+              eq(mcqSessions.status, "submitted"),
+            ),
+          )
+          .orderBy(asc(mcqAttempts.answeredAt));
+        const latest = new Map<string, boolean>();
+        for (const attempt of attempts) {
+          if (attempt.correct !== null) latest.set(attempt.fingerprint, attempt.correct);
+        }
+        return set.set.questions
+          .filter((question) => latest.get(question.fingerprint) === false)
+          .map((question) => question.key);
+      },
+
       /** Starts a session on questions of the user's quiz, in the order given. */
       async start(
         resourceId: string,

@@ -18,6 +18,7 @@ export const MESSAGES = {
   notFound: "This quiz could not be found.",
   sessionNotFound: "This practice session could not be found.",
   noQuestions: "No questions match this choice. Choose another topic or mode.",
+  noMissed: "No wrong answers to practise: nothing you answered in a finished session is wrong.",
   invalid: "This could not be saved. Reload the page and try again.",
   closed: "This session has already ended.",
   expired: "Time is up. Your exam is being submitted.",
@@ -31,6 +32,7 @@ const startInput = z.object({
   shuffle: z.boolean(),
   timing: z.enum(["default", "untimed", "custom"]),
   minutes: z.number().int().min(1).max(600).nullable(),
+  missedOnly: z.boolean().default(false),
 });
 
 const answerInput = z.object({
@@ -69,12 +71,14 @@ export async function startSession(
 ): Promise<ActionResult<{ sessionId: string }>> {
   const parsed = startInput.safeParse(input);
   if (!parsed.success) return { ok: false, error: MESSAGES.invalid };
-  const { resourceId, mode, topic, count, shuffle, timing, minutes } = parsed.data;
+  const { resourceId, mode, topic, count, shuffle, timing, minutes, missedOnly } = parsed.data;
   if (timing === "custom" && minutes === null) return { ok: false, error: MESSAGES.invalid };
 
   const quiz = await scope.mcq.get(resourceId);
   if (!quiz) return { ok: false, error: MESSAGES.notFound };
-  const keys = selectQuestions(quiz.set, { mode, topic, count, shuffle, random });
+  const only = missedOnly ? new Set(await scope.mcq.sessions.missed(resourceId)) : null;
+  if (only && only.size === 0) return { ok: false, error: MESSAGES.noMissed };
+  const keys = selectQuestions(quiz.set, { mode, topic, count, shuffle, only, random });
   if (keys.length === 0) return { ok: false, error: MESSAGES.noQuestions };
 
   const session = await scope.mcq.sessions.start(resourceId, {

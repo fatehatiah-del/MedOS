@@ -28,6 +28,10 @@ Before starting you can choose one topic and a smaller number of questions (10 o
 the time limit can be the default, untimed, or a number of minutes. Options always keep the
 source's order and letters, because explanations refer to them.
 
+**Only questions I got wrong** limits any mode to the questions whose latest answer in a finished
+session was wrong. Answer one right in a later finished session and it drops off the list;
+unanswered and unscored questions never count, and unfinished sessions count once finished.
+
 **Learn.** After you check an answer: correct or incorrect, the correct answer, the source's
 explanation, why the other options are wrong where the source says, the source's reference
 ("Source: S17") and any image the source shows after answering. Answers are kept as you go; you

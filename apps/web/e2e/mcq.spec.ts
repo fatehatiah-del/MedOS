@@ -176,6 +176,26 @@ test.describe("MCQ practice", () => {
     await expect(page.getByText("This exam was discarded.")).toBeVisible();
   });
 
+  test("practises only the questions answered wrong in a finished session", async ({ page }) => {
+    await startMode(page, "Learn");
+    await option(page, "B").check({ force: true });
+    await page.getByRole("button", { name: "Check answer" }).click();
+    await expect(page.getByText("Incorrect. The answer is A.")).toBeVisible();
+    await page.getByRole("button", { name: "Finish session" }).click();
+    await expect(page.getByRole("heading", { name: "Learn results" })).toBeVisible();
+
+    await startMode(page, "Learn", async () => {
+      // Other tests share this account, so the exact count can vary; question 1 is in it.
+      const wrongOnly = page.getByRole("checkbox", {
+        name: /^Only questions I got wrong \(\d+\)$/,
+      });
+      await expect(wrongOnly).toBeEnabled();
+      await wrongOnly.check();
+    });
+    await expect(page.getByText(/Question 1 of [1-5]$/).first()).toBeVisible();
+    await expect(page.getByText("Synthetic question 1", { exact: false }).first()).toBeVisible();
+  });
+
   test("never completes the lecture", async ({ page }) => {
     await page.goto(`/courses/pharmacology/lectures/${fixture.lectureId}`);
     await expect(page.getByRole("button", { name: "Mark lecture complete" })).toBeVisible();
