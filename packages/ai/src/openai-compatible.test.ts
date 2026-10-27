@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 
 import { systemPrompt } from "./chat";
+import { createCompatibleChat } from "./openai-compatible";
 import { createAIProvider } from "./provider";
 
 /*
@@ -50,14 +51,14 @@ describe("an OpenAI-compatible provider", () => {
     const result = await provider.streamChat({ page, messages });
     expect(result.ok).toBe(true);
     if (!result.ok) return;
-    expect(result.model).toBe("gemini-2.5-flash");
+    expect(result.model).toBe("gemini-3-flash-preview");
     expect(await collect(result.chunks)).toBe("Severe is below 500.");
 
     const [url, init] = fetch.mock.calls[0] as unknown as [string, RequestInit];
     expect(url).toBe("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions");
     expect((init.headers as Record<string, string>).authorization).toBe("Bearer secret");
     const sent = JSON.parse(String(init.body));
-    expect(sent).toMatchObject({ model: "gemini-2.5-flash", stream: true });
+    expect(sent).toMatchObject({ model: "gemini-3-flash-preview", stream: true });
     expect(sent.messages[0]).toEqual({ role: "system", content: systemPrompt(page) });
     expect(sent.messages[1]).toEqual(messages[0]);
   });
@@ -96,6 +97,50 @@ describe("an OpenAI-compatible provider", () => {
       message: expect.stringContaining("rate limit"),
     });
     expect(await answer(new Error("offline"))).toMatchObject({ ok: false, reason: "unavailable" });
+  });
+
+  it("falls back to the next model when one is retired, overloaded or silent", async () => {
+    const tried: string[] = [];
+    const fetch = vi.fn(async (_url: string, init?: RequestInit) => {
+      const model = JSON.parse(String(init?.body)).model as string;
+      tried.push(model);
+      if (model === "gemini-3-flash-preview") return new Response("gone", { status: 404 });
+      if (model === "gemini-flash-latest") {
+        // Never answers: the wait for a first byte runs out.
+        return new Promise<Response>((_, reject) =>
+          init?.signal?.addEventListener("abort", () => reject(new Error("aborted"))),
+        );
+      }
+      return new Response(streamOf(['data: {"choices":[{"delta":{"content":"ok"}}]}\n\n']));
+    });
+    const chat = createCompatibleChat({
+      name: "gemini",
+      label: "Gemini",
+      apiKey: "k",
+      baseUrl: "https://example.test",
+      model: "gemini-3-flash-preview",
+      fallbackModels: ["gemini-flash-latest", "gemini-3.1-flash-lite"],
+      fetch: fetch as unknown as typeof globalThis.fetch,
+      firstByteTimeoutMs: 50,
+    });
+    const result = await chat.streamChat({ page, messages });
+    expect(tried).toEqual([
+      "gemini-3-flash-preview",
+      "gemini-flash-latest",
+      "gemini-3.1-flash-lite",
+    ]);
+    expect(result).toMatchObject({ ok: true, model: "gemini-3.1-flash-lite" });
+    if (result.ok) expect(await collect(result.chunks)).toBe("ok");
+  });
+
+  it("does not try other models when the key is refused", async () => {
+    const fetch = vi.fn(async () => new Response("no", { status: 401 }));
+    const result = await createAIProvider({ provider: "gemini", apiKey: "k", fetch }).streamChat({
+      page,
+      messages,
+    });
+    expect(result.ok).toBe(false);
+    expect(fetch).toHaveBeenCalledTimes(1);
   });
 
   it("puts the selected passage and the page text in the instructions", () => {

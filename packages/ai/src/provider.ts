@@ -198,6 +198,7 @@ export function createAIProvider(config: AIProviderConfig | AIProviderName): AIP
     apiKey,
     baseUrl: baseUrl ?? preset.baseUrl,
     model: model ?? preset.model,
+    fallbackModels: preset.fallbacks,
     fetch,
   });
   return chatProvider(provider, chat, preset.label);
