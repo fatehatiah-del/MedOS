@@ -65,3 +65,16 @@ test("Settings says no provider is configured", async ({ page }) => {
   await expect(features).toHaveCount(5);
   for (const button of await features.all()) await expect(button).toBeDisabled();
 });
+
+test("Ask AI is in the top bar and says it is not set up", async ({ page, baseURL }) => {
+  const external = watchExternalRequests(page, baseURL);
+  await page.goto(`/courses/pharmacology/lectures/${fixture.lectureId}`);
+  await page.getByRole("button", { name: "Ask AI" }).click();
+  const panel = page.getByRole("complementary", { name: "Ask AI" });
+  await expect(panel).toBeVisible();
+  await expect(panel.getByText("Ask AI needs an AI service.")).toBeVisible();
+  await expect(panel.getByRole("textbox", { name: "Your question" })).toBeDisabled();
+  await page.keyboard.press("Escape");
+  await expect(panel).toBeHidden();
+  expect(external).toEqual([]);
+});

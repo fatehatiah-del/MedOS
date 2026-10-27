@@ -28,6 +28,11 @@ const calls: (() => Promise<unknown>)[] = [
     }),
   () => noneProvider.analyzeWeaknesses({ weaknesses: [] }),
   () => noneProvider.answerFromLecture({ lecture, question: "Why?" }),
+  () =>
+    noneProvider.streamChat({
+      page: { title: "t", path: "/", text: "x", selection: null },
+      messages: [{ role: "user", content: "?" }],
+    }),
 ];
 
 afterEach(() => {
@@ -36,8 +41,11 @@ afterEach(() => {
 
 describe("the none provider", () => {
   it("is the default and is not configured", () => {
-    expect(AI_PROVIDER_NAMES).toEqual(["none"]);
+    expect(AI_PROVIDER_NAMES[0]).toBe("none");
     expect(createAIProvider("none")).toBe(noneProvider);
+    // A provider without its key is no AI at all.
+    expect(createAIProvider({ provider: "gemini" })).toBe(noneProvider);
+    expect(createAIProvider({ provider: "openai-compatible", apiKey: "k" })).toBe(noneProvider);
     expect(noneProvider).toMatchObject({ name: "none", configured: false });
   });
 

@@ -306,3 +306,28 @@
     pointer-events: none;
   }
 }
+
+/* Ask AI answers: the notebook's typography at a size for a side panel. */
+@layer components {
+  .nb-prose.ai-answer {
+    min-height: 0;
+    font-size: 14.5px;
+    line-height: 1.65;
+  }
+  .nb-prose.ai-answer h1 {
+    font-size: 1.25rem;
+  }
+  .nb-prose.ai-answer h2 {
+    font-size: 1.1rem;
+  }
+  .nb-prose.ai-answer h3 {
+    font-size: 1rem;
+  }
+  .nb-prose.ai-answer :where(th, td) {
+    font-size: 13px;
+    padding: 0.4rem 0.55rem;
+  }
+  .nb-prose.ai-answer table {
+    table-layout: auto;
+  }
+}

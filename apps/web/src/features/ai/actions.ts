@@ -32,6 +32,9 @@ export async function requestAI(raw: unknown): Promise<AIActionResult> {
   if (!parsed.success) return { ok: false, message: "This AI request was not understood." };
   const provider = getAIProvider();
   if (!provider.configured) return { ok: false, message: NOT_CONFIGURED_MESSAGE };
-  // A configured provider is not part of MedOS yet; this is where it would run.
-  return { ok: false, message: NOT_CONFIGURED_MESSAGE };
+  // These buttons are not connected yet; questions go through Ask AI at the top of the page.
+  return {
+    ok: false,
+    message: "This button is not connected to AI yet. Use Ask AI at the top of the page.",
+  };
 }

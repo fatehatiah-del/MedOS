@@ -1,3 +1,6 @@
+import type { ChatMessage, PageContext } from "./chat";
+import { COMPATIBLE_PRESETS, type ChatStream, createCompatibleChat } from "./openai-compatible";
+
 /*
  * The AI provider interface (specification §30). MedOS works fully without
  * AI: the default provider is "none", which answers every request with "not
@@ -54,6 +57,8 @@ export interface QuestionContext {
 export interface AIProvider {
   /** Registered name, e.g. "none". */
   readonly name: string;
+  /** How the interface names it, e.g. "Gemini". */
+  readonly label: string;
   /** False for "none": the interface shows AI features as unavailable. */
   readonly configured: boolean;
 
@@ -90,6 +95,13 @@ export interface AIProvider {
     lecture: LectureContext;
     question: string;
   }): Promise<AIResult<{ answer: string }>>;
+
+  /** A conversation about the page on screen, answered as it is written. */
+  streamChat(input: {
+    page: PageContext;
+    messages: ChatMessage[];
+    signal?: AbortSignal;
+  }): Promise<ChatStream>;
 }
 
 export const NOT_CONFIGURED_MESSAGE =
@@ -107,6 +119,7 @@ const notConfigured = async (): Promise<AIFailure> => ({
  */
 export const noneProvider: AIProvider = Object.freeze({
   name: "none",
+  label: "No AI",
   configured: false,
   summarizeLecture: notConfigured,
   generateFlashcards: notConfigured,
@@ -114,17 +127,80 @@ export const noneProvider: AIProvider = Object.freeze({
   explainQuestion: notConfigured,
   analyzeWeaknesses: notConfigured,
   answerFromLecture: notConfigured,
+  streamChat: notConfigured,
 });
 
 /** Providers MedOS knows. A new provider adds its name here and its case below. */
-export const AI_PROVIDER_NAMES = ["none"] as const;
+export const AI_PROVIDER_NAMES = ["none", "gemini", "deepseek", "openai-compatible"] as const;
 export type AIProviderName = (typeof AI_PROVIDER_NAMES)[number];
 
-export function createAIProvider(name: AIProviderName): AIProvider {
-  switch (name) {
-    case "none":
-      return noneProvider;
+export interface AIProviderConfig {
+  provider: AIProviderName;
+  /** The service's API key. Server-side only. */
+  apiKey?: string;
+  /** Overrides the preset's model. */
+  model?: string;
+  /** Required for "openai-compatible"; overrides a preset's address otherwise. */
+  baseUrl?: string;
+  fetch?: typeof fetch;
+}
+
+const NOT_YET: AIFailure = {
+  ok: false,
+  reason: "unavailable",
+  message: "This button is not connected to AI yet. Use Ask AI at the top of the page.",
+};
+
+/**
+ * A provider that answers questions about the page on screen. The other
+ * capabilities are not built yet and say so.
+ */
+function chatProvider(name: string, chat: ReturnType<typeof createCompatibleChat>, label: string) {
+  const notYet = async (): Promise<AIFailure> => NOT_YET;
+  return Object.freeze({
+    name,
+    label,
+    configured: true,
+    summarizeLecture: notYet,
+    generateFlashcards: notYet,
+    generateMCQs: notYet,
+    explainQuestion: notYet,
+    analyzeWeaknesses: notYet,
+    answerFromLecture: notYet,
+    streamChat: chat.streamChat,
+  }) satisfies AIProvider;
+}
+
+/**
+ * The provider a deployment configured. Without a key (or an address, for a
+ * generic service) it is "none": nothing is sent anywhere.
+ */
+export function createAIProvider(config: AIProviderConfig | AIProviderName): AIProvider {
+  const { provider, apiKey, model, baseUrl, fetch } =
+    typeof config === "string" ? { provider: config } : config;
+  if (provider === "none" || !apiKey) return noneProvider;
+  if (provider === "openai-compatible") {
+    if (!baseUrl || !model) return noneProvider;
+    const chat = createCompatibleChat({
+      name: provider,
+      label: "AI",
+      apiKey,
+      baseUrl,
+      model,
+      fetch,
+    });
+    return chatProvider(provider, chat, "AI");
   }
+  const preset = COMPATIBLE_PRESETS[provider];
+  const chat = createCompatibleChat({
+    name: provider,
+    label: preset.label,
+    apiKey,
+    baseUrl: baseUrl ?? preset.baseUrl,
+    model: model ?? preset.model,
+    fetch,
+  });
+  return chatProvider(provider, chat, preset.label);
 }
 
 /**

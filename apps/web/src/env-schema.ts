@@ -10,8 +10,18 @@ import { z } from "zod";
  */
 const envSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
-  /** AI is optional. "none" is the only provider until one is implemented (see @medos/ai). */
+  /**
+   * AI is optional: "none" (the default) sends nothing anywhere. "gemini" or
+   * "deepseek" with AI_API_KEY enables Ask AI; "openai-compatible" also needs
+   * AI_BASE_URL and AI_MODEL. See @medos/ai.
+   */
   AI_PROVIDER: z.enum(AI_PROVIDER_NAMES).default("none"),
+  /** The AI service's key. Server-side only; never sent to the browser. */
+  AI_API_KEY: z.string().optional(),
+  /** Overrides the provider's default model (e.g. "gemini-2.5-pro"). */
+  AI_MODEL: z.string().optional(),
+  /** The service's OpenAI-compatible address, for AI_PROVIDER=openai-compatible. */
+  AI_BASE_URL: z.url().optional(),
   /** Public base URL of the deployment. */
   APP_URL: z.url().optional(),
   /**
