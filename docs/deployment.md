@@ -140,6 +140,9 @@ transaction.
 2. **Root Directory**: `apps/web`. Framework: Next.js (detected). Keep "Include files outside the
    Root Directory" on: the app uses the workspace packages. Install and build commands: the
    defaults. Node.js: 22 or newer.
+   `apps/web/vercel.json` runs the server code in Frankfurt (`fra1`), next to the database. Keep
+   the two in the same region: every page makes many small queries, and a region apart (Vercel's
+   default is Washington, `iad1`) adds about 100 ms to each, which makes pages take seconds.
 3. **Environment Variables**: everything in the table above, for Production.
 4. Deploy. Then open the address and sign in: with your existing account if you transferred your
    data, otherwise create it (only `AUTH_ALLOWED_EMAILS` can).
