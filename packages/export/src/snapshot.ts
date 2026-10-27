@@ -97,6 +97,19 @@ export interface ExportAnnotation {
   source: ExportSource;
 }
 
+/** The user's own rich-text notebook for a lecture. */
+export interface ExportNotebook {
+  id: string;
+  /** The notes as plain text, to read anywhere. */
+  text: string;
+  /** The notes as the MedOS editor stores them (ProseMirror JSON), with their formatting. */
+  document: unknown;
+  revision: number;
+  createdAt: Instant;
+  updatedAt: Instant;
+  source: ExportSource;
+}
+
 export interface ExportDeck {
   id: string;
   name: string;
@@ -333,4 +346,6 @@ export interface ExportSnapshot {
     days: ExportPlanDay[];
   };
   difficultConcepts: ExportDifficultConcept[];
+  /** Lecture notebooks with something written in them or saved once. */
+  notebooks: ExportNotebook[];
 }

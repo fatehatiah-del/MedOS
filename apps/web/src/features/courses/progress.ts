@@ -131,3 +131,7 @@ export function questionBankHref(
 ): string {
   return `${lectureHref(courseSlug, lectureId)}/question-bank/${resourceId}`;
 }
+
+export function notebookHref(courseSlug: string, lectureId: string): string {
+  return `${lectureHref(courseSlug, lectureId)}/notebook`;
+}

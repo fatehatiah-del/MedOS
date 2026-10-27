@@ -7,3 +7,7 @@
 export const MAX_EVENT_TITLE = 200;
 export const MAX_EVENT_LOCATION = 200;
 export const MAX_EVENT_NOTES = 5000;
+
+/** A lecture notebook: its stored JSON in bytes, and its text in characters. */
+export const MAX_NOTEBOOK_BYTES = 2_000_000;
+export const MAX_NOTEBOOK_TEXT = 200_000;

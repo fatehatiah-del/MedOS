@@ -6,6 +6,7 @@ import {
   ListChecks,
   type LucideIcon,
   MessageCircleQuestionMark,
+  NotebookPen,
   RotateCcw,
   Search,
   Settings,
@@ -26,6 +27,7 @@ export const PRIMARY_NAV: readonly NavItem[] = [
   { href: "/review", label: "Review", icon: RotateCcw },
   { href: "/question-bank", label: "Question Bank", icon: MessageCircleQuestionMark },
   { href: "/flashcards", label: "Flashcards", icon: Layers },
+  { href: "/notebooks", label: "Notebooks", icon: NotebookPen },
   { href: "/search", label: "Search", icon: Search },
   { href: "/statistics", label: "Statistics", icon: ChartNoAxesColumn },
 ];

@@ -113,6 +113,13 @@
       "when": 1791148538171,
       "tag": "0015_search_index",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1793056997508,
+      "tag": "0016_lecture_notebooks",
+      "breakpoints": true
     }
   ]
 }

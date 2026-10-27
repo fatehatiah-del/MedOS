@@ -6,6 +6,7 @@ export * from "./flashcards";
 export * from "./insights";
 export * from "./lecture-viewer";
 export * from "./mcq";
+export * from "./notebooks";
 export * from "./planner";
 export * from "./progress";
 export * from "./question-bank";

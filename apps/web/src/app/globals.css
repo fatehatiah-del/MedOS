@@ -125,3 +125,184 @@
     user-select: none;
   }
 }
+
+/*
+ * Lecture notebook. The user's own notes, set in the Study Guide's
+ * typography: serif headings at the reader's sizes, the reader's body text,
+ * its tables and its callout boxes.
+ */
+@layer components {
+  .nb-prose {
+    min-height: 12rem;
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--fg);
+    overflow-wrap: break-word;
+  }
+  .nb-prose > * + * {
+    margin-top: 0.75em;
+  }
+  .nb-prose :where(h1, h2, h3) {
+    font-family: var(--font-serif);
+    font-weight: 600;
+    color: var(--fg);
+    text-wrap: balance;
+  }
+  .nb-prose h1 {
+    margin-top: 1.4em;
+    font-size: 1.6rem;
+    line-height: 1.25;
+  }
+  .nb-prose h2 {
+    margin-top: 1.25em;
+    font-size: 1.25rem;
+    line-height: 1.35;
+  }
+  .nb-prose h3 {
+    margin-top: 1.1em;
+    font-size: 1.075rem;
+    line-height: 1.4;
+  }
+  .nb-prose > :first-child {
+    margin-top: 0;
+  }
+  .nb-prose :where(ul, ol) {
+    padding-left: 1.4em;
+  }
+  .nb-prose ul {
+    list-style: disc;
+  }
+  .nb-prose ol {
+    list-style: decimal;
+  }
+  .nb-prose li > p {
+    margin: 0;
+  }
+  .nb-prose li + li {
+    margin-top: 0.25em;
+  }
+  .nb-prose ul[data-type="taskList"] {
+    list-style: none;
+    padding-left: 0.1em;
+  }
+  .nb-prose ul[data-type="taskList"] li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.55em;
+  }
+  .nb-prose ul[data-type="taskList"] li > label {
+    margin-top: 0.3em;
+    flex-shrink: 0;
+  }
+  .nb-prose ul[data-type="taskList"] li > label input {
+    width: 1rem;
+    height: 1rem;
+    accent-color: var(--accent);
+    cursor: pointer;
+  }
+  .nb-prose ul[data-type="taskList"] li > div {
+    flex: 1;
+    min-width: 0;
+  }
+  .nb-prose ul[data-type="taskList"] li[data-checked="true"] > div {
+    color: var(--fg-subtle);
+    text-decoration: line-through;
+  }
+  .nb-prose blockquote {
+    border-left: 3px solid var(--border-strong);
+    padding: 0.1em 0 0.1em 1em;
+    color: var(--fg-muted);
+  }
+  .nb-prose blockquote p + p {
+    margin-top: 0.3em;
+    font-size: 0.88em;
+  }
+  .nb-prose :where(strong) {
+    font-weight: 600;
+  }
+  .nb-prose a {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .nb-prose mark {
+    border-radius: 2px;
+    background-color: var(--highlight);
+    padding: 0 0.1em;
+    color: inherit;
+  }
+  .nb-prose code {
+    border-radius: 0.3rem;
+    background-color: var(--subtle);
+    padding: 0.1em 0.35em;
+    font-family: var(--font-mono);
+    font-size: 0.86em;
+  }
+  .nb-prose pre {
+    overflow-x: auto;
+    border-radius: 0.6rem;
+    background-color: var(--subtle);
+    padding: 0.8em 1em;
+  }
+  .nb-prose pre code {
+    background: none;
+    padding: 0;
+  }
+  .nb-prose hr {
+    margin: 1.5em 0;
+    border: 0;
+    border-top: 1px solid var(--border);
+  }
+  .nb-prose hr.ProseMirror-selectednode {
+    border-top-color: var(--accent);
+  }
+  .nb-prose .tableWrapper {
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+  }
+  .nb-prose table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+  .nb-prose :where(th, td) {
+    position: relative;
+    border-bottom: 1px solid var(--border);
+    padding: 0.55rem 0.75rem;
+    vertical-align: top;
+    text-align: left;
+    font-size: 14.5px;
+    line-height: 1.55;
+  }
+  .nb-prose :where(th, td) + :where(th, td) {
+    border-left: 1px solid var(--border);
+  }
+  .nb-prose th {
+    background-color: var(--subtle);
+    font-weight: 600;
+  }
+  .nb-prose tr:last-child > * {
+    border-bottom: 0;
+  }
+  .nb-prose :where(th, td) > p {
+    margin: 0;
+  }
+  .nb-prose .selectedCell::after {
+    position: absolute;
+    inset: 0;
+    background: color-mix(in srgb, var(--accent) 14%, transparent);
+    content: "";
+    pointer-events: none;
+  }
+  .nb-prose .nb-callout-body > * + * {
+    margin-top: 0.6em;
+  }
+  .nb-prose p.is-editor-empty:first-child::before {
+    float: left;
+    height: 0;
+    color: var(--fg-subtle);
+    content: attr(data-placeholder);
+    pointer-events: none;
+  }
+}

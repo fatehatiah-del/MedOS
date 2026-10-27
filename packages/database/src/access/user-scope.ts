@@ -12,6 +12,7 @@ import { createCalendarAccess } from "./calendar";
 import { createExportAccess } from "./export";
 import { createFlashcardAccess } from "./flashcards";
 import { createMcqAccess } from "./mcq";
+import { createNotebookAccess } from "./notebooks";
 import { createPlannerAccess } from "./planner";
 import { createProgressAccess } from "./progress";
 import { createOriginalLectureAccess } from "./original-lectures";
@@ -389,6 +390,9 @@ export function createUserScope(db: Database, userId: string) {
 
     /** Study guides for the reader, with the user's annotations and reading progress. */
     studyGuides: createStudyGuideAccess(db, userId),
+
+    /** The user's rich-text notebook for each lecture, written beside the Study Guide. */
+    notebooks: createNotebookAccess(db, userId),
 
     /** Original lecture PDFs for the viewer, with the user's page annotations and position. */
     originalLectures: createOriginalLectureAccess(db, userId),

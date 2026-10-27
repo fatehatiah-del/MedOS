@@ -19,6 +19,7 @@ describe("navigation", () => {
       "Review",
       "Question Bank",
       "Flashcards",
+      "Notebooks",
       "Search",
       "Statistics",
     ]);

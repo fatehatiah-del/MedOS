@@ -28,6 +28,7 @@ import {
   flashcardDecks,
   flashcardReviews,
   flashcards,
+  lectureNotebooks,
   lectureProgress,
   lectures,
   mcqAttempts,
@@ -128,6 +129,7 @@ export function createExportAccess(db: Database, userId: string) {
         planRows,
         planItemRows,
         conceptRows,
+        notebookRows,
       ] = await Promise.all([
         db
           .select({ email: users.email, displayName: users.displayName })
@@ -218,6 +220,11 @@ export function createExportAccess(db: Database, userId: string) {
           .from(difficultConcepts)
           .where(mine(difficultConcepts.userId))
           .orderBy(asc(difficultConcepts.createdAt)),
+        db
+          .select()
+          .from(lectureNotebooks)
+          .where(mine(lectureNotebooks.userId))
+          .orderBy(asc(lectureNotebooks.createdAt)),
       ]);
       if (!owner) throw new Error("The user of this scope does not exist.");
 
@@ -614,6 +621,16 @@ export function createExportAccess(db: Database, userId: string) {
           label: row.label,
           createdAt: iso(row.createdAt),
           source: sourceFor({ courseId: row.courseId }),
+        })),
+
+        notebooks: notebookRows.map((row) => ({
+          id: row.id,
+          text: row.plainText,
+          document: row.content,
+          revision: row.revision,
+          createdAt: iso(row.createdAt),
+          updatedAt: iso(row.updatedAt),
+          source: sourceFor({ lectureId: row.lectureId }),
         })),
       };
     },

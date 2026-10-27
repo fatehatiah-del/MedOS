@@ -1,14 +1,15 @@
 import type {
   ExportAnnotation,
   ExportCard,
+  ExportNotebook,
   ExportQuestionReview,
   ExportSnapshot,
   ExportSource,
 } from "./snapshot";
 
 /*
- * Markdown: the export to read. Highlights, notes, bookmarks, Review Later
- * questions and flashcards, grouped course → week → lecture in the order of
+ * Markdown: the export to read. Lecture notebooks, highlights, notes,
+ * bookmarks, Review Later questions and flashcards, grouped course → week → lecture in the order of
  * the course outline, each with the file and section it came from. Records
  * such as attempts and sessions are in the JSON and CSV files instead.
  */
@@ -68,16 +69,26 @@ function questionLines(item: ExportQuestionReview): string[] {
   return lines;
 }
 
+/** A notebook's text, each paragraph its own quoted line so nothing in it becomes Markdown. */
+function notebookLines(notebook: ExportNotebook): string[] {
+  return quoteBlock(notebook.text)
+    .filter((line) => line !== "  >")
+    .map((line) => line.trimStart());
+}
+
 interface Bucket {
+  notebook: ExportNotebook | null;
   annotations: ExportAnnotation[];
   questions: ExportQuestionReview[];
   cards: ExportCard[];
 }
 
-const emptyBucket = (): Bucket => ({ annotations: [], questions: [], cards: [] });
+const emptyBucket = (): Bucket => ({ notebook: null, annotations: [], questions: [], cards: [] });
 const bucketKey = (source: ExportSource) => `${source.courseId}/${source.lectureId ?? ""}`;
 const isEmpty = (bucket: Bucket | undefined) =>
-  !bucket || bucket.annotations.length + bucket.questions.length + bucket.cards.length === 0;
+  !bucket ||
+  (!bucket.notebook?.text.trim() &&
+    bucket.annotations.length + bucket.questions.length + bucket.cards.length === 0);
 
 function bucketLines(bucket: Bucket): string[] {
   const lines: string[] = [];
@@ -85,6 +96,7 @@ function bucketLines(bucket: Bucket): string[] {
     if (items.length === 0) return;
     lines.push(`#### ${title}`, "", ...items.flat(), "");
   };
+  if (bucket.notebook?.text.trim()) section("Notebook", [notebookLines(bucket.notebook)]);
   section("Highlights, notes and bookmarks", bucket.annotations.map(annotationLines));
   section("Review Later questions", bucket.questions.map(questionLines));
   section(`Flashcards (${bucket.cards.length})`, bucket.cards.map(cardLines));
@@ -100,6 +112,7 @@ export function toMarkdown(snapshot: ExportSnapshot): string {
     if (!bucket) buckets.set(key, (bucket = emptyBucket()));
     return bucket;
   };
+  for (const notebook of snapshot.notebooks) bucketFor(notebook.source).notebook = notebook;
   for (const annotation of snapshot.annotations)
     bucketFor(annotation.source).annotations.push(annotation);
   for (const item of snapshot.reviewLater) bucketFor(item.source).questions.push(item);
@@ -142,6 +155,9 @@ export function toMarkdown(snapshot: ExportSnapshot): string {
   }
 
   if (!wroteAny)
-    lines.push("Nothing to show yet: no highlights, notes, bookmarks or flashcards.", "");
+    lines.push(
+      "Nothing to show yet: no notebooks, highlights, notes, bookmarks or flashcards.",
+      "",
+    );
   return `${lines.join("\n").trimEnd()}\n`;
 }

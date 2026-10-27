@@ -2,7 +2,7 @@
 
 import type { AnnotationKind } from "@medos/database";
 import { cn } from "@medos/ui";
-import { Bookmark, Clock, Highlighter, Layers, StickyNote, X } from "lucide-react";
+import { Bookmark, Clock, Highlighter, Layers, NotebookPen, StickyNote, X } from "lucide-react";
 import {
   type KeyboardEvent,
   useCallback,
@@ -12,13 +12,16 @@ import {
   useState,
 } from "react";
 
+import { useNotebook } from "@/features/notebook/notebook-context";
+
 import { useReader } from "./reader-context";
 import { type SelectionAnchor, anchorFromSelection } from "./selection";
 
 /*
  * The actions offered for selected Study Guide text: Highlight, Add note,
- * Bookmark and Review Later, and Create flashcard (an editor prefilled with
- * the passage; the user writes the question and saves).
+ * Bookmark and Review Later, Create flashcard (an editor prefilled with
+ * the passage; the user writes the question and saves), and To notebook,
+ * which quotes the passage in the lecture notebook.
  *
  * It works with any way of selecting text: mouse, touch, or the keyboard with
  * caret browsing (F7). With text selected, Alt+A moves focus into the
@@ -41,6 +44,7 @@ const ACTIONS: { kind: AnnotationKind; label: string; icon: typeof Bookmark }[] 
 
 export function SelectionToolbar() {
   const { annotate, openNoteEditor, openFlashcardEditor, pending } = useReader();
+  const notebook = useNotebook();
   const [shown, setShown] = useState<Shown | null>(null);
   const [coarse, setCoarse] = useState(false);
   const toolbar = useRef<HTMLDivElement>(null);
@@ -192,6 +196,24 @@ export function SelectionToolbar() {
             <Layers aria-hidden="true" className="size-4 text-fg-muted" />
             Create flashcard
           </button>
+          {notebook ? (
+            <button
+              type="button"
+              onClick={() => {
+                if (shown.status !== "anchor") return;
+                const { anchor } = shown;
+                const heading = anchor.sectionId
+                  ? document.getElementById(anchor.sectionId)?.textContent?.trim()
+                  : null;
+                close(true);
+                notebook.sendPassage({ quote: anchor.quote, section: heading || null });
+              }}
+              className="flex h-9 shrink-0 items-center gap-1.5 rounded-lg px-2.5 text-[13px] font-medium text-fg transition-colors duration-150 hover:bg-hover"
+            >
+              <NotebookPen aria-hidden="true" className="size-4 text-fg-muted" />
+              To notebook
+            </button>
+          ) : null}
         </>
       )}
       <button

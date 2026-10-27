@@ -147,6 +147,7 @@ const snapshot: ExportSnapshot = {
   calendar: [],
   planner: { availability: null, days: [] },
   difficultConcepts: [],
+  notebooks: [],
 };
 
 /** A strict RFC 4180 reader, to prove the files parse back to what was written. */

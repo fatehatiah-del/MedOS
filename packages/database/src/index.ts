@@ -111,7 +111,20 @@ export {
   USER_EVENT_TYPES,
   type UserEventType,
 } from "./access/calendar";
-export { MAX_EVENT_LOCATION, MAX_EVENT_NOTES, MAX_EVENT_TITLE } from "./limits";
+export {
+  MAX_EVENT_LOCATION,
+  MAX_EVENT_NOTES,
+  MAX_EVENT_TITLE,
+  MAX_NOTEBOOK_BYTES,
+  MAX_NOTEBOOK_TEXT,
+} from "./limits";
+export {
+  EMPTY_NOTEBOOK,
+  type NotebookListing,
+  type NotebookSave,
+  type NotebookSaveResult,
+  type NotebookView,
+} from "./access/notebooks";
 export {
   type DailyPlanView,
   MAX_ITEM_MINUTES,

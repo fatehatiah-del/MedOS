@@ -7,6 +7,7 @@ import {
   ListChecks,
   type LucideIcon,
   MessageCircleQuestionMark,
+  NotebookPen,
 } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -20,6 +21,7 @@ import { FIXTURE_LECTURES_NOTICE } from "@/features/courses/fixture-data";
 import {
   lectureHref,
   mcqHref,
+  notebookHref,
   originalLectureHref,
   questionBankHref,
   studyGuideHref,
@@ -77,11 +79,12 @@ export default async function LecturePage({ params }: LecturePageProps) {
   const { lecture, week, course, completedAt, resources, weekLectures } = detail;
 
   const categories = lectureCategoryStates(resources);
-  const [fixtures, reading, mcqScores, banks] = await Promise.all([
+  const [fixtures, reading, mcqScores, banks, notebook] = await Promise.all([
     scope.lectures.includesFixtures(),
     scope.studyGuides.progress.forLecture(lecture.id),
     scope.mcq.latestScores(lecture.id),
     scope.questionBanks.banks(),
+    scope.notebooks.get(lecture.id),
   ]);
   const lectureDeck = await scope.flashcards.decks.lectureSummary(lecture.id);
   const practisedBanks = new Map(banks.map((bank) => [bank.resourceId, bank]));
@@ -129,6 +132,31 @@ export default async function LecturePage({ params }: LecturePageProps) {
       <StudyTimeSection scope={scope} lectureId={lecture.id} courseId={course.id} />
 
       <LecturePerformance scope={scope} lectureId={lecture.id} course={course} />
+
+      <section aria-label="Notebook">
+        <Surface padding="md" className="flex flex-wrap items-center gap-3">
+          <span
+            aria-hidden="true"
+            className="flex size-8 items-center justify-center rounded-lg bg-accent-soft text-accent [&_svg]:size-4"
+          >
+            <NotebookPen />
+          </span>
+          <div className="min-w-0">
+            <h2 className="text-[15px] font-medium text-fg">Notebook</h2>
+            <p className="text-[13px] text-fg-muted">
+              {notebook?.updatedAt
+                ? `Your notes for this lecture · edited ${COMPLETED_ON.format(notebook.updatedAt)}`
+                : "Your own notes for this lecture, beside the Study Guide."}
+            </p>
+          </div>
+          <Link
+            href={notebookHref(course.slug, lecture.id)}
+            className="ml-auto inline-flex h-8 items-center gap-1.5 rounded-lg bg-accent px-3 text-[13px] font-medium text-accent-fg transition-colors duration-150 hover:bg-accent-hover"
+          >
+            {notebook?.updatedAt ? "Open notebook" : "Start notebook"}
+          </Link>
+        </Surface>
+      </section>
 
       <Section title="Study material">
         <ul className="grid gap-4 @xl:grid-cols-2 @4xl:grid-cols-3">

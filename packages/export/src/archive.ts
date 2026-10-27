@@ -22,7 +22,7 @@ Your MedOS data in open formats. Nothing here needs MedOS to be read.
 
 medos-export.json
   Everything, exactly as recorded: the course outline with lecture
-  completion, highlights, notes, bookmarks, Review Later items, flashcards
+  completion, lecture notebooks, highlights, notes, bookmarks, Review Later items, flashcards
   with their full FSRS scheduling state and review history, MCQ sessions
   and attempts, Question Bank attempts, reading progress, study sessions,
   calendar events and exams, daily plans and difficult concepts.
@@ -35,7 +35,7 @@ csv/
   so a spreadsheet never runs it as a formula; the JSON is unaltered.
 
 medos-notes.md
-  Highlights, notes, bookmarks, Review Later questions and flashcards,
+  Lecture notebooks, highlights, notes, bookmarks, Review Later questions and flashcards,
   grouped by course, week and lecture, to read.
 
 flashcards-anki.txt
