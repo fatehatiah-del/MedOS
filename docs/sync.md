@@ -77,7 +77,9 @@ Friends can have their own MedOS login with the same study material:
 
 1. Add their address to `AUTH_ALLOWED_EMAILS` (comma-separated) and let them sign up.
 2. `npm run medos-sync -- mirror --from <your email> --to-all --dry-run`, read it, then run it
-   without `--dry-run`. `--to <email>` (repeatable) names accounts instead of `--to-all`.
+   without `--dry-run`. `--to <email>` (repeatable, or comma-separated) names accounts instead of `--to-all`;
+   `--skip-missing` skips named accounts that have not signed up yet. Prefer naming accounts:
+   `--to-all` includes every account on the server.
 
 Mirroring copies the source account's weeks, lectures, materials, parsed content, image records and
 sync manifest into each target account. Nothing is parsed or uploaded again: the copies point at the
@@ -87,7 +89,7 @@ and notebooks; none of the source account's study data is copied.
 The copy belongs to the friend. A file is matched by its path in the study folder, so once it has
 been mirrored it is never added again, and a lecture the friend renamed stays renamed. Only a file
 whose content changed in the source account (or was parsed again) is brought up to date. Nothing is
-ever deleted. Run it after every sync; the bb-pipeline Publish step does this automatically.
+ever deleted. Run it after every sync; the bb-pipeline Publish step does this automatically for its `FRIENDS`.
 
 Always run a dry run first. A sync applies migrations to the database before writing, so it never
 writes to an outdated schema.

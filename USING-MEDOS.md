@@ -104,12 +104,12 @@ Folder layout MedOS understands: `S5\<course>\w<week>\[lecture-1\]<files>`, for 
 
 1. On Vercel (project `med-os` → Settings → Environment Variables), add your friends' emails to
    `AUTH_ALLOWED_EMAILS`, separated by commas, keeping yours. Redeploy, then they sign up.
-2. The **Publish to MedOS** button copies your material into every other account after each
-   publish. To do it by hand (with the same database settings as the publish):
+2. The **Publish to MedOS** button copies your material into the friends listed in
+   `bb-pipeline\src\sync_check.py` (`FRIENDS`) after each publish; ones not signed up yet are skipped. To do it by hand (with the same database settings as the publish):
 
    ```
-   npm run medos-sync -- mirror --from fatehatiah@gmail.com --to-all --dry-run
-   npm run medos-sync -- mirror --from fatehatiah@gmail.com --to-all
+   npm run medos-sync -- mirror --from fatehatiah@gmail.com --to <friend emails, comma-separated> --skip-missing --dry-run
+   npm run medos-sync -- mirror --from fatehatiah@gmail.com --to <friend emails, comma-separated> --skip-missing
    ```
 
 Friends get their own copy: their progress, notes and renames are theirs, and they never see yours.

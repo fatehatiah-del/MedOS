@@ -65,8 +65,9 @@ Options:
   --remove-placeholders
                        With sync: remove development placeholder lectures first.
   --from <email>       With mirror: the account whose material is copied (or MEDOS_SYNC_USER).
-  --to <email>         With mirror: an account to copy into. Repeat for several.
+  --to <email>         With mirror: an account to copy into. Repeat, or separate with commas.
   --to-all             With mirror: copy into every other account.
+  --skip-missing       With mirror: skip --to accounts that have not signed up yet.
   --verbose            List every file, the structure, and skipped files.
   --help               Show this help.
 
@@ -101,6 +102,7 @@ async function main(argv: readonly string[]): Promise<void> {
       from: { type: "string" },
       to: { type: "string", multiple: true },
       "to-all": { type: "boolean", default: false },
+      "skip-missing": { type: "boolean", default: false },
       "dry-run": { type: "boolean", default: false },
       all: { type: "boolean", default: false },
       "remove-placeholders": { type: "boolean", default: false },
@@ -207,7 +209,8 @@ async function main(argv: readonly string[]): Promise<void> {
     case "mirror": {
       const from = resolveUserEmail(values.from ?? process.env.MEDOS_SYNC_USER);
       const dryRun = values["dry-run"];
-      const named = values.to ?? [];
+      // --to may be repeated, and each value may be a comma-separated list.
+      const named = (values.to ?? []).flatMap((value) => value.split(",")).filter((v) => v.trim());
       if (named.length === 0 && !values["to-all"]) {
         throw new ConfigError("Name the accounts to copy into with --to <email>, or use --to-all.");
       }
@@ -216,14 +219,28 @@ async function main(argv: readonly string[]): Promise<void> {
         const targets = values["to-all"]
           ? await otherAccounts(db, sourceId)
           : named.map((email) => resolveUserEmail(email));
-        if (targets.length === 0) {
-          console.log("MedOS Sync — mirror\n\n  No other accounts to copy into.");
-          return;
-        }
         // Resolve every account before changing anything.
         const resolved: [string, string][] = [];
-        for (const email of targets) resolved.push([email, await findUserId(db, email)]);
+        const notSignedUp: string[] = [];
+        for (const email of targets) {
+          try {
+            resolved.push([email, await findUserId(db, email)]);
+          } catch (error) {
+            if (!(error instanceof SyncError) || !values["skip-missing"]) throw error;
+            notSignedUp.push(email);
+          }
+        }
         const reports: string[] = [];
+        if (notSignedUp.length > 0) {
+          reports.push(
+            ["MedOS Sync — mirror", "", "  Not signed up yet (skipped):"]
+              .concat(notSignedUp.map((email) => `    ${email}`))
+              .join("\n"),
+          );
+        }
+        if (resolved.length === 0) {
+          reports.push("MedOS Sync — mirror\n\n  No accounts to copy into.");
+        }
         for (const [email, targetId] of resolved) {
           const report = await mirrorLibrary(db, sourceId, targetId, { dryRun });
           reports.push(formatMirrorReport(from, email, report));
