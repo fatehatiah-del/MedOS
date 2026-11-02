@@ -199,6 +199,7 @@ export function createAIProvider(config: AIProviderConfig | AIProviderName): AIP
     baseUrl: baseUrl ?? preset.baseUrl,
     model: model ?? preset.model,
     fallbackModels: preset.fallbacks,
+    reasoningEffort: "reasoningEffort" in preset ? preset.reasoningEffort : undefined,
     fetch,
   });
   return chatProvider(provider, chat, preset.label);

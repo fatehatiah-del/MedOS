@@ -58,7 +58,11 @@ describe("an OpenAI-compatible provider", () => {
     expect(url).toBe("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions");
     expect((init.headers as Record<string, string>).authorization).toBe("Bearer secret");
     const sent = JSON.parse(String(init.body));
-    expect(sent).toMatchObject({ model: "gemini-3-flash-preview", stream: true });
+    expect(sent).toMatchObject({
+      model: "gemini-3-flash-preview",
+      stream: true,
+      reasoning_effort: "low",
+    });
     expect(sent.messages[0]).toEqual({ role: "system", content: systemPrompt(page) });
     expect(sent.messages[1]).toEqual(messages[0]);
   });
@@ -74,7 +78,9 @@ describe("an OpenAI-compatible provider", () => {
     await provider.streamChat({ page, messages });
     const [url, init] = fetch.mock.calls[0] as unknown as [string, RequestInit];
     expect(url).toBe("https://api.deepseek.com/chat/completions");
-    expect(JSON.parse(String(init.body)).model).toBe("deepseek-reasoner");
+    const sent = JSON.parse(String(init.body));
+    expect(sent.model).toBe("deepseek-reasoner");
+    expect(sent).not.toHaveProperty("reasoning_effort");
   });
 
   it("explains a refused key, a rate limit and a lost connection", async () => {

@@ -17,6 +17,11 @@ export interface CompatiblePreset {
    * Google retires and overloads Gemini models often.
    */
   fallbacks: readonly string[];
+  /**
+   * How much the model thinks before answering, sent as `reasoning_effort`.
+   * Lower starts the answer sooner. Left out for services that do not take it.
+   */
+  reasoningEffort?: "low" | "medium" | "high";
 }
 
 export const COMPATIBLE_PRESETS = {
@@ -25,6 +30,8 @@ export const COMPATIBLE_PRESETS = {
     baseUrl: "https://generativelanguage.googleapis.com/v1beta/openai",
     model: "gemini-3-flash-preview",
     fallbacks: ["gemini-flash-latest", "gemini-3.1-flash-lite"],
+    // Gemini 3 thinks at length by default, which delayed every answer by many seconds.
+    reasoningEffort: "low",
   },
   deepseek: {
     label: "DeepSeek",
@@ -49,6 +56,7 @@ export interface CompatibleConfig {
   model: string;
   /** Other models to try, in order, when `model` cannot answer. */
   fallbackModels?: readonly string[];
+  reasoningEffort?: CompatiblePreset["reasoningEffort"];
   /** For tests. */
   fetch?: typeof fetch;
   firstByteTimeoutMs?: number;
@@ -146,6 +154,7 @@ export function createCompatibleChat(config: CompatibleConfig) {
           stream: true,
           temperature: 0.3,
           max_tokens: 4096,
+          ...(config.reasoningEffort ? { reasoning_effort: config.reasoningEffort } : {}),
           messages: [
             { role: "system", content: systemPrompt(input.page) },
             ...boundedConversation(input.messages),
