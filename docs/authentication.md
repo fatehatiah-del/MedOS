@@ -125,6 +125,10 @@ By default anyone who reaches the sign-up page can create an account, which give
 workspace of their own. They cannot see anyone else's data. For a personal deployment, set
 `AUTH_ALLOWED_EMAILS` to your own address: every other sign-up, by either method, is refused.
 
+To give friends their own login with the same study material, add their addresses to
+`AUTH_ALLOWED_EMAILS` and mirror your material into their accounts (`docs/sync.md`, "Sharing
+material with other accounts"). Their progress and notes stay their own.
+
 ## Not implemented
 
 - **Email verification and password reset.** Both need an email provider, which MedOS does not

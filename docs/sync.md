@@ -66,9 +66,28 @@ message saying so.
 | `npm run medos-sync -- sync`           | Imports, then reads new and changed materials.           |
 | `npm run medos-sync -- process`        | Reads imported materials into content (`--all`: all).    |
 | `npm run medos-sync -- status`         | Shows what earlier syncs recorded.                       |
+| `npm run medos-sync -- mirror`         | Copies one account's material into others (see below).   |
 | `npm run medos-sync -- --help`         | Help.                                                    |
 
 Add `--verbose` to list every file with its classification, the full structure, and skipped files.
+
+## Sharing material with other accounts (mirror)
+
+Friends can have their own MedOS login with the same study material:
+
+1. Add their address to `AUTH_ALLOWED_EMAILS` (comma-separated) and let them sign up.
+2. `npm run medos-sync -- mirror --from <your email> --to-all --dry-run`, read it, then run it
+   without `--dry-run`. `--to <email>` (repeatable) names accounts instead of `--to-all`.
+
+Mirroring copies the source account's weeks, lectures, materials, parsed content, image records and
+sync manifest into each target account. Nothing is parsed or uploaded again: the copies point at the
+same stored originals and images. Each account keeps its own progress, attempts, notes, flashcards
+and notebooks; none of the source account's study data is copied.
+
+The copy belongs to the friend. A file is matched by its path in the study folder, so once it has
+been mirrored it is never added again, and a lecture the friend renamed stays renamed. Only a file
+whose content changed in the source account (or was parsed again) is brought up to date. Nothing is
+ever deleted. Run it after every sync; the bb-pipeline Publish step does this automatically.
 
 Always run a dry run first. A sync applies migrations to the database before writing, so it never
 writes to an outdated schema.

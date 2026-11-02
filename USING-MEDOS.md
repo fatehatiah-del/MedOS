@@ -100,6 +100,20 @@ example the Pathophysiology Anemias files now in `Downloads\S5\Pathophysiology\w
 Folder layout MedOS understands: `S5\<course>\w<week>\[lecture-1\]<files>`, for example
 `S5\Pharma\w2\Pharmacology_StudyGuide.docx`. More detail: `docs/sync.md`.
 
+### Giving friends the same material
+
+1. On Vercel (project `med-os` → Settings → Environment Variables), add your friends' emails to
+   `AUTH_ALLOWED_EMAILS`, separated by commas, keeping yours. Redeploy, then they sign up.
+2. The **Publish to MedOS** button copies your material into every other account after each
+   publish. To do it by hand (with the same database settings as the publish):
+
+   ```
+   npm run medos-sync -- mirror --from fatehatiah@gmail.com --to-all --dry-run
+   npm run medos-sync -- mirror --from fatehatiah@gmail.com --to-all
+   ```
+
+Friends get their own copy: their progress, notes and renames are theirs, and they never see yours.
+
 ## Troubleshooting
 
 | Problem                                            | What to do                                                                                                                    |
