@@ -109,6 +109,14 @@ test.describe("the lecture notebook", () => {
       editor(page).locator("p", { hasText: "Buffer:" }).locator('[data-type="inline-math"]'),
     ).toBeVisible();
 
+    // Autocorrect while typing; Backspace straight after a correction undoes it.
+    await page.keyboard.press("Control+End");
+    await page.keyboard.press("Enter");
+    await page.keyboard.type("teh pateint -> better adn ");
+    await expect(editor(page).locator("p").last()).toHaveText("The patient → better and ");
+    await page.keyboard.press("Backspace");
+    await expect(editor(page).locator("p").last()).toHaveText("The patient → better adn ");
+
     // Images: uploaded from the device, kept privately in MedOS.
     const png = Buffer.from(
       "iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAIAAABLbSncAAAAEklEQVR4nGP4z8CAFWEXHbQSACj/P8Fu7N9hAAAAAElFTkSuQmCC",

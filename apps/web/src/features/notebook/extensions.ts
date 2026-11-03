@@ -11,6 +11,7 @@ import { CharacterCount, Placeholder } from "@tiptap/extensions";
 import type { Node as ProseMirrorNode } from "@tiptap/pm/model";
 import { StarterKit } from "@tiptap/starter-kit";
 
+import { Autocorrect } from "./autocorrect";
 import { Callout } from "./callout-node";
 import { isNotebookImageSrc, isSafeHref } from "./document";
 
@@ -73,6 +74,7 @@ export function notebookExtensions(placeholder = "", onMathClick?: MathClick) {
       blockOptions: { onClick: (node, pos) => onMathClick?.("block", node, pos) },
     }),
     CharacterCount,
+    Autocorrect,
     Placeholder.configure({ placeholder }),
     Callout,
   ];

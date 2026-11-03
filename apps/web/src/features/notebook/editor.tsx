@@ -43,6 +43,7 @@ import {
   Redo2,
   RemoveFormatting,
   Sigma,
+  SpellCheck,
   SquareDashed,
   Strikethrough,
   Subscript,
@@ -138,6 +139,24 @@ type Status =
 interface Draft {
   content: JSONContent;
   baseRevision: number;
+}
+
+const AUTOCORRECT_KEY = "medos:notebook-autocorrect";
+
+function readAutocorrect(): boolean {
+  try {
+    return window.localStorage.getItem(AUTOCORRECT_KEY) !== "off";
+  } catch {
+    return true;
+  }
+}
+
+function writeAutocorrect(enabled: boolean) {
+  try {
+    window.localStorage.setItem(AUTOCORRECT_KEY, enabled ? "on" : "off");
+  } catch {
+    // Only a preference: it applies to this visit either way.
+  }
 }
 
 const draftKey = (lectureId: string) => `medos:notebook-draft:${lectureId}`;
@@ -306,6 +325,7 @@ export function NotebookEditor({
   useEffect(() => {
     if (!editor) return;
     editorRef.current = editor;
+    editor.commands.setAutocorrect(readAutocorrect());
     if (recovered.restore)
       editor.commands.setContent(recovered.restore.content, { emitUpdate: true });
     onReady?.(editor);
@@ -740,6 +760,7 @@ function Toolbar({
             canIndent: e.can().sinkListItem("listItem") || e.can().sinkListItem("taskItem"),
             canOutdent: e.can().liftListItem("listItem") || e.can().liftListItem("taskItem"),
             words: e.storage.characterCount.words() as number,
+            autocorrect: e.storage.autocorrect.enabled,
             code: e.isActive("code"),
             highlight: e.isActive("highlight"),
             link: e.isActive("link"),
@@ -1162,6 +1183,17 @@ function Toolbar({
                 shortcut: "Tab",
               })}
               {item("Divider line", Minus, () => chain().setHorizontalRule().run())}
+              {item(
+                "Autocorrect",
+                SpellCheck,
+                () => {
+                  if (!editor) return;
+                  const enabled = !editor.storage.autocorrect.enabled;
+                  editor.commands.setAutocorrect(enabled);
+                  writeAutocorrect(enabled);
+                },
+                { active: state?.autocorrect },
+              )}
               {item(
                 "Clear formatting",
                 RemoveFormatting,
