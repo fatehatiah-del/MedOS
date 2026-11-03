@@ -456,7 +456,9 @@ export function NotebookEditor({
           </span>
           <span className="min-w-0 flex-1">
             <span className="font-medium">Listening</span>
-            <span className="text-fg-muted"> · press Alt to stop</span>
+            <span className="text-fg-muted">
+              {dictation.holding ? " · let go of Alt to stop" : " · tap Alt to stop"}
+            </span>
             {dictation.interim ? (
               <span className="mt-0.5 block truncate text-fg-muted italic">{dictation.interim}</span>
             ) : (

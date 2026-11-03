@@ -9,7 +9,7 @@ import { formatDictation } from "./dictation";
  * Dictation into the notebook with the browser's own speech recognition
  * (Chrome, Edge and Safari; the speech is turned into text by the browser's
  * provider). A tap of Alt on its own starts or stops it, as does the
- * microphone button; Escape stops it. What is being heard shows as a preview
+ * microphone button; holding Alt listens until it is let go; Escape stops it. What is being heard shows as a preview
  * and goes into the notes, at the cursor, once each phrase is finished.
  */
 
@@ -64,6 +64,9 @@ function typingElsewhere(target: EventTarget | null, editor: Editor): boolean {
   );
 }
 
+/** Alt held this long starts push-to-talk; a shorter press is a tap. */
+const HOLD_DELAY = 350;
+
 function insertHeard(editor: Editor, heard: string) {
   const { $from } = editor.state.selection;
   const before = $from.parent.textBetween(0, $from.parentOffset, undefined, "￼");
@@ -82,6 +85,7 @@ export function useDictation(editor: Editor | null) {
   const [listening, setListening] = useState(false);
   const [interim, setInterim] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [holding, setHolding] = useState(false);
   const recognition = useRef<Recognition | null>(null);
   const wanted = useRef(false);
 
@@ -154,40 +158,77 @@ export function useDictation(editor: Editor | null) {
     else start();
   }, [start, stop]);
 
-  // Alt pressed and let go on its own (not Alt+something, not AltGr) toggles dictation.
+  /*
+   * Alt on its own (not Alt+something, not AltGr): a tap switches dictation on
+   * or off; held down, it listens until Alt is let go (push to talk).
+   */
   useEffect(() => {
     if (!editor) return;
-    let armed = false;
+    let armed = false; // Alt is down and no other key has been pressed with it
+    let held = false; // dictation was started by holding Alt
+    let timer: number | undefined;
+    const reset = () => {
+      armed = false;
+      window.clearTimeout(timer);
+    };
     const onDown = (event: KeyboardEvent) => {
-      if (event.key === "Alt" && !event.repeat) {
+      if (event.key === "Alt") {
+        if (event.repeat) return;
+        reset();
         armed = !event.ctrlKey && !event.shiftKey && !event.metaKey;
-        if (armed) event.preventDefault();
+        if (!armed || typingElsewhere(event.target, editor)) {
+          armed = false;
+          return;
+        }
+        event.preventDefault();
+        if (!wanted.current) {
+          timer = window.setTimeout(() => {
+            if (!armed || wanted.current) return;
+            held = true;
+            setHolding(true);
+            start();
+          }, HOLD_DELAY);
+        }
         return;
       }
-      armed = false;
+      reset(); // Alt+N and the like are shortcuts, not dictation
       if (event.key === "Escape" && wanted.current) stop();
     };
     const onUp = (event: KeyboardEvent) => {
-      if (event.key !== "Alt" || !armed) return;
-      armed = false;
-      if (typingElsewhere(event.target, editor)) return;
+      if (event.key !== "Alt") return;
+      const wasArmed = armed;
+      reset();
+      if (held) {
+        held = false;
+        setHolding(false);
+        event.preventDefault();
+        stop();
+        return;
+      }
+      if (!wasArmed) return;
       event.preventDefault(); // keeps Firefox's menu bar from opening
       toggle();
     };
-    const disarm = () => {
-      armed = false;
+    const onBlur = () => {
+      reset();
+      if (held) {
+        held = false;
+        setHolding(false);
+        stop();
+      }
     };
     window.addEventListener("keydown", onDown, true);
     window.addEventListener("keyup", onUp, true);
-    window.addEventListener("mousedown", disarm, true);
-    window.addEventListener("blur", disarm);
+    window.addEventListener("mousedown", reset, true);
+    window.addEventListener("blur", onBlur);
     return () => {
+      reset();
       window.removeEventListener("keydown", onDown, true);
       window.removeEventListener("keyup", onUp, true);
-      window.removeEventListener("mousedown", disarm, true);
-      window.removeEventListener("blur", disarm);
+      window.removeEventListener("mousedown", reset, true);
+      window.removeEventListener("blur", onBlur);
     };
-  }, [editor, toggle, stop]);
+  }, [editor, toggle, start, stop]);
 
   // Leaving the notebook ends dictation.
   useEffect(
@@ -199,5 +240,5 @@ export function useDictation(editor: Editor | null) {
     [editor],
   );
 
-  return { supported, listening, interim, error, clearError: () => setError(null), toggle };
+  return { supported, listening, holding, interim, error, clearError: () => setError(null), toggle };
 }

@@ -160,6 +160,15 @@ test.describe("the lecture notebook", () => {
     );
     await page.keyboard.press("Alt");
     await expect(listening).toBeHidden();
+    // Held down, Alt listens until it is let go.
+    await page.keyboard.down("Alt");
+    await expect(listening).toContainText("let go of Alt to stop");
+    await hear("then recover", true);
+    await page.keyboard.up("Alt");
+    await expect(listening).toBeHidden();
+    await expect(editor(page).locator("p").last()).toHaveText(
+      "The patient → better adn neutrophils rise, then fall. Then recover",
+    );
 
     // Images: uploaded from the device, kept privately in MedOS.
     const png = Buffer.from(
