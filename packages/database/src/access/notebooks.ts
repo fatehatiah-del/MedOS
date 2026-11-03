@@ -2,7 +2,14 @@ import { and, desc, eq, sql } from "drizzle-orm";
 
 import type { Database } from "../client";
 import { MAX_NOTEBOOK_BYTES, MAX_NOTEBOOK_TEXT } from "../limits";
-import { type NotebookDocument, courses, lectureNotebooks, lectures, weeks } from "../schema";
+import {
+  type NotebookDocument,
+  courses,
+  lectureNotebooks,
+  lectures,
+  notebookImages,
+  weeks,
+} from "../schema";
 
 /*
  * Lecture notebooks: the user's own rich-text notes, one document per
@@ -17,6 +24,16 @@ import { type NotebookDocument, courses, lectureNotebooks, lectures, weeks } fro
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const isId = (value: string) => UUID.test(value);
+const HASH = /^[0-9a-f]{64}$/;
+const IMAGE_TYPES = new Set(["image/png", "image/jpeg", "image/gif", "image/webp"]);
+
+/** An image the user put into a notebook, as the image route needs it. */
+export interface NotebookImageRecord {
+  contentHash: string;
+  storageKey: string;
+  mimeType: string;
+  sizeBytes: number;
+}
 
 export const EMPTY_NOTEBOOK: NotebookDocument = { type: "doc", content: [] };
 
@@ -166,6 +183,35 @@ export function createNotebookAccess(db: Database, userId: string) {
           ...row,
           course: { slug, name, shortName, colorToken },
         }));
+    },
+
+    /**
+     * Records that the user owns an image already in storage (the caller
+     * stored the bytes and checked their type). Recording it twice is fine.
+     */
+    async recordImage(image: NotebookImageRecord): Promise<void> {
+      if (!HASH.test(image.contentHash) || !IMAGE_TYPES.has(image.mimeType)) {
+        throw new Error("Not a notebook image.");
+      }
+      await db
+        .insert(notebookImages)
+        .values({ userId, ...image })
+        .onConflictDoNothing({ target: [notebookImages.userId, notebookImages.contentHash] });
+    },
+
+    /** One of the user's notebook images, or null if it is not theirs or the hash is malformed. */
+    async image(contentHash: string): Promise<NotebookImageRecord | null> {
+      if (!HASH.test(contentHash)) return null;
+      const [row] = await db
+        .select({
+          contentHash: notebookImages.contentHash,
+          storageKey: notebookImages.storageKey,
+          mimeType: notebookImages.mimeType,
+          sizeBytes: notebookImages.sizeBytes,
+        })
+        .from(notebookImages)
+        .where(and(eq(notebookImages.userId, userId), eq(notebookImages.contentHash, contentHash)));
+      return row ?? null;
     },
   };
 }

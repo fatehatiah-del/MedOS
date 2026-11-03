@@ -135,3 +135,30 @@ describe("lecture notebooks", () => {
     expect(result.status).toBe("invalid");
   });
 });
+
+describe("notebook images", () => {
+  const image = {
+    contentHash: "a".repeat(64),
+    storageKey: `sha256/${"a".repeat(64)}`,
+    mimeType: "image/png",
+    sizeBytes: 120,
+  };
+
+  it("are served only to the user who added them", async () => {
+    const owner = await createOwner();
+    const other = await createOwner();
+    await owner.scope.notebooks.recordImage(image);
+    await owner.scope.notebooks.recordImage(image); // twice is fine
+
+    expect(await owner.scope.notebooks.image(image.contentHash)).toEqual(image);
+    expect(await other.scope.notebooks.image(image.contentHash)).toBeNull();
+    expect(await owner.scope.notebooks.image("not-a-hash")).toBeNull();
+  });
+
+  it("refuse anything but raster images", async () => {
+    const owner = await createOwner();
+    await expect(
+      owner.scope.notebooks.recordImage({ ...image, mimeType: "image/svg+xml" }),
+    ).rejects.toThrow();
+  });
+});

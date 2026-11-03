@@ -123,6 +123,7 @@ export {
   type NotebookListing,
   type NotebookSave,
   type NotebookSaveResult,
+  type NotebookImageRecord,
   type NotebookView,
 } from "./access/notebooks";
 export {

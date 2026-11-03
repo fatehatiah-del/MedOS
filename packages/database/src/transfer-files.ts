@@ -2,7 +2,7 @@ import { ObjectMissingError, type ObjectStore } from "@medos/storage";
 import { isNotNull } from "drizzle-orm";
 
 import type { Database } from "./client";
-import { resourceMedia, resources } from "./schema";
+import { notebookImages, resourceMedia, resources } from "./schema";
 
 /*
  * The files a database refers to (copies of originals and extracted images),
@@ -21,14 +21,21 @@ export interface FileTransferResult {
 
 /** Every storage key the database refers to, without duplicates, in a stable order. */
 export async function referencedObjects(db: Database): Promise<string[]> {
-  const [originals, media] = await Promise.all([
+  const [originals, media, notebookMedia] = await Promise.all([
     db
       .selectDistinct({ key: resources.storageKey })
       .from(resources)
       .where(isNotNull(resources.storageKey)),
     db.selectDistinct({ key: resourceMedia.storageKey }).from(resourceMedia),
+    db.selectDistinct({ key: notebookImages.storageKey }).from(notebookImages),
   ]);
-  return [...new Set([...originals, ...media].map((row) => row.key).filter((key) => key !== null))]
+  return [
+    ...new Set(
+      [...originals, ...media, ...notebookMedia]
+        .map((row) => row.key)
+        .filter((key) => key !== null),
+    ),
+  ]
     .map(String)
     .sort();
 }

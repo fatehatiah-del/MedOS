@@ -9,18 +9,30 @@ import {
   useEditor,
   useEditorState,
 } from "@tiptap/react";
+import "katex/dist/katex.min.css";
+
 import {
+  AlignCenter,
+  AlignJustify,
+  AlignLeft,
+  AlignRight,
+  Baseline,
   Bold,
   Check,
   ChevronDown,
   CloudOff,
+  Ellipsis,
   Code,
   Heading1,
   Heading2,
   Heading3,
   Highlighter,
+  ImagePlus,
+  IndentDecrease,
+  IndentIncrease,
   Italic,
   Link2,
+  LoaderCircle,
   List,
   ListChecks,
   ListOrdered,
@@ -30,9 +42,13 @@ import {
   Quote,
   Redo2,
   RemoveFormatting,
+  Sigma,
   SquareDashed,
   Strikethrough,
+  Subscript,
+  Superscript,
   Table2,
+  Type,
   Underline,
   Undo2,
 } from "lucide-react";
@@ -41,8 +57,10 @@ import { type ReactNode, useCallback, useEffect, useRef, useState } from "react"
 import { CALLOUT_STYLES } from "@/features/study-guide/callouts";
 
 import { saveLectureNotebook } from "./actions";
-import { NOTEBOOK_CALLOUTS, isSafeHref } from "./document";
-import { notebookExtensions } from "./extensions";
+import { NOTEBOOK_CALLOUTS, cleanNotebookDocument, isSafeHref } from "./document";
+import { NOTEBOOK_TEXT_SERIALIZERS, notebookExtensions } from "./extensions";
+import { FormulaDialog, type FormulaRequest } from "./formula-dialog";
+import { NOTEBOOK_IMAGE_ACCEPT, isImageFile, uploadNotebookImage } from "./image-upload";
 
 /*
  * The lecture notebook editor. Notes are written in the Study Guide's own
@@ -65,6 +83,49 @@ const HIGHLIGHTS = [
   { label: "Pink", color: "var(--danger-soft)" },
   { label: "Violet", color: "var(--violet-soft)" },
 ];
+
+const TEXT_COLORS = [
+  { label: "Default", color: null },
+  { label: "Grey", color: "var(--fg-muted)" },
+  { label: "Red", color: "var(--danger)" },
+  { label: "Orange", color: "var(--warning)" },
+  { label: "Green", color: "var(--success)" },
+  { label: "Blue", color: "var(--accent)" },
+  { label: "Violet", color: "var(--violet)" },
+];
+
+const FONTS = [
+  { label: "Default", value: null },
+  { label: "Sans serif", value: "var(--font-sans)" },
+  { label: "Serif", value: "var(--font-serif)" },
+  { label: "Monospace", value: "var(--font-mono)" },
+];
+
+const SIZES = [
+  { label: "Small", value: "13px" },
+  { label: "Normal", value: null },
+  { label: "Large", value: "19px" },
+  { label: "Larger", value: "22px" },
+  { label: "Huge", value: "28px" },
+];
+
+const ALIGNS = [
+  { label: "Left", value: "left", icon: AlignLeft, shortcut: "Ctrl+Shift+L" },
+  { label: "Centre", value: "center", icon: AlignCenter, shortcut: "Ctrl+Shift+E" },
+  { label: "Right", value: "right", icon: AlignRight, shortcut: "Ctrl+Shift+R" },
+  { label: "Justify", value: "justify", icon: AlignJustify, shortcut: "Ctrl+Shift+J" },
+] as const;
+
+/** Leaves fonts, sizes and plain black from other apps (Word, Google Docs, websites) behind on paste. */
+function plainerPastedHTML(html: string): string {
+  if (html.includes("data-pm-slice")) return html; // copied from a notebook: keep as it was
+  return html
+    .replace(/font-(family|size)\s*:[^;"']*;?/gi, "")
+    .replace(
+      /(^|[;"'\s])color\s*:\s*(#000000|#000|rgb\(\s*0\s*,\s*0\s*,\s*0\s*\)|windowtext|black)\s*;?/gi,
+      "$1",
+    );
+}
 
 type Status =
   | { kind: "saved"; at: Date | null }
@@ -138,6 +199,11 @@ export function NotebookEditor({
   const timer = useRef<number | undefined>(undefined);
   const editorRef = useRef<Editor | null>(null);
   const saveRef = useRef<() => Promise<void>>(async () => {});
+  const [formula, setFormula] = useState<FormulaRequest | null>(null);
+  const [uploading, setUploading] = useState(0);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const fileInput = useRef<HTMLInputElement>(null);
+  const insertImagesRef = useRef<(files: File[], pos?: number) => void>(() => {});
 
   const schedule = useCallback((delay: number) => {
     window.clearTimeout(timer.current);
@@ -158,8 +224,11 @@ export function NotebookEditor({
     try {
       const result = await saveLectureNotebook({
         lectureId,
-        content: JSON.stringify(editor.getJSON()),
-        plainText: editor.getText({ blockSeparator: "\n" }),
+        content: JSON.stringify(cleanNotebookDocument(editor.getJSON())),
+        plainText: editor.getText({
+          blockSeparator: "\n",
+          textSerializers: NOTEBOOK_TEXT_SERIALIZERS,
+        }),
         baseRevision: revision.current,
       });
       if (result.status === "saved") {
@@ -198,13 +267,31 @@ export function NotebookEditor({
 
   const editor = useEditor({
     immediatelyRender: false,
-    extensions: notebookExtensions(placeholder),
+    extensions: notebookExtensions(placeholder, (kind, node, pos) =>
+      setFormula({ display: kind === "block", latex: String(node.attrs.latex ?? ""), pos }),
+    ),
     content: initial.content as JSONContent,
     editorProps: {
       attributes: {
         class: "nb-prose focus:outline-none",
         "aria-label": "Lecture notebook",
         spellcheck: "true",
+      },
+      transformPastedHTML: plainerPastedHTML,
+      handlePaste: (_view, event) => {
+        const files = Array.from(event.clipboardData?.files ?? []).filter(isImageFile);
+        if (files.length === 0) return false;
+        insertImagesRef.current(files);
+        return true;
+      },
+      handleDrop: (view, event, _slice, moved) => {
+        if (moved) return false;
+        const files = Array.from(event.dataTransfer?.files ?? []).filter(isImageFile);
+        if (files.length === 0) return false;
+        event.preventDefault();
+        const at = view.posAtCoords({ left: event.clientX, top: event.clientY });
+        insertImagesRef.current(files, at?.pos);
+        return true;
       },
     },
     onUpdate: ({ editor: current }) => {
@@ -246,6 +333,68 @@ export function NotebookEditor({
     };
   }, [save]);
 
+  // Images: sent to MedOS one by one, each put in the notes once it is stored.
+  const insertImages = useCallback(async (files: File[], pos?: number) => {
+    setUploadError(null);
+    let at = pos;
+    for (const file of files) {
+      setUploading((n) => n + 1);
+      try {
+        const image = await uploadNotebookImage(file);
+        const current = editorRef.current;
+        if (!current || current.isDestroyed) return;
+        const node = { type: "image", attrs: { src: image.src, alt: image.alt || null } };
+        if (at === undefined) current.chain().focus().insertContent(node).run();
+        else {
+          current.chain().focus().insertContentAt(at, node).run();
+          at = current.state.selection.to;
+        }
+      } catch (error) {
+        setUploadError(error instanceof Error ? error.message : "The image could not be added.");
+      } finally {
+        setUploading((n) => n - 1);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    insertImagesRef.current = (files, pos) => void insertImages(files, pos);
+  }, [insertImages]);
+
+  const openFormula = () => {
+    if (!editor) return;
+    const { from, to, empty } = editor.state.selection;
+    const selected = empty ? "" : editor.state.doc.textBetween(from, to, " ").slice(0, 500);
+    setFormula({ display: false, latex: selected });
+  };
+
+  const submitFormula = (request: FormulaRequest) => {
+    if (!editor) return;
+    const { latex, pos, display } = request;
+    const chain = editor.chain().focus();
+    if (pos !== undefined) {
+      (display
+        ? chain.updateBlockMath({ latex, pos })
+        : chain.updateInlineMath({ latex, pos }).setTextSelection(pos + 1)
+      ).run();
+    } else if (display) {
+      chain.deleteSelection().insertBlockMath({ latex }).run();
+    } else {
+      chain.deleteSelection().insertInlineMath({ latex }).run();
+    }
+    setFormula(null);
+  };
+
+  const deleteFormula = (request: FormulaRequest) => {
+    if (!editor || request.pos === undefined) return;
+    const chain = editor.chain().focus();
+    (request.display
+      ? chain.deleteBlockMath({ pos: request.pos })
+      : chain.deleteInlineMath({ pos: request.pos })
+    ).run();
+    setFormula(null);
+  };
+
   const loadNewer = (current: NotebookView) => {
     if (!editor) return;
     revision.current = current.revision;
@@ -263,7 +412,43 @@ export function NotebookEditor({
 
   return (
     <div className={cn("flex min-h-0 flex-col", variant === "pane" && "h-full")}>
-      <Toolbar editor={editor} status={status} sticky={variant === "page"} />
+      <Toolbar
+        editor={editor}
+        status={status}
+        sticky={variant === "page"}
+        uploading={uploading}
+        onImage={() => fileInput.current?.click()}
+        onFormula={openFormula}
+      />
+      <input
+        ref={fileInput}
+        type="file"
+        accept={NOTEBOOK_IMAGE_ACCEPT}
+        multiple
+        hidden
+        onChange={(event) => {
+          const files = Array.from(event.target.files ?? []);
+          event.target.value = "";
+          if (files.length) void insertImages(files);
+        }}
+      />
+      <FormulaDialog
+        request={formula}
+        onClose={() => {
+          setFormula(null);
+          editor?.commands.focus();
+        }}
+        onSubmit={submitFormula}
+        onDelete={deleteFormula}
+      />
+      {uploadError ? (
+        <Banner tone="danger">
+          {uploadError}
+          <span className="mt-2 flex">
+            <BannerButton onClick={() => setUploadError(null)}>OK</BannerButton>
+          </span>
+        </Banner>
+      ) : null}
       {status.kind === "conflict" ? (
         <Banner tone="warning">
           These notes were changed in another tab or on another device.
@@ -385,7 +570,7 @@ function StatusText({ status }: { status: Status }) {
     <span
       aria-live="polite"
       className={cn(
-        "ml-auto inline-flex shrink-0 items-center gap-1 pl-2 text-[12px] whitespace-nowrap text-fg-subtle",
+        "inline-flex shrink-0 items-center gap-1 pl-2 text-[12px] whitespace-nowrap text-fg-subtle",
         (status.kind === "error" || status.kind === "conflict") && "text-danger",
       )}
     >
@@ -426,6 +611,11 @@ function ToolButton({
       <Icon aria-hidden="true" className="size-4" />
     </button>
   );
+}
+
+function AlignIcon({ align }: { align?: string }) {
+  const Icon = ALIGNS.find((item) => item.value === align)?.icon ?? AlignLeft;
+  return <Icon aria-hidden="true" className="size-4" />;
 }
 
 const Divider = () => <span aria-hidden="true" className="mx-1 h-5 w-px shrink-0 bg-border" />;
@@ -483,14 +673,23 @@ function Menu({
   );
 }
 
-function MenuItem({ onClick, children }: { onClick: () => void; children: ReactNode }) {
+function MenuItem({
+  onClick,
+  disabled,
+  children,
+}: {
+  onClick: () => void;
+  disabled?: boolean;
+  children: ReactNode;
+}) {
   return (
     <button
       type="button"
       role="menuitem"
+      disabled={disabled}
       onMouseDown={(event) => event.preventDefault()}
       onClick={onClick}
-      className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-[13px] text-fg hover:bg-hover"
+      className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-[13px] whitespace-nowrap text-fg hover:bg-hover disabled:opacity-40 disabled:hover:bg-transparent"
     >
       {children}
     </button>
@@ -508,10 +707,16 @@ function Toolbar({
   editor,
   status,
   sticky,
+  uploading,
+  onImage,
+  onFormula,
 }: {
   editor: Editor | null;
   status: Status;
   sticky: boolean;
+  uploading: number;
+  onImage: () => void;
+  onFormula: () => void;
 }) {
   const state = useEditorState({
     editor,
@@ -523,6 +728,18 @@ function Toolbar({
             italic: e.isActive("italic"),
             underline: e.isActive("underline"),
             strike: e.isActive("strike"),
+            sub: e.isActive("subscript"),
+            sup: e.isActive("superscript"),
+            color: (e.getAttributes("textStyle").color as string | undefined) ?? null,
+            fontSize: (e.getAttributes("textStyle").fontSize as string | undefined) ?? null,
+            fontFamily: (e.getAttributes("textStyle").fontFamily as string | undefined) ?? null,
+            align:
+              (["center", "right", "justify"] as const).find((value) =>
+                e.isActive({ textAlign: value }),
+              ) ?? "left",
+            canIndent: e.can().sinkListItem("listItem") || e.can().sinkListItem("taskItem"),
+            canOutdent: e.can().liftListItem("listItem") || e.can().liftListItem("taskItem"),
+            words: e.storage.characterCount.words() as number,
             code: e.isActive("code"),
             highlight: e.isActive("highlight"),
             link: e.isActive("link"),
@@ -591,6 +808,61 @@ function Toolbar({
           ))
         }
       </Menu>
+      <Menu
+        label="Font"
+        trigger={
+          <Type aria-hidden="true" className={cn("size-4", state?.fontFamily && "text-accent")} />
+        }
+      >
+        {(close) =>
+          FONTS.map((font) => (
+            <MenuItem
+              key={font.label}
+              onClick={() => {
+                if (font.value) chain().setFontFamily(font.value).run();
+                else chain().unsetFontFamily().run();
+                close();
+              }}
+            >
+              <span style={font.value ? { fontFamily: font.value } : undefined}>{font.label}</span>
+              {(state?.fontFamily ?? null) === font.value ? (
+                <Check aria-hidden="true" className="ml-auto size-3.5 text-accent" />
+              ) : null}
+            </MenuItem>
+          ))
+        }
+      </Menu>
+      <Menu
+        label="Text size"
+        trigger={
+          <span
+            className={cn(
+              "w-6 text-center text-[12px] tabular-nums",
+              state?.fontSize && "text-accent",
+            )}
+          >
+            {state?.fontSize ? state.fontSize.replace("px", "") : "16"}
+          </span>
+        }
+      >
+        {(close) =>
+          SIZES.map((size) => (
+            <MenuItem
+              key={size.label}
+              onClick={() => {
+                if (size.value) chain().setFontSize(size.value).run();
+                else chain().unsetFontSize().run();
+                close();
+              }}
+            >
+              <span style={size.value ? { fontSize: size.value } : undefined}>{size.label}</span>
+              {(state?.fontSize ?? null) === size.value ? (
+                <Check aria-hidden="true" className="ml-auto size-3.5 text-accent" />
+              ) : null}
+            </MenuItem>
+          ))
+        }
+      </Menu>
       <Divider />
       <ToolButton
         label="Bold"
@@ -623,6 +895,38 @@ function Toolbar({
         disabled={off}
         onClick={() => chain().toggleStrike().run()}
       />
+      <Menu
+        label="Text colour"
+        trigger={
+          <Baseline
+            aria-hidden="true"
+            className="size-4"
+            style={state?.color ? { color: state.color } : undefined}
+          />
+        }
+      >
+        {(close) =>
+          TEXT_COLORS.map((item) => (
+            <MenuItem
+              key={item.label}
+              onClick={() => {
+                if (item.color) chain().setColor(item.color).run();
+                else chain().unsetColor().run();
+                close();
+              }}
+            >
+              <span
+                aria-hidden="true"
+                className="flex size-4 items-center justify-center rounded border border-border text-[11px] font-semibold"
+                style={{ color: item.color ?? "var(--fg)" }}
+              >
+                A
+              </span>
+              {item.label}
+            </MenuItem>
+          ))
+        }
+      </Menu>
       <Menu
         label="Highlight"
         trigger={
@@ -662,15 +966,25 @@ function Toolbar({
           </>
         )}
       </Menu>
-      <ToolButton
-        label="Inline code"
-        icon={Code}
-        active={state?.code}
-        disabled={off}
-        onClick={() => chain().toggleCode().run()}
-      />
       <ToolButton label="Link" icon={Link2} active={state?.link} disabled={off} onClick={setLink} />
       <Divider />
+      <Menu label="Align" trigger={<AlignIcon align={state?.align} />}>
+        {(close) =>
+          ALIGNS.map((item) => (
+            <MenuItem
+              key={item.value}
+              onClick={() => {
+                chain().setTextAlign(item.value).run();
+                close();
+              }}
+            >
+              <item.icon aria-hidden="true" className="size-4 text-fg-muted" />
+              {item.label}
+              <span className="ml-auto pl-3 text-[11px] text-fg-subtle">{item.shortcut}</span>
+            </MenuItem>
+          ))
+        }
+      </Menu>
       <ToolButton
         label="Bulleted list"
         icon={List}
@@ -691,13 +1005,6 @@ function Toolbar({
         active={state?.task}
         disabled={off}
         onClick={() => chain().toggleTaskList().run()}
-      />
-      <ToolButton
-        label="Quote"
-        icon={Quote}
-        active={state?.quote}
-        disabled={off}
-        onClick={() => chain().toggleBlockquote().run()}
       />
       <Menu
         label="Box"
@@ -742,6 +1049,9 @@ function Toolbar({
           </>
         )}
       </Menu>
+      <Divider />
+      <ToolButton label="Insert image" icon={ImagePlus} disabled={off} onClick={onImage} />
+      <ToolButton label="Insert formula" icon={Sigma} disabled={off} onClick={onFormula} />
       <Menu
         label="Table"
         trigger={
@@ -755,9 +1065,16 @@ function Toolbar({
           };
           return state?.table ? (
             <>
+              <MenuItem onClick={run(() => chain().addRowBefore().run())}>Add row above</MenuItem>
               <MenuItem onClick={run(() => chain().addRowAfter().run())}>Add row below</MenuItem>
+              <MenuItem onClick={run(() => chain().addColumnBefore().run())}>
+                Add column left
+              </MenuItem>
               <MenuItem onClick={run(() => chain().addColumnAfter().run())}>
                 Add column right
+              </MenuItem>
+              <MenuItem onClick={run(() => chain().mergeOrSplit().run())}>
+                Merge or split cells
               </MenuItem>
               <MenuItem onClick={run(() => chain().deleteRow().run())}>Delete row</MenuItem>
               <MenuItem onClick={run(() => chain().deleteColumn().run())}>Delete column</MenuItem>
@@ -793,12 +1110,68 @@ function Toolbar({
           );
         }}
       </Menu>
-      <ToolButton
-        label="Divider line"
-        icon={Minus}
-        disabled={off}
-        onClick={() => chain().setHorizontalRule().run()}
-      />
+      <Menu label="More formatting" trigger={<Ellipsis aria-hidden="true" className="size-4" />}>
+        {(close) => {
+          const item = (
+            label: string,
+            Icon: LucideIcon,
+            action: () => void,
+            options: { active?: boolean; disabled?: boolean; shortcut?: string } = {},
+          ) => (
+            <MenuItem
+              key={label}
+              disabled={options.disabled}
+              onClick={() => {
+                action();
+                close();
+              }}
+            >
+              <Icon aria-hidden="true" className="size-4 text-fg-muted" />
+              {label}
+              {options.active ? (
+                <Check aria-hidden="true" className="ml-auto size-3.5 text-accent" />
+              ) : options.shortcut ? (
+                <span className="ml-auto pl-3 text-[11px] text-fg-subtle">{options.shortcut}</span>
+              ) : null}
+            </MenuItem>
+          );
+          const listType = editor?.isActive("taskItem") ? "taskItem" : "listItem";
+          return (
+            <>
+              {item("Subscript", Subscript, () => chain().toggleSubscript().run(), {
+                active: state?.sub,
+                shortcut: "Ctrl+,",
+              })}
+              {item("Superscript", Superscript, () => chain().toggleSuperscript().run(), {
+                active: state?.sup,
+                shortcut: "Ctrl+.",
+              })}
+              {item("Inline code", Code, () => chain().toggleCode().run(), {
+                active: state?.code,
+                shortcut: "Ctrl+E",
+              })}
+              {item("Quote", Quote, () => chain().toggleBlockquote().run(), {
+                active: state?.quote,
+              })}
+              {item("Decrease indent", IndentDecrease, () => chain().liftListItem(listType).run(), {
+                disabled: !state?.canOutdent,
+                shortcut: "Shift+Tab",
+              })}
+              {item("Increase indent", IndentIncrease, () => chain().sinkListItem(listType).run(), {
+                disabled: !state?.canIndent,
+                shortcut: "Tab",
+              })}
+              {item("Divider line", Minus, () => chain().setHorizontalRule().run())}
+              {item(
+                "Clear formatting",
+                RemoveFormatting,
+                () => chain().unsetAllMarks().unsetTextAlign().run(),
+                { shortcut: "Ctrl+\\" },
+              )}
+            </>
+          );
+        }}
+      </Menu>
       <Divider />
       <ToolButton
         label="Undo"
@@ -814,6 +1187,17 @@ function Toolbar({
         disabled={!state?.canRedo}
         onClick={() => chain().redo().run()}
       />
+      <span aria-hidden="true" className="ml-auto" />
+      {uploading > 0 ? (
+        <span className="inline-flex items-center gap-1 pl-2 text-[12px] text-fg-subtle">
+          <LoaderCircle aria-hidden="true" className="size-3.5 animate-spin" />
+          Adding image…
+        </span>
+      ) : state && state.words > 0 ? (
+        <span className="hidden pl-2 text-[12px] whitespace-nowrap text-fg-subtle tabular-nums sm:inline">
+          {state.words.toLocaleString("en-GB")} {state.words === 1 ? "word" : "words"}
+        </span>
+      ) : null}
       <StatusText status={status} />
     </div>
   );

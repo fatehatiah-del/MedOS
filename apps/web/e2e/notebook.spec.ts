@@ -86,6 +86,67 @@ test.describe("the lecture notebook", () => {
     );
     await expect(pane.getByText(/^Saved \d{2}:\d{2}$/)).toBeVisible();
 
+    // Formulas: written in LaTeX with a live preview, typeset in the notes, changed by a click.
+    await page.keyboard.press("Control+End");
+    await page.keyboard.press("Enter");
+    await page.keyboard.type("Buffer: ");
+    await pane.getByRole("button", { name: "Insert formula" }).click();
+    const dialog = page.getByRole("dialog", { name: "Insert formula" });
+    await dialog.getByRole("button", { name: "Henderson–Hasselbalch" }).click();
+    await expect(dialog.locator(".katex")).toBeVisible();
+    await dialog.getByRole("button", { name: "Insert", exact: true }).click();
+    await expect(editor(page).locator('[data-type="inline-math"] .katex')).toBeVisible();
+    await editor(page).locator('[data-type="inline-math"] .katex-html').click();
+    const edit = page.getByRole("dialog", { name: "Edit formula" });
+    await edit.getByRole("textbox", { name: "Formula in LaTeX" }).fill("\\frac{U \\times V}{P}");
+    await edit.getByRole("button", { name: "Update" }).click();
+    await expect(editor(page).locator('[data-type="inline-math"]')).toHaveAttribute(
+      "data-latex",
+      "\\frac{U \\times V}{P}",
+    );
+    // It sits in the sentence it was written in.
+    await expect(
+      editor(page).locator("p", { hasText: "Buffer:" }).locator('[data-type="inline-math"]'),
+    ).toBeVisible();
+
+    // Images: uploaded from the device, kept privately in MedOS.
+    const png = Buffer.from(
+      "iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAIAAABLbSncAAAAEklEQVR4nGP4z8CAFWEXHbQSACj/P8Fu7N9hAAAAAElFTkSuQmCC",
+      "base64",
+    );
+    await pane
+      .locator('input[type="file"]')
+      .setInputFiles({ name: "smear.png", mimeType: "image/png", buffer: png });
+    const image = editor(page).locator('img[src^="/api/notebook-images/"]');
+    await expect(image).toBeVisible();
+    await expect(image).toHaveAttribute("alt", "smear");
+    const src = await image.getAttribute("src");
+    const served = await page.request.get(src!);
+    expect(served.status()).toBe(200);
+    expect(served.headers()["content-type"]).toBe("image/png");
+
+    // Colour, alignment and subscript, as in a word processor.
+    await page.keyboard.press("Control+End");
+    await page.keyboard.press("Enter");
+    await page.keyboard.type("CO2 rises");
+    await page.keyboard.press("Shift+Home");
+    await pane.getByRole("button", { name: "Text colour" }).click();
+    await page.getByRole("menuitem", { name: "Red" }).click();
+    await pane.getByRole("button", { name: "Align" }).click();
+    await page.getByRole("menuitem", { name: "Centre" }).click();
+    await expect(editor(page).locator('p[style*="text-align: center"]')).toContainText("CO2 rises");
+    await expect(editor(page).locator('span[style*="color"]')).toContainText("CO2 rises");
+    await expect(pane.getByText(/^Saved \d{2}:\d{2}$/)).toBeVisible();
+
+    await page.reload();
+    await expect(page.locator("[data-reader-ready]")).toBeAttached();
+    await expect(editor(page).locator('[data-type="inline-math"] .katex')).toBeVisible();
+    await expect(editor(page).locator('img[src^="/api/notebook-images/"]')).toBeVisible();
+    await expect(editor(page).locator('p[style*="text-align: center"]')).toContainText("CO2 rises");
+    await page
+      .getByRole("complementary", { name: "Notebook" })
+      .screenshot({ path: test.info().outputPath("notebook.png") });
+
     // Listed with its lecture on the Notebooks page, and open on its own page.
     await page.goto("/notebooks");
     const card = page.getByRole("link", { name: /Neutrophils/ });

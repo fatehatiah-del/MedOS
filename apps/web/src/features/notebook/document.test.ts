@@ -2,7 +2,7 @@
 import { Editor } from "@tiptap/core";
 import { describe, expect, it } from "vitest";
 
-import { isNotebookDocument } from "./document";
+import { cleanNotebookDocument, isNotebookDocument, notebookImageSrc } from "./document";
 import { notebookExtensions } from "./extensions";
 
 /*
@@ -29,8 +29,24 @@ describe("notebook documents", () => {
       <hr>
       <table><tr><th><p>A</p></th><th><p>B</p></th></tr><tr><td><p>1</p></td><td><p>2</p></td></tr></table>
       <div data-callout="exam-trap"><p>Trap</p></div>
+      <p style="text-align: center"><sub>2</sub><sup>3</sup>
+        <span style="color: var(--danger); font-size: 19px; font-family: var(--font-serif)">styled</span>
+        <span data-type="inline-math" data-latex="\frac{a}{b}"></span></p>
+      <div data-type="block-math" data-latex="E = mc^2"></div>
+      <img src="${notebookImageSrc("b".repeat(64))}" alt="figure" width="320">
     `);
     const json = editor.getJSON();
+    const types = JSON.stringify(json);
+    for (const type of [
+      "inlineMath",
+      "blockMath",
+      "image",
+      "subscript",
+      "superscript",
+      "textStyle",
+    ]) {
+      expect(types).toContain(`"${type}"`);
+    }
     expect(isNotebookDocument(json)).toBe(true);
     // And after the trip through a Server Function, which sends plain JSON.
     expect(isNotebookDocument(JSON.parse(JSON.stringify(json)))).toBe(true);
@@ -76,5 +92,31 @@ describe("notebook documents", () => {
       ),
     ).toBe(false);
     expect(isNotebookDocument({ type: "paragraph" })).toBe(false);
+  });
+
+  it("leave out images from other sites, and refuse unsafe styles", () => {
+    const editor = editorWith(`<p>a</p><img src="https://tracker.example/x.png"><p>b</p>`);
+    expect(JSON.stringify(editor.getJSON())).not.toContain("tracker");
+    editor.destroy();
+
+    const doc = (marks: unknown[]) => ({
+      type: "doc",
+      content: [{ type: "paragraph", content: [{ type: "text", text: "x", marks }] }],
+    });
+    const unsafe = doc([{ type: "textStyle", attrs: { color: "red; background: url(//x)" } }]);
+    expect(isNotebookDocument(unsafe)).toBe(false);
+    expect(isNotebookDocument(cleanNotebookDocument(unsafe))).toBe(true);
+    expect(
+      isNotebookDocument({
+        type: "doc",
+        content: [{ type: "image", attrs: { src: "https://example.org/a.png" } }],
+      }),
+    ).toBe(false);
+    expect(
+      isNotebookDocument({
+        type: "doc",
+        content: [{ type: "blockMath", attrs: { latex: "x".repeat(5000) } }],
+      }),
+    ).toBe(false);
   });
 });

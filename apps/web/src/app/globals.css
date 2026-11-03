@@ -298,6 +298,57 @@
   .nb-prose .nb-callout-body > * + * {
     margin-top: 0.6em;
   }
+  /* Images: centred, never wider than the page, resizable from their corners. */
+  .nb-prose img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin-inline: auto;
+    border-radius: 0.5rem;
+  }
+  .nb-prose [data-resize-container] {
+    justify-content: center;
+    max-width: 100%;
+  }
+  .nb-prose [data-resize-wrapper] {
+    max-width: 100%;
+  }
+  .nb-prose img.ProseMirror-selectednode,
+  .nb-prose .ProseMirror-selectednode img {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  .nb-prose [data-resize-handle] {
+    margin: -5px;
+    width: 10px;
+    height: 10px;
+    border: 1.5px solid var(--accent);
+    border-radius: 2px;
+    background: var(--surface);
+  }
+  .nb-prose [data-resize-wrapper]:not(:hover):not(.ProseMirror-selectednode) [data-resize-handle] {
+    opacity: 0;
+  }
+  /* Formulas, typeset by KaTeX; click one to change it. */
+  .nb-prose .tiptap-mathematics-render {
+    cursor: pointer;
+    border-radius: 0.3rem;
+    padding: 0 0.1em;
+    transition: background-color 100ms;
+  }
+  .nb-prose .tiptap-mathematics-render:hover,
+  .nb-prose .ProseMirror-selectednode .tiptap-mathematics-render,
+  .nb-prose .tiptap-mathematics-render.ProseMirror-selectednode {
+    background-color: var(--accent-soft);
+  }
+  .nb-prose [data-type="block-math"] {
+    margin: 1em 0;
+    overflow-x: auto;
+    text-align: center;
+  }
+  .nb-prose .katex {
+    font-size: 1.08em;
+  }
   .nb-prose p.is-editor-empty:first-child::before {
     float: left;
     height: 0;

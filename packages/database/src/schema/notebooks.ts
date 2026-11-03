@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
 import {
+  bigint,
   check,
   foreignKey,
   integer,
@@ -59,3 +60,31 @@ export const lectureNotebooks = pgTable(
 );
 
 export type LectureNotebook = typeof lectureNotebooks.$inferSelect;
+
+/*
+ * Images the user put into their notebooks (pasted, dropped or uploaded).
+ * The bytes live in MedOS storage under their SHA-256, like Study Guide
+ * figures; this row says the image is the user's, so it is only ever served
+ * to them. One row per user and image, however many notebooks show it.
+ */
+export const notebookImages = pgTable(
+  "notebook_images",
+  {
+    id: id(),
+    userId: ownerId(),
+    contentHash: text("content_hash").notNull(),
+    storageKey: text("storage_key").notNull(),
+    mimeType: text("mime_type").notNull(),
+    sizeBytes: bigint("size_bytes", { mode: "number" }).notNull(),
+    ...timestamps,
+  },
+  (table) => [
+    unique("notebook_images_user_hash_unique").on(table.userId, table.contentHash),
+    check("notebook_images_hash_format", sql`${table.contentHash} ~ '^[0-9a-f]{64}$'`),
+    // Raster images only: SVG can carry script.
+    check("notebook_images_type_valid", sql`${table.mimeType} ~ '^image/(png|jpeg|gif|webp)$'`),
+    check("notebook_images_size_valid", sql`${table.sizeBytes} > 0`),
+  ],
+);
+
+export type NotebookImage = typeof notebookImages.$inferSelect;
