@@ -45,6 +45,29 @@ test.describe("the lecture notebook", () => {
 
   test("is written beside the guide, saved, and kept across a reload", async ({ page }) => {
     test.skip(isMobile(page), "Only the desktop project writes to the shared notebook.");
+    test.setTimeout(60_000); // one long journey through every notebook feature
+    // A stand-in for the browser's speech recognition, which needs a microphone.
+    await page.addInitScript(() => {
+      class FakeRecognition {
+        onresult: ((event: unknown) => void) | null = null;
+        onerror: ((event: unknown) => void) | null = null;
+        onend: (() => void) | null = null;
+        start() {
+          (window as unknown as { fakeSpeech: unknown }).fakeSpeech = this;
+        }
+        stop() {
+          setTimeout(() => this.onend?.(), 0);
+        }
+        abort() {
+          this.stop();
+        }
+        hear(transcript: string, isFinal: boolean) {
+          const result = Object.assign([{ transcript }], { isFinal });
+          this.onresult?.({ resultIndex: 0, results: [result] });
+        }
+      }
+      Object.assign(window, { SpeechRecognition: FakeRecognition });
+    });
     await openGuide(page);
     await page.getByRole("button", { name: "Open notebook" }).click();
 
@@ -116,6 +139,27 @@ test.describe("the lecture notebook", () => {
     await expect(editor(page).locator("p").last()).toHaveText("The patient → better and ");
     await page.keyboard.press("Backspace");
     await expect(editor(page).locator("p").last()).toHaveText("The patient → better adn ");
+
+    // Dictation: a tap of Alt starts it, spoken punctuation becomes signs, Alt again stops it.
+    await page.keyboard.press("Alt");
+    const listening = pane.getByRole("status").filter({ hasText: "Listening" });
+    await expect(listening).toBeVisible();
+    const hear = (text: string, isFinal: boolean) =>
+      page.evaluate(
+        ([t, f]) =>
+          (
+            window as unknown as { fakeSpeech: { hear(t: string, f: boolean): void } }
+          ).fakeSpeech.hear(t, f),
+        [text, isFinal] as const,
+      );
+    await hear("neutrophils rise", false);
+    await expect(listening).toContainText("neutrophils rise");
+    await hear("neutrophils rise comma then fall full stop", true);
+    await expect(editor(page).locator("p").last()).toHaveText(
+      "The patient → better adn neutrophils rise, then fall.",
+    );
+    await page.keyboard.press("Alt");
+    await expect(listening).toBeHidden();
 
     // Images: uploaded from the device, kept privately in MedOS.
     const png = Buffer.from(

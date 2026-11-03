@@ -37,6 +37,7 @@ import {
   ListChecks,
   ListOrdered,
   type LucideIcon,
+  Mic,
   Minus,
   Pilcrow,
   Quote,
@@ -62,6 +63,7 @@ import { NOTEBOOK_CALLOUTS, cleanNotebookDocument, isSafeHref } from "./document
 import { NOTEBOOK_TEXT_SERIALIZERS, notebookExtensions } from "./extensions";
 import { FormulaDialog, type FormulaRequest } from "./formula-dialog";
 import { NOTEBOOK_IMAGE_ACCEPT, isImageFile, uploadNotebookImage } from "./image-upload";
+import { useDictation } from "./use-dictation";
 
 /*
  * The lecture notebook editor. Notes are written in the Study Guide's own
@@ -415,6 +417,8 @@ export function NotebookEditor({
     setFormula(null);
   };
 
+  const dictation = useDictation(editor);
+
   const loadNewer = (current: NotebookView) => {
     if (!editor) return;
     revision.current = current.revision;
@@ -439,7 +443,38 @@ export function NotebookEditor({
         uploading={uploading}
         onImage={() => fileInput.current?.click()}
         onFormula={openFormula}
+        dictation={dictation}
       />
+      {dictation.listening ? (
+        <div
+          role="status"
+          className="mx-3 mt-3 flex items-start gap-2.5 rounded-lg border border-danger/30 bg-danger-soft/50 px-3 py-2 text-[13px] text-fg"
+        >
+          <span aria-hidden="true" className="relative mt-1.5 flex size-2 shrink-0">
+            <span className="absolute inline-flex size-full animate-ping rounded-full bg-danger opacity-60 motion-reduce:animate-none" />
+            <span className="relative inline-flex size-2 rounded-full bg-danger" />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="font-medium">Listening</span>
+            <span className="text-fg-muted"> · press Alt to stop</span>
+            {dictation.interim ? (
+              <span className="mt-0.5 block truncate text-fg-muted italic">{dictation.interim}</span>
+            ) : (
+              <span className="mt-0.5 block text-[12px] text-fg-subtle">
+                Say “comma”, “full stop”, “question mark”, “new line” or “new paragraph”.
+              </span>
+            )}
+          </span>
+        </div>
+      ) : null}
+      {dictation.error ? (
+        <Banner tone="danger">
+          {dictation.error}
+          <span className="mt-2 flex">
+            <BannerButton onClick={dictation.clearError}>OK</BannerButton>
+          </span>
+        </Banner>
+      ) : null}
       <input
         ref={fileInput}
         type="file"
@@ -730,6 +765,7 @@ function Toolbar({
   uploading,
   onImage,
   onFormula,
+  dictation,
 }: {
   editor: Editor | null;
   status: Status;
@@ -737,6 +773,7 @@ function Toolbar({
   uploading: number;
   onImage: () => void;
   onFormula: () => void;
+  dictation: { supported: boolean; listening: boolean; toggle: () => void };
 }) {
   const state = useEditorState({
     editor,
@@ -1073,6 +1110,14 @@ function Toolbar({
       <Divider />
       <ToolButton label="Insert image" icon={ImagePlus} disabled={off} onClick={onImage} />
       <ToolButton label="Insert formula" icon={Sigma} disabled={off} onClick={onFormula} />
+      <ToolButton
+        label={dictation.listening ? "Stop dictation" : "Dictate"}
+        icon={Mic}
+        shortcut="Alt"
+        active={dictation.listening}
+        disabled={off || !dictation.supported}
+        onClick={dictation.toggle}
+      />
       <Menu
         label="Table"
         trigger={
