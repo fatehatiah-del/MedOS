@@ -459,7 +459,7 @@ export function NotebookEditor({
               {dictation.hearing ? "Listening" : "Starting the microphone…"}
             </span>
             <span className="text-fg-muted">
-              {dictation.holding ? " · let go of Alt to stop" : " · tap Alt to stop"}
+              {" · Esc or the microphone button to stop"}
             </span>
             {dictation.interim ? (
               <span className="mt-0.5 block truncate text-fg-muted italic">{dictation.interim}</span>
@@ -1121,7 +1121,6 @@ function Toolbar({
       <ToolButton
         label={dictation.listening ? "Stop dictation" : "Dictate"}
         icon={Mic}
-        shortcut="Alt"
         active={dictation.listening}
         disabled={off || !dictation.supported}
         onClick={dictation.toggle}

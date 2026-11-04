@@ -142,9 +142,12 @@ test.describe("the lecture notebook", () => {
     await page.keyboard.press("Backspace");
     await expect(editor(page).locator("p").last()).toHaveText("The patient → better adn ");
 
-    // Dictation: a tap of Alt starts it, spoken punctuation becomes signs, Alt again stops it.
+    // Alt alone no longer starts dictation; the microphone button does.
     await page.keyboard.press("Alt");
     const listening = pane.getByRole("status").filter({ hasText: "Listening" });
+    await expect(listening).toBeHidden();
+    const mic = pane.getByRole("button", { name: "Dictate" });
+    await mic.click();
     await expect(listening).toBeVisible();
     const hear = (text: string, isFinal: boolean) =>
       page.evaluate(
@@ -160,16 +163,16 @@ test.describe("the lecture notebook", () => {
     await expect(editor(page).locator("p").last()).toHaveText(
       "The patient → better adn neutrophils rise, then fall.",
     );
-    await page.keyboard.press("Alt");
+    await pane.getByRole("button", { name: "Stop dictation" }).click();
     await expect(listening).toBeHidden();
     // The real recogniser needs the microphone, which MedOS's own pages may use.
     const headers = (await page.request.get("/login")).headers();
     expect(headers["permissions-policy"]).toContain("microphone=(self)");
-    // Held down, Alt listens until it is let go.
-    await page.keyboard.down("Alt");
-    await expect(listening).toContainText("let go of Alt to stop");
+    // Escape stops it too.
+    await mic.click();
+    await expect(listening).toBeVisible();
     await hear("then recover", true);
-    await page.keyboard.up("Alt");
+    await page.keyboard.press("Escape");
     await expect(listening).toBeHidden();
     await expect(editor(page).locator("p").last()).toHaveText(
       "The patient → better adn neutrophils rise, then fall. Then recover",
