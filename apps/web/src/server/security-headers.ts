@@ -17,10 +17,11 @@ export const SECURITY_HEADERS: readonly { key: string; value: string }[] = [
   // Addresses of private pages never leave MedOS in a Referer header.
   { key: "Referrer-Policy", value: "same-origin" },
   { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
-  // MedOS uses none of these. Fullscreen (the lecture viewer) keeps its default.
+  // MedOS uses none of these but the microphone, for notebook dictation on its own
+  // pages only. Fullscreen (the lecture viewer) keeps its default.
   {
     key: "Permissions-Policy",
-    value: "camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()",
+    value: "camera=(), microphone=(self), geolocation=(), payment=(), usb=(), browsing-topics=()",
   },
 ];
 

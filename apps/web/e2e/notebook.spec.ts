@@ -52,8 +52,10 @@ test.describe("the lecture notebook", () => {
         onresult: ((event: unknown) => void) | null = null;
         onerror: ((event: unknown) => void) | null = null;
         onend: (() => void) | null = null;
+        onaudiostart: (() => void) | null = null;
         start() {
           (window as unknown as { fakeSpeech: unknown }).fakeSpeech = this;
+          setTimeout(() => this.onaudiostart?.(), 0);
         }
         stop() {
           setTimeout(() => this.onend?.(), 0);
@@ -160,6 +162,9 @@ test.describe("the lecture notebook", () => {
     );
     await page.keyboard.press("Alt");
     await expect(listening).toBeHidden();
+    // The real recogniser needs the microphone, which MedOS's own pages may use.
+    const headers = (await page.request.get("/login")).headers();
+    expect(headers["permissions-policy"]).toContain("microphone=(self)");
     // Held down, Alt listens until it is let go.
     await page.keyboard.down("Alt");
     await expect(listening).toContainText("let go of Alt to stop");

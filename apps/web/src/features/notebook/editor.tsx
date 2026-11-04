@@ -455,15 +455,21 @@ export function NotebookEditor({
             <span className="relative inline-flex size-2 rounded-full bg-danger" />
           </span>
           <span className="min-w-0 flex-1">
-            <span className="font-medium">Listening</span>
+            <span className="font-medium">
+              {dictation.hearing ? "Listening" : "Starting the microphone…"}
+            </span>
             <span className="text-fg-muted">
               {dictation.holding ? " · let go of Alt to stop" : " · tap Alt to stop"}
             </span>
             {dictation.interim ? (
               <span className="mt-0.5 block truncate text-fg-muted italic">{dictation.interim}</span>
-            ) : (
+            ) : dictation.hearing ? (
               <span className="mt-0.5 block text-[12px] text-fg-subtle">
                 Say “comma”, “full stop”, “question mark”, “new line” or “new paragraph”.
+              </span>
+            ) : (
+              <span className="mt-0.5 block text-[12px] text-fg-subtle">
+                If the browser asks, allow the microphone.
               </span>
             )}
           </span>

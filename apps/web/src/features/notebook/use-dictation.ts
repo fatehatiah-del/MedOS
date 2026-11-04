@@ -28,6 +28,7 @@ interface Recognition {
   onresult: ((event: RecognitionEvent) => void) | null;
   onerror: ((event: { error: string }) => void) | null;
   onend: (() => void) | null;
+  onaudiostart: (() => void) | null;
   start(): void;
   stop(): void;
   abort(): void;
@@ -86,6 +87,8 @@ export function useDictation(editor: Editor | null) {
   const [interim, setInterim] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [holding, setHolding] = useState(false);
+  // The microphone is on and sound is arriving (until then: "Starting the microphone…").
+  const [hearing, setHearing] = useState(false);
   const recognition = useRef<Recognition | null>(null);
   const wanted = useRef(false);
 
@@ -112,6 +115,12 @@ export function useDictation(editor: Editor | null) {
     r.lang = "en-GB";
     r.continuous = true;
     r.interimResults = true;
+    let gotAudio = false;
+    let failed = false;
+    r.onaudiostart = () => {
+      gotAudio = true;
+      setHearing(true);
+    };
     r.onresult = (event) => {
       let pending = "";
       for (let i = event.resultIndex; i < event.results.length; i++) {
@@ -124,9 +133,17 @@ export function useDictation(editor: Editor | null) {
     r.onerror = (event) => {
       if (event.error === "no-speech" || event.error === "aborted") return;
       wanted.current = false;
+      failed = true;
       setError(ERRORS[event.error] ?? "Dictation stopped because of an error. Press Alt to try again.");
     };
     r.onend = () => {
+      // Ended before any sound came in, with no reason given: say so rather than go quiet.
+      if (!gotAudio && !failed && wanted.current) {
+        wanted.current = false;
+        setError(
+          "The microphone did not start. Check that MedOS may use it (the icon at the left of the address bar) and that no other app is using it, then try again.",
+        );
+      }
       // The browser ends a session after a silence: carry on until asked to stop.
       if (wanted.current && recognition.current === r) {
         try {
@@ -138,6 +155,7 @@ export function useDictation(editor: Editor | null) {
       }
       if (recognition.current === r) recognition.current = null;
       setListening(false);
+      setHearing(false);
       setInterim("");
     };
     recognition.current?.abort();
@@ -240,5 +258,5 @@ export function useDictation(editor: Editor | null) {
     [editor],
   );
 
-  return { supported, listening, holding, interim, error, clearError: () => setError(null), toggle };
+  return { supported, listening, hearing, holding, interim, error, clearError: () => setError(null), toggle };
 }
