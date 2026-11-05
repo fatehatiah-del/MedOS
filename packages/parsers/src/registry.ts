@@ -1,6 +1,7 @@
 import type { ContentFormat } from "./model";
 import { parseMcqHtml } from "./mcq/parse";
 import { parsePdf } from "./pdf/parse";
+import { parsePresentationViewCopy } from "./presentation/parse";
 import { parseQuestionBankDocx } from "./question-bank/parse";
 import type { ParseResult } from "./result";
 import { parseStudyGuideDocx } from "./study-guide/parse";
@@ -24,16 +25,27 @@ export type MaterialKind =
   | "image"
   | "supplementary";
 
+/** What the pipeline may add to a parser's input. */
+export interface ParseExtra {
+  /** Text per page, used where the PDF itself has none (a view copy made of slide pictures). */
+  pageText?: readonly string[];
+}
+
 export interface ParserInfo {
   id: string;
   version: number;
   format: ContentFormat;
+  /**
+   * What the parser reads. Absent: the stored original itself. "pdf-view-copy":
+   * a PDF made from the original (a PowerPoint), which the pipeline makes first.
+   */
+  input?: "pdf-view-copy";
 }
 
 interface ParserEntry extends ParserInfo {
   kind: MaterialKind;
   extensions: readonly string[];
-  parse(bytes: Uint8Array): ParseResult | Promise<ParseResult>;
+  parse(bytes: Uint8Array, extra?: ParseExtra): ParseResult | Promise<ParseResult>;
 }
 
 const PARSERS: readonly ParserEntry[] = [
@@ -69,6 +81,15 @@ const PARSERS: readonly ParserEntry[] = [
     extensions: [".pdf"],
     parse: parsePdf,
   },
+  {
+    id: "pptx-view-copy",
+    version: 1,
+    format: "pdf",
+    input: "pdf-view-copy",
+    kind: "original-lecture",
+    extensions: [".pptx", ".ppt"],
+    parse: parsePresentationViewCopy,
+  },
 ];
 
 export type Identification =
@@ -86,8 +107,11 @@ export function identify(kind: MaterialKind, filename: string): Identification {
     (parser) => parser.kind === kind && parser.extensions.includes(extension),
   );
   if (entry) {
-    const { id, version, format } = entry;
-    return { supported: true, parser: { id, version, format } };
+    const { id, version, format, input } = entry;
+    return {
+      supported: true,
+      parser: input ? { id, version, format, input } : { id, version, format },
+    };
   }
   return { supported: false, reason: unsupportedReason(kind, extension) };
 }
@@ -97,7 +121,7 @@ function unsupportedReason(kind: MaterialKind, extension: string): string {
     return "Older Word documents (.doc) are not read yet. Save it as .docx in Word to import its content. The original is kept.";
   }
   if (extension === ".ppt" || extension === ".pptx") {
-    return "PowerPoint files are kept as originals, but MedOS does not read their content yet.";
+    return "PowerPoint files are shown in MedOS only when they are an Original Lecture. This file is kept as the original.";
   }
   switch (kind) {
     case "study-guide":
@@ -117,13 +141,18 @@ function unsupportedReason(kind: MaterialKind, extension: string): string {
 }
 
 /**
- * Parses one material with the parser `identify` chose. Throws ParseError,
+ * Parses one material with the parser `identify` chose. For a parser with an
+ * `input`, `bytes` are that input (e.g. the PDF made from a PowerPoint). Throws ParseError,
  * with a message for the user, when the file cannot be read.
  */
-export async function parseWith(parser: ParserInfo, bytes: Uint8Array): Promise<ParseResult> {
+export async function parseWith(
+  parser: ParserInfo,
+  bytes: Uint8Array,
+  extra?: ParseExtra,
+): Promise<ParseResult> {
   const entry = PARSERS.find((candidate) => candidate.id === parser.id);
   if (!entry) throw new Error(`Unknown parser ${parser.id}.`);
-  return entry.parse(bytes);
+  return entry.parse(bytes, extra);
 }
 
 /** The current version of every parser, for deciding what to process again. */

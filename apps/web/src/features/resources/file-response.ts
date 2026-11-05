@@ -19,8 +19,17 @@ export function contentDisposition(kind: "inline" | "attachment", filename: stri
   return `${kind}; filename="${fallback}"; filename*=UTF-8''${encodeURIComponent(filename)}`;
 }
 
+/** Types a downloaded original may be sent as; anything else goes as plain bytes. */
+const DOWNLOAD_TYPES = new Set([
+  "application/pdf",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+  "application/vnd.ms-powerpoint",
+]);
+
 /**
- * Serves the original PDF of one of the signed-in user's lectures.
+ * Serves the lecture PDF of one of the signed-in user's lectures: the PDF
+ * itself, or for a PowerPoint lecture the PDF made from it. A download sends
+ * the original as imported (the PDF, or the PowerPoint file).
  *
  * - No session: 401.
  * - Anything that is not the user's original lecture PDF (someone else's,
@@ -39,8 +48,11 @@ export async function resourceFileResponse(
 ): Promise<Response> {
   if (!scope) return json({ error: "Authentication required." }, 401);
 
-  const file = await scope.originalLectures.file(resourceId);
+  const file = download
+    ? await scope.originalLectures.original(resourceId)
+    : await scope.originalLectures.file(resourceId);
   if (!file) return NOT_FOUND();
+  const pdf = !download || file.mimeType === "application/pdf";
 
   let bytes: Uint8Array;
   try {
@@ -50,15 +62,23 @@ export async function resourceFileResponse(
     return UNAVAILABLE();
   }
 
-  if (createHash("sha256").update(bytes).digest("hex") !== file.contentHash || !isPdf(bytes)) {
+  if (
+    createHash("sha256").update(bytes).digest("hex") !== file.contentHash ||
+    (pdf && !isPdf(bytes))
+  ) {
     return UNAVAILABLE();
   }
+  const contentType = pdf
+    ? "application/pdf"
+    : DOWNLOAD_TYPES.has(file.mimeType)
+      ? file.mimeType
+      : "application/octet-stream";
 
   return new Response(new Uint8Array(bytes), {
     status: 200,
     headers: {
       ...PRIVATE,
-      "Content-Type": "application/pdf",
+      "Content-Type": contentType,
       "Content-Length": String(bytes.byteLength),
       "Content-Disposition": contentDisposition(
         download ? "attachment" : "inline",

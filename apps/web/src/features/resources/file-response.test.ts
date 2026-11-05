@@ -214,6 +214,72 @@ describe("original lecture files", () => {
     expect(await response.text()).not.toContain(root);
   });
 
+  it("show a PowerPoint lecture as its PDF view copy, and download the PowerPoint", async () => {
+    const owner = await createOwner();
+    const deckBytes = new TextEncoder().encode(`PK pretend presentation ${sequence}`);
+    const deckHash = sha256(deckBytes);
+    const copy = buildPdf(["Transfusion", "ABO"]);
+    const copyHash = sha256(copy);
+    await store.putBytes(contentKey(deckHash), deckBytes);
+    await store.putBytes(contentKey(copyHash), copy);
+    const pptxType = "application/vnd.openxmlformats-officedocument.presentationml.presentation";
+    const deck = await only(
+      db
+        .insert(resources)
+        .values({
+          userId: owner.pdf.userId,
+          lectureId: owner.pdf.lectureId,
+          kind: "original-lecture",
+          originalFilename: "Transfusion.pptx",
+          mimeType: pptxType,
+          sizeBytes: deckBytes.byteLength,
+          contentHash: deckHash,
+          storageKey: contentKey(deckHash),
+          status: "parsed",
+        })
+        .returning(),
+    );
+    await db.insert(resourceContents).values({
+      userId: owner.pdf.userId,
+      resourceId: deck.id,
+      format: "pdf",
+      parser: "pptx-view-copy",
+      parserVersion: 1,
+      sourceContentHash: deckHash,
+      content: {
+        format: "pdf",
+        pageCount: 2,
+        metadata: { title: null, author: null, creator: null, producer: null, createdAt: null },
+        pages: [
+          { number: 1, text: "Transfusion" },
+          { number: 2, text: "ABO" },
+        ],
+        viewCopy: { contentHash: copyHash, sizeBytes: copy.byteLength, madeFrom: "powerpoint" },
+      },
+      extractedAt: new Date(),
+    });
+
+    const view = await resourceFileResponse(owner.scope, deck.id, store);
+    expect(view.status).toBe(200);
+    expect(view.headers.get("content-type")).toBe("application/pdf");
+    expect(new Uint8Array(await view.arrayBuffer())).toEqual(copy);
+    expect(view.headers.get("content-disposition")).toMatch(/^inline; filename="Transfusion.pdf"/);
+
+    const download = await resourceFileResponse(owner.scope, deck.id, store, { download: true });
+    expect(download.status).toBe(200);
+    expect(download.headers.get("content-type")).toBe(pptxType);
+    expect(download.headers.get("content-disposition")).toMatch(
+      /^attachment; filename="Transfusion.pptx"/,
+    );
+    expect(new Uint8Array(await download.arrayBuffer())).toEqual(deckBytes);
+
+    // Someone else gets the same 404 for either.
+    expect((await resourceFileResponse(a.scope, deck.id, store)).status).toBe(404);
+    expect((await resourceFileResponse(a.scope, deck.id, store, { download: true })).status).toBe(
+      404,
+    );
+  });
+
   it("name any file safely in the download header", () => {
     expect(contentDisposition("inline", 'a"b\\c.pdf')).toBe(
       `inline; filename="a_b_c.pdf"; filename*=UTF-8''a%22b%5Cc.pdf`,

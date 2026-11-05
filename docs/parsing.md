@@ -34,20 +34,40 @@ on its own:
 
 ## Supported formats
 
-| Material         | File    | Parser               | Becomes                                    |
-| ---------------- | ------- | -------------------- | ------------------------------------------ |
-| Study Guide      | `.docx` | `docx-study-guide`   | `study-guide`: sections of blocks          |
-| Question Bank    | `.docx` | `docx-question-bank` | `question-bank`: question–answer items     |
-| MCQ              | `.html` | `html-mcq`           | `mcq-set`: questions, choices, answers     |
-| Original Lecture | `.pdf`  | `pdf-registration`   | `pdf`: page count, metadata, text per page |
+| Material         | File           | Parser               | Becomes                                                |
+| ---------------- | -------------- | -------------------- | ------------------------------------------------------ |
+| Study Guide      | `.docx`        | `docx-study-guide`   | `study-guide`: sections of blocks                      |
+| Question Bank    | `.docx`        | `docx-question-bank` | `question-bank`: question–answer items                 |
+| MCQ              | `.html`        | `html-mcq`           | `mcq-set`: questions, choices, answers                 |
+| Original Lecture | `.pdf`         | `pdf-registration`   | `pdf`: page count, metadata, text per page             |
+| Original Lecture | `.pptx` `.ppt` | `pptx-view-copy`     | `pdf`, of a PDF view copy made with PowerPoint (below) |
 
 The parser is chosen by the material's kind, which comes from the sync's classification and stays
 authoritative, and by the file type. MCQ and Question Bank are separate parsers producing separate
 formats; a Question Bank is never read as an MCQ, even when its questions have lettered choices.
 
 Everything else is **unsupported**, with a reason the lecture page shows: `.doc` (save as `.docx`),
-PowerPoint, Study Guides or Question Banks that are not `.docx`, MCQs that are not HTML, imported
+PowerPoint files that are not an Original Lecture, Study Guides or Question Banks that are not `.docx`, MCQs that are not HTML, imported
 flashcard files, images and supplementary files. Their originals are kept and available as before.
+
+## PowerPoint lectures: the PDF view copy
+
+Browsers cannot show PowerPoint files, so MedOS Sync makes a PDF of each PowerPoint lecture with
+Microsoft PowerPoint on the computer that syncs (`apps/sync/scripts/pptx-to-pdf.ps1`, called from
+`apps/sync/src/process/convert.ts`). The stored original is written to a temporary folder, opened
+read-only and without a window, saved as PDF, and the folder is removed; the study folder's file
+is never opened. Hidden slides are left out, as in a slide show.
+
+- The PDF is stored by its SHA-256 next to the original, and the `pdf` content records it as
+  `viewCopy` (hash, size, `madeFrom: "powerpoint"`). Pages, page text and search come from it.
+- The PowerPoint stays the original: it is what **Download** gives, unchanged.
+- Some heavy decks make PowerPoint's PDF export fail. Then each shown slide is exported as a
+  1600-pixel JPEG and the PDF is made of those pictures (`jpeg-pdf.ts`); the slides' own text,
+  read from the presentation, is used for search since the pictures have none.
+- Without PowerPoint (another operating system, or Office not installed) the lecture stays
+  "unsupported" with a message saying so, and it is converted on the next sync from a computer
+  that has it. `process --all` converts again; PowerPoint's PDFs are not byte-identical between
+  runs, so this stores a new copy each time.
 
 ## Source fidelity
 
@@ -211,7 +231,7 @@ material is committed.
   data; they read the content and never change it.
 - Only HTML quizzes that keep their questions in a JSON data block are read. Quizzes written as
   plain HTML markup are reported as unreadable rather than guessed at.
-- `.doc`, PowerPoint, image-only PDFs' text, imported flashcard files and ZIP archives are not read.
+- `.doc`, image-only PDFs' text, imported flashcard files and ZIP archives are not read.
 - Search text is stored, but there is no search index or search screen yet (Phase 17).
 - Word features without a study meaning (text boxes, comments, footnotes, headers and footers,
   colours) are not extracted.

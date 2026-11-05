@@ -118,6 +118,7 @@ describe("an original lecture PDF", () => {
       metadata: pdf.metadata,
       pagesWithoutText: [2],
       current: true,
+      sourceFormat: "pdf",
     });
   });
 
@@ -128,6 +129,14 @@ describe("an original lecture PDF", () => {
       mimeType: "application/pdf",
     });
     expect(await b.scope.originalLectures.file(a.lecturePdf.id)).toBeNull();
+  });
+
+  it("downloads as the original that was imported", async () => {
+    expect(await a.scope.originalLectures.original(a.lecturePdf.id)).toMatchObject({
+      contentHash: a.hash,
+      originalFilename: "Lecture.pdf",
+    });
+    expect(await b.scope.originalLectures.original(a.lecturePdf.id)).toBeNull();
   });
 
   it("is not found for anyone else, for other kinds of material, or malformed ids", async () => {
@@ -229,5 +238,67 @@ describe("the viewer position", () => {
       .where(eq(lectureProgress.lectureId, a.lecture.id));
     expect(rows.every((row) => row.completedAt === null)).toBe(true);
     expect((await a.scope.lectures.detail(a.lecture.id))?.completedAt).toBeNull();
+  });
+});
+
+describe("a PowerPoint lecture with a PDF view copy", () => {
+  it("is shown through the view copy and downloads as the PowerPoint", async () => {
+    const owner = await createOwner();
+    const deckHash = "d".repeat(64);
+    const copyHash = "c".repeat(64);
+    const deck = first(
+      await db
+        .insert(resources)
+        .values({
+          userId: owner.user.id,
+          lectureId: owner.lecture.id,
+          kind: "original-lecture",
+          originalFilename: "Transfusion.PPTX",
+          mimeType: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+          sizeBytes: 38_000_000,
+          contentHash: deckHash,
+          storageKey: `sha256/${deckHash}`,
+          status: "parsed",
+        })
+        .returning(),
+    );
+    await db.insert(resourceContents).values({
+      userId: owner.user.id,
+      resourceId: deck.id,
+      format: "pdf",
+      parser: "pptx-view-copy",
+      parserVersion: 1,
+      sourceContentHash: deckHash,
+      content: {
+        ...pdf,
+        viewCopy: { contentHash: copyHash, sizeBytes: 5_000_000, madeFrom: "powerpoint" },
+      },
+      extractedAt: new Date(),
+    });
+
+    expect(await owner.scope.originalLectures.get(deck.id)).toMatchObject({
+      originalFilename: "Transfusion.PPTX",
+      sizeBytes: 38_000_000,
+      pageCount: 3,
+      sourceFormat: "powerpoint",
+    });
+    expect(await owner.scope.originalLectures.file(deck.id)).toEqual({
+      contentHash: copyHash,
+      storageKey: `sha256/${copyHash}`,
+      mimeType: "application/pdf",
+      originalFilename: "Transfusion.pdf",
+      sizeBytes: 5_000_000,
+    });
+    expect(await owner.scope.originalLectures.original(deck.id)).toMatchObject({
+      contentHash: deckHash,
+      originalFilename: "Transfusion.PPTX",
+    });
+    // Pages exist as in the view copy, so annotations work the same way.
+    const bookmark = await owner.scope.originalLectures.annotations.create(deck.id, {
+      kind: "bookmark",
+      page: 3,
+    });
+    expect(bookmark.ok).toBe(true);
+    expect(await b.scope.originalLectures.file(deck.id)).toBeNull();
   });
 });

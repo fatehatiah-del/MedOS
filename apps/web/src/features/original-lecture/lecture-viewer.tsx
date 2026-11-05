@@ -92,6 +92,8 @@ export interface LectureViewerProps {
   title: string;
   fileUrl: string;
   downloadUrl: string;
+  /** Tooltip of the download button, e.g. "Download the original PowerPoint file". */
+  downloadHint?: string;
   /** This viewer's address without a page, for `?page=` links. */
   baseHref: string;
   pageCount: number;
@@ -111,6 +113,7 @@ export function LectureViewer({
   title,
   fileUrl,
   downloadUrl,
+  downloadHint = "Download the original file",
   baseHref,
   pageCount,
   initialPage,
@@ -588,7 +591,7 @@ export function LectureViewer({
               download
               className={iconButton}
               aria-label={`Download original: ${title}`}
-              title="Download the original file"
+              title={downloadHint}
             >
               <Download aria-hidden="true" className="size-4" />
             </a>

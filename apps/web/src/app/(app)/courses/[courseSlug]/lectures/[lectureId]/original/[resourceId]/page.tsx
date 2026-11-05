@@ -87,8 +87,10 @@ export default async function OriginalLecturePage({
           <p className="flex items-center gap-1.5 text-[12.5px] text-fg-subtle">
             <FileText aria-hidden="true" className="size-3.5 shrink-0" />
             <span>
-              PDF · {original.pageCount} {original.pageCount === 1 ? "page" : "pages"} ·{" "}
-              {fileSize(original.sizeBytes)}
+              {original.sourceFormat === "powerpoint"
+                ? `PowerPoint, shown as PDF · ${original.pageCount} ${original.pageCount === 1 ? "slide" : "slides"}`
+                : `PDF · ${original.pageCount} ${original.pageCount === 1 ? "page" : "pages"}`}{" "}
+              · {fileSize(original.sizeBytes)}
               {original.pagesWithoutText.length > 0
                 ? ` · ${original.pagesWithoutText.length} without selectable text`
                 : null}
@@ -112,6 +114,11 @@ export default async function OriginalLecturePage({
         title={original.originalFilename}
         fileUrl={`/api/resources/${resourceId}/file`}
         downloadUrl={`/api/resources/${resourceId}/file?download=1`}
+        downloadHint={
+          original.sourceFormat === "powerpoint"
+            ? "Download the original PowerPoint file"
+            : "Download the original file"
+        }
         baseHref={originalLectureHref(course.slug, lecture.id, resourceId)}
         pageCount={original.pageCount}
         initialPage={pageFromQuery(query.page, original.pageCount)}

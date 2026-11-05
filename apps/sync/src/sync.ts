@@ -3,6 +3,7 @@ import type { Database } from "@medos/database";
 import { type ApplyResult, applySync } from "./apply";
 import { type Classification, classifyScan } from "./classify/classify";
 import { type SyncPlan, planSync } from "./plan";
+import type { PresentationConverter } from "./process/convert";
 import { type ProcessReport, processResources } from "./process/process";
 import { type ScanResult, scanSource } from "./scan/walk";
 import { loadSyncState } from "./state";
@@ -36,6 +37,8 @@ export interface SyncOptions {
   now?: Date;
   /** See ProcessOptions.onUnexpectedError. */
   onUnexpectedError?: (label: string, error: unknown) => void;
+  /** See ProcessOptions.convertPresentation. */
+  convertPresentation?: PresentationConverter;
 }
 
 export async function scanAndClassify(sourceRoot: string) {
@@ -55,6 +58,7 @@ export async function runSync(
     store: options.store,
     now: options.now,
     onUnexpectedError: options.onUnexpectedError,
+    convertPresentation: options.convertPresentation,
   };
   if (options.dryRun) {
     const processing = await processResources(db, userId, { ...processOptions, dryRun: true });

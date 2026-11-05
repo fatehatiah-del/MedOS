@@ -18,6 +18,16 @@ export interface PdfDocument {
   };
   /** Text per page, in page order. Empty for a page without extractable text (e.g. a scan). */
   pages: { number: number; text: string }[];
+  /**
+   * Set when the original is a PowerPoint file: the PDF MedOS made from it so
+   * it can be shown in the lecture viewer. The PowerPoint stays the original;
+   * this copy is stored by its SHA-256, and the pages above describe it.
+   */
+  viewCopy?: {
+    contentHash: string;
+    sizeBytes: number;
+    madeFrom: "powerpoint";
+  };
 }
 
 export const pdfDocumentSchema: z.ZodType<PdfDocument> = z
@@ -32,6 +42,13 @@ export const pdfDocumentSchema: z.ZodType<PdfDocument> = z
       createdAt: z.string().nullable(),
     }),
     pages: z.array(z.object({ number: z.number().int().positive(), text: z.string() })),
+    viewCopy: z
+      .object({
+        contentHash: z.string().regex(/^[0-9a-f]{64}$/),
+        sizeBytes: z.number().int().positive(),
+        madeFrom: z.literal("powerpoint"),
+      })
+      .optional(),
   })
   .refine((document) => document.pages.length === document.pageCount, {
     message: "Every page must be listed.",

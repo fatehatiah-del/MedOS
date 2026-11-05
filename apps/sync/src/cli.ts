@@ -18,6 +18,7 @@ import {
 import { eq } from "drizzle-orm";
 
 import { ConfigError, resolveSourceDir, resolveStorageDir, resolveUserEmail } from "./config";
+import { powerPointConverter } from "./process/convert";
 import { processResources } from "./process/process";
 import { formatScanReport, formatSyncReport, processLines } from "./report";
 import { formatMirrorReport, mirrorLibrary, otherAccounts } from "./mirror";
@@ -140,6 +141,7 @@ async function main(argv: readonly string[]): Promise<void> {
           dryRun,
           removePlaceholders: values["remove-placeholders"],
           onUnexpectedError: reportUnexpected,
+          convertPresentation: powerPointConverter,
         });
         console.log(formatSyncReport({ ...run, dryRun, verbose, storage: store.describe() }));
       });
@@ -158,6 +160,7 @@ async function main(argv: readonly string[]): Promise<void> {
           dryRun,
           reprocessAll: values.all,
           onUnexpectedError: reportUnexpected,
+          convertPresentation: powerPointConverter,
         });
         console.log(
           [

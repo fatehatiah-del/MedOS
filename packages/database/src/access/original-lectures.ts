@@ -25,6 +25,9 @@ const isId = (value: string) => UUID.test(value);
 
 const MAX_PAGE_NOTE_LENGTH = 10_000;
 
+/** "Transfusion.pptx" → "Transfusion.pdf": the view copy's name when it is saved. */
+const pdfName = (filename: string) => `${filename.replace(/\.pptx?$/i, "")}.pdf`;
+
 /** An original lecture PDF as the viewer needs it. */
 export interface OriginalLectureView {
   resourceId: string;
@@ -37,6 +40,8 @@ export interface OriginalLectureView {
   pagesWithoutText: number[];
   /** False when the file changed after it was registered. */
   current: boolean;
+  /** "powerpoint": the original is a presentation, shown through a PDF made from it. */
+  sourceFormat: "pdf" | "powerpoint";
 }
 
 /** Where an original file is stored. Server-side only; never sent to the browser. */
@@ -132,6 +137,7 @@ export function createOriginalLectureAccess(db: Database, userId: string) {
           .filter((page) => page.text.trim().length === 0)
           .map((page) => page.number),
         current: row.content?.sourceContentHash === row.contentHash,
+        sourceFormat: content.viewCopy ? "powerpoint" : "pdf",
       };
     },
 
@@ -140,6 +146,34 @@ export function createOriginalLectureAccess(db: Database, userId: string) {
      * is the user's original lecture PDF. For the server only.
      */
     async file(resourceId: string): Promise<StoredOriginal | null> {
+      const found = await load(resourceId);
+      const storageKey = found?.row.storageKey;
+      if (!found || !storageKey) return null;
+      const { row, content } = found;
+      if (content.viewCopy) {
+        // A PowerPoint: the browser is given the PDF made from it.
+        return {
+          contentHash: content.viewCopy.contentHash,
+          storageKey: `sha256/${content.viewCopy.contentHash}`,
+          mimeType: "application/pdf",
+          originalFilename: pdfName(row.originalFilename),
+          sizeBytes: content.viewCopy.sizeBytes,
+        };
+      }
+      return {
+        contentHash: row.contentHash,
+        storageKey,
+        mimeType: row.mimeType,
+        originalFilename: row.originalFilename,
+        sizeBytes: row.sizeBytes,
+      };
+    },
+
+    /**
+     * Where the stored original of a readable lecture is, as imported: the PDF
+     * itself, or the PowerPoint a view copy was made from. For downloading.
+     */
+    async original(resourceId: string): Promise<StoredOriginal | null> {
       const found = await load(resourceId);
       const storageKey = found?.row.storageKey;
       if (!found || !storageKey) return null;

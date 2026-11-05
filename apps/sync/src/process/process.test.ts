@@ -30,6 +30,7 @@ import { LocalObjectStore, contentKey } from "@medos/storage";
 import { runSync } from "../sync";
 import { createScratchFolder, createSourceTree, removeFolder, snapshotTree } from "../test-support";
 
+import { ConversionError, type PresentationConverter } from "./convert";
 import { UNEXPECTED_FAILURE, processResources } from "./process";
 
 /*
@@ -198,6 +199,72 @@ describe("failures preserve the original", () => {
     const deck = await resourceAt(DECK);
     expect(deck.status).toBe("unsupported");
     expect(deck.processingError).toMatch(/PowerPoint/);
+  });
+
+  it("waits for PowerPoint, and retries, when this computer cannot convert", async () => {
+    const { sync, resourceAt } = await setup();
+    await sync();
+    const deck = await resourceAt(DECK);
+    expect(deck.status).toBe("unsupported");
+    expect(deck.processingError).toMatch(/Microsoft PowerPoint/);
+    // Not skipped as "failed before": the next run tries again.
+    const store = new LocalObjectStore(createScratchFolder("z"));
+    const without = await processResources(db, deck.userId, { store, dryRun: true });
+    expect(without.processed.map((entry) => entry.label)).not.toContain(DECK);
+    const withConverter = await processResources(db, deck.userId, {
+      store,
+      dryRun: true,
+      convertPresentation: async () => ({ pdf: new Uint8Array() }),
+    });
+    expect(withConverter.processed.map((entry) => entry.label)).toContain(DECK);
+  });
+
+  it("shows a PowerPoint lecture through a stored PDF view copy", async () => {
+    const { store, sync, resourceAt, contentOf, user } = await setup();
+    const viewCopy = buildPdf(["Transfusion", "ABO groups", "Reactions"]);
+    const seen: { bytes: Uint8Array; filename: string }[] = [];
+    const convert: PresentationConverter = async (bytes, filename) => {
+      seen.push({ bytes, filename });
+      return { pdf: viewCopy };
+    };
+    await sync();
+    // The sync above had no converter; processing with one converts the deck.
+    const report = await processResources(db, user.id, { store, convertPresentation: convert });
+    expect(report.processed.find((entry) => entry.label === DECK)?.outcome).toBe("parsed");
+
+    const deck = await resourceAt(DECK);
+    expect(deck.status).toBe("parsed");
+    expect(deck.processingError).toBeNull();
+    // The converter is given MedOS's stored original, never anything else.
+    expect(seen).toHaveLength(1);
+    expect(sha256(seen[0]?.bytes ?? new Uint8Array())).toBe(deck.contentHash);
+    expect(seen[0]?.filename).toBe("Lecture.pptx");
+
+    const [content] = await contentOf(deck.id);
+    expect(content).toMatchObject({ format: "pdf", parser: "pptx-view-copy" });
+    expect(content?.content).toMatchObject({
+      pageCount: 3,
+      viewCopy: { contentHash: sha256(viewCopy), sizeBytes: viewCopy.byteLength },
+    });
+    expect(await store.read(contentKey(sha256(viewCopy)))).toEqual(viewCopy);
+    // The original stays stored, unchanged.
+    expect(sha256(await store.read(contentKey(deck.contentHash)))).toBe(deck.contentHash);
+
+    // Current now: a later run does not convert again.
+    await processResources(db, user.id, { store, convertPresentation: convert });
+    expect(seen).toHaveLength(1);
+  });
+
+  it("records a failed conversion with a plain message", async () => {
+    const { store, sync, resourceAt, user } = await setup();
+    await sync();
+    const convert: PresentationConverter = async () => {
+      throw new ConversionError("failed", "PowerPoint could not save this presentation as PDF.");
+    };
+    await processResources(db, user.id, { store, convertPresentation: convert });
+    const deck = await resourceAt(DECK);
+    expect(deck.status).toBe("failed");
+    expect(deck.processingError).toMatch(/could not save this presentation/);
   });
 
   it("reports a missing stored copy without crashing", async () => {

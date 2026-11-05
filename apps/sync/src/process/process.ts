@@ -20,12 +20,22 @@ import { and, eq } from "drizzle-orm";
 
 import { ObjectMissingError, type ObjectStore, contentKey } from "@medos/storage";
 
+import {
+  ConversionError,
+  type PresentationConverter,
+  UNAVAILABLE_MESSAGE,
+  type ViewCopy,
+} from "./convert";
+
 /*
  * The resource pipeline, after a file has been imported:
  *
  *   stored original ─identify─▶ parser ─validate─▶ bytes match the import
  *                   ─parse─▶ content ─normalize─▶ schema-checked model
  *                   ─persist─▶ resource_contents + images ─index─▶ search text
+ *
+ * A PowerPoint lecture is first saved as PDF (convert.ts); that PDF view copy
+ * is what gets parsed, and it is stored by its hash next to the original.
  *
  * It reads only MedOS's own stored copies, never the source folder. A failure
  * changes the resource's status and message and nothing else: the original
@@ -41,6 +51,11 @@ export interface ProcessOptions {
   now?: Date;
   /** Called with errors that are not ordinary parse failures, for the command's diagnostics. */
   onUnexpectedError?: (label: string, error: unknown) => void;
+  /**
+   * Makes PDFs of PowerPoint lectures (the command passes Microsoft PowerPoint's).
+   * Without one, PowerPoint lectures stay "unsupported" and are tried again later.
+   */
+  convertPresentation?: PresentationConverter;
 }
 
 export type ProcessReason = "new" | "source-changed" | "parser-updated" | "requested";
@@ -136,12 +151,17 @@ export async function processResources(
 
   for (const { content, ...resource } of rows) {
     const identification = identify(resource.kind, resource.originalFilename);
-    const reason = processingReason(
-      resource,
-      content ?? null,
-      identification,
-      options.reprocessAll ?? false,
-    );
+    const waitingForConverter =
+      identification.supported &&
+      identification.parser.input === "pdf-view-copy" &&
+      !options.convertPresentation &&
+      !options.reprocessAll &&
+      resource.status === "unsupported" &&
+      resource.processingError === UNAVAILABLE_MESSAGE;
+    // A PowerPoint already waiting for a converter is not tried again without one.
+    const reason = waitingForConverter
+      ? null
+      : processingReason(resource, content ?? null, identification, options.reprocessAll ?? false);
     if (!reason) {
       if (resource.status === "failed") {
         report.failedBefore.push({ label: labelOf(resource), message: resource.processingError });
@@ -162,12 +182,26 @@ export async function processResources(
 
     const outcome = await parseStored(resource, identification.parser, options);
     if (!outcome.ok) {
-      await setStatus(db, userId, resource.id, "failed", outcome.message);
-      Object.assign(entry, { outcome: "failed", message: outcome.message });
+      const status = outcome.status ?? "failed";
+      await setStatus(db, userId, resource.id, status, outcome.message);
+      Object.assign(entry, { outcome: status, message: outcome.message });
       continue;
     }
 
-    const { result, parser } = outcome;
+    const { result, parser, viewCopy } = outcome;
+    if (viewCopy) {
+      try {
+        await options.store.putBytes(contentKey(sha256(viewCopy)), viewCopy);
+      } catch (error) {
+        options.onUnexpectedError?.(labelOf(resource), error);
+        const message =
+          "The PDF made from this PowerPoint could not be stored, so it cannot be shown yet. " +
+          "The original is kept; run the sync again.";
+        await setStatus(db, userId, resource.id, "failed", message);
+        Object.assign(entry, { outcome: "failed", message });
+        continue;
+      }
+    }
     for (const media of result.media) {
       await options.store.putBytes(contentKey(media.ref.hash), media.bytes);
     }
@@ -219,7 +253,8 @@ export async function processResources(
 }
 
 type ParseOutcome =
-  { ok: true; result: ParseResult; parser: ParserInfo } | { ok: false; message: string };
+  | { ok: true; result: ParseResult; parser: ParserInfo; viewCopy?: Uint8Array }
+  | { ok: false; message: string; status?: "failed" | "unsupported" };
 
 /** Reads the stored original, checks it is the imported file, and parses it. */
 async function parseStored(
@@ -247,11 +282,35 @@ async function parseStored(
     };
   }
 
+  let viewCopy: ViewCopy | undefined;
+  if (parser.input === "pdf-view-copy") {
+    try {
+      if (!options.convertPresentation)
+        throw new ConversionError("unavailable", UNAVAILABLE_MESSAGE);
+      viewCopy = await options.convertPresentation(bytes, resource.originalFilename);
+    } catch (error) {
+      if (error instanceof ConversionError) {
+        // Without PowerPoint here, the file stays "unsupported" and is tried again next sync.
+        return {
+          ok: false,
+          message: error.message,
+          status: error.code === "unavailable" ? "unsupported" : "failed",
+        };
+      }
+      options.onUnexpectedError?.(labelOf(resource), error);
+      return { ok: false, message: UNEXPECTED_FAILURE };
+    }
+  }
+
   try {
-    const result = await parseWith(parser, bytes);
+    const result = viewCopy
+      ? await parseWith(parser, viewCopy.pdf, { pageText: viewCopy.slideText })
+      : await parseWith(parser, bytes);
     // Normalized content must satisfy its schema before anything is stored.
     validateContent(result.content);
-    return { ok: true, result, parser };
+    return viewCopy
+      ? { ok: true, result, parser, viewCopy: viewCopy.pdf }
+      : { ok: true, result, parser };
   } catch (error) {
     if (error instanceof ParseError) return { ok: false, message: error.message };
     options.onUnexpectedError?.(labelOf(resource), error);

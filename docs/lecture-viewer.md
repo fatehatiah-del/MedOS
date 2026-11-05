@@ -10,7 +10,11 @@ Phase 8 are the specification; this file describes what was built.
 ```
 
 The lecture page shows **Open lecture** beside every Original Lecture PDF that was registered by
-the sync. The PDF is the authoritative document: MedOS shows it exactly as it is and never
+the sync, and beside every PowerPoint lecture (`.pptx`, `.ppt`). A PowerPoint is shown through a
+PDF view copy that MedOS Sync makes with Microsoft PowerPoint (see
+[`parsing.md`](parsing.md#powerpoint-lectures-the-pdf-view-copy)); everything below works the
+same on it, page N being the Nth shown slide. The header says "PowerPoint, shown as PDF", and
+**Download** gives the original PowerPoint file. The PDF is the authoritative document: MedOS shows it exactly as it is and never
 changes it.
 
 `?page=N` opens a page, and the address follows the page you are on, so every page can be linked.
@@ -76,7 +80,9 @@ check this.
 
 ## The file address
 
-`GET /api/resources/<resource-id>/file` (`?download=1` to save):
+`GET /api/resources/<resource-id>/file` (`?download=1` to save). For a PowerPoint lecture the
+viewer is sent the PDF view copy (checked against the hash its content records) and a download
+sends the original PowerPoint, as an attachment:
 
 1. No session: 401.
 2. Anything that is not your Original Lecture PDF (someone else's, a Study Guide or quiz, a
@@ -125,6 +131,5 @@ Later item per page.
 
 - Clickable slide references in Study Guides (prepared above).
 - Searching inside the PDF, highlighting or annotating PDF text.
-- PowerPoint or other slide formats (not parsed).
 - Global annotation pages (Phase 12). The viewer offers the study timer (activity Original
   lecture); see [`study-timer.md`](study-timer.md).

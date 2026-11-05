@@ -12,6 +12,7 @@ export { type ExtractedMedia, sha256, sniffImageType } from "./media";
 export {
   type Identification,
   type MaterialKind,
+  type ParseExtra,
   type ParserInfo,
   PARSER_VERSIONS,
   identify,
@@ -20,5 +21,6 @@ export {
 export { type ParseResult, MAX_SEARCH_TEXT } from "./result";
 export { parseMcqHtml } from "./mcq/parse";
 export { parsePdf } from "./pdf/parse";
+export { parsePresentationViewCopy } from "./presentation/parse";
 export { parseQuestionBankDocx } from "./question-bank/parse";
 export { parseStudyGuideDocx } from "./study-guide/parse";

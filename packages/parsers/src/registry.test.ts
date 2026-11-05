@@ -29,12 +29,21 @@ describe("identifying a parser", () => {
     expect(identify("mcq", "x.docx")).toMatchObject({ supported: false });
   });
 
+  it("reads PowerPoint lectures through a PDF view copy", () => {
+    for (const name of ["Slides.pptx", "Old slides.PPT"]) {
+      expect(identify("original-lecture", name)).toEqual({
+        supported: true,
+        parser: { id: "pptx-view-copy", version: 1, format: "pdf", input: "pdf-view-copy" },
+      });
+    }
+  });
+
   it("explains why a file is not read", () => {
     expect(identify("study-guide", "Old.doc")).toMatchObject({
       supported: false,
       reason: expect.stringContaining(".docx"),
     });
-    expect(identify("original-lecture", "Slides.pptx")).toMatchObject({
+    expect(identify("supplementary", "Slides.pptx")).toMatchObject({
       supported: false,
       reason: expect.stringContaining("PowerPoint"),
     });
@@ -51,6 +60,7 @@ describe("identifying a parser", () => {
       "docx-study-guide",
       "html-mcq",
       "pdf-registration",
+      "pptx-view-copy",
     ]);
     expect(Object.values(PARSER_VERSIONS).every((version) => version > 0)).toBe(true);
   });
