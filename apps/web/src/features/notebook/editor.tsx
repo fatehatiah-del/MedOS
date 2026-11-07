@@ -63,6 +63,7 @@ import { NOTEBOOK_CALLOUTS, cleanNotebookDocument, isSafeHref } from "./document
 import { NOTEBOOK_TEXT_SERIALIZERS, notebookExtensions } from "./extensions";
 import { FormulaDialog, type FormulaRequest } from "./formula-dialog";
 import { NOTEBOOK_IMAGE_ACCEPT, isImageFile, uploadNotebookImage } from "./image-upload";
+import { loadLexicon } from "./speller";
 import { useDictation } from "./use-dictation";
 
 /*
@@ -293,10 +294,23 @@ export function NotebookEditor({
     ),
     content: initial.content as JSONContent,
     editorProps: {
-      attributes: {
-        class: "nb-prose focus:outline-none",
-        "aria-label": "Lecture notebook",
-        spellcheck: "true",
+      // While autocorrect is on it fixes words itself: no red underlines from
+      // the browser, and Grammarly (whose suggestions a page cannot accept)
+      // is asked to stay out of the notebook.
+      attributes: () => {
+        const corrects = editorRef.current?.storage.autocorrect.enabled ?? readAutocorrect();
+        return {
+          class: "nb-prose focus:outline-none",
+          "aria-label": "Lecture notebook",
+          spellcheck: corrects ? "false" : "true",
+          ...(corrects
+            ? {
+                "data-gramm": "false",
+                "data-gramm_editor": "false",
+                "data-enable-grammarly": "false",
+              }
+            : {}),
+        };
       },
       transformPastedHTML: plainerPastedHTML,
       handlePaste: (_view, event) => {
@@ -328,6 +342,7 @@ export function NotebookEditor({
     if (!editor) return;
     editorRef.current = editor;
     editor.commands.setAutocorrect(readAutocorrect());
+    void loadLexicon();
     if (recovered.restore)
       editor.commands.setContent(recovered.restore.content, { emitUpdate: true });
     onReady?.(editor);
@@ -458,11 +473,11 @@ export function NotebookEditor({
             <span className="font-medium">
               {dictation.hearing ? "Listening" : "Starting the microphone…"}
             </span>
-            <span className="text-fg-muted">
-              {" · Esc or the microphone button to stop"}
-            </span>
+            <span className="text-fg-muted">{" · Esc or the microphone button to stop"}</span>
             {dictation.interim ? (
-              <span className="mt-0.5 block truncate text-fg-muted italic">{dictation.interim}</span>
+              <span className="mt-0.5 block truncate text-fg-muted italic">
+                {dictation.interim}
+              </span>
             ) : dictation.hearing ? (
               <span className="mt-0.5 block text-[12px] text-fg-subtle">
                 Say “comma”, “full stop”, “question mark”, “new line” or “new paragraph”.

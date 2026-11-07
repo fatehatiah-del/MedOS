@@ -136,6 +136,22 @@ describe("lecture notebooks", () => {
   });
 });
 
+describe("notebook vocabulary", () => {
+  it("lists the words in the owner's notes, lowercase, for autocorrect only", async () => {
+    const owner = await createOwner();
+    const other = await createOwner();
+    await owner.scope.notebooks.save(owner.lecture.id, {
+      content: doc("Hyperkalemia: peaked T waves, hyperkalemia again."),
+      plainText: "Hyperkalemia: peaked T waves, hyperkalemia again.",
+      baseRevision: 0,
+    });
+
+    const words = await owner.scope.notebooks.vocabulary();
+    expect(words.sort()).toEqual(["again", "hyperkalemia", "peaked", "waves"]);
+    expect(await other.scope.notebooks.vocabulary()).toEqual([]);
+  });
+});
+
 describe("notebook images", () => {
   const image = {
     contentHash: "a".repeat(64),

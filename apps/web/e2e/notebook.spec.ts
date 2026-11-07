@@ -142,6 +142,14 @@ test.describe("the lecture notebook", () => {
     await page.keyboard.press("Backspace");
     await expect(editor(page).locator("p").last()).toHaveText("The patient → better adn ");
 
+    // Any misspelt word once the dictionary is in, with no red underlines meanwhile.
+    await expect(editor(page)).toHaveAttribute("spellcheck", "false");
+    await page.waitForLoadState("networkidle");
+    await page.keyboard.type("thw kidnye ");
+    await expect(editor(page).locator("p").last()).toHaveText(
+      "The patient → better adn the kidney ",
+    );
+
     // Alt alone no longer starts dictation; the microphone button does.
     await page.keyboard.press("Alt");
     const listening = pane.getByRole("status").filter({ hasText: "Listening" });
@@ -161,7 +169,7 @@ test.describe("the lecture notebook", () => {
     await expect(listening).toContainText("neutrophils rise");
     await hear("neutrophils rise comma then fall full stop", true);
     await expect(editor(page).locator("p").last()).toHaveText(
-      "The patient → better adn neutrophils rise, then fall.",
+      "The patient → better adn the kidney neutrophils rise, then fall.",
     );
     await pane.getByRole("button", { name: "Stop dictation" }).click();
     await expect(listening).toBeHidden();
@@ -175,7 +183,7 @@ test.describe("the lecture notebook", () => {
     await page.keyboard.press("Escape");
     await expect(listening).toBeHidden();
     await expect(editor(page).locator("p").last()).toHaveText(
-      "The patient → better adn neutrophils rise, then fall. Then recover",
+      "The patient → better adn the kidney neutrophils rise, then fall. Then recover",
     );
 
     // Images: uploaded from the device, kept privately in MedOS.

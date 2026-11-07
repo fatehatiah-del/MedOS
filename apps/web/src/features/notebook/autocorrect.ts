@@ -1,5 +1,7 @@
 import { Extension, InputRule } from "@tiptap/core";
 
+import { currentLexicon, correctWord, teachWord } from "./speller";
+
 /*
  * Autocorrect while typing, as a word processor does: common typos, the
  * first letter of a sentence, "i" on its own, curly quotes, dashes and the
@@ -9,11 +11,21 @@ import { Extension, InputRule } from "@tiptap/core";
  *
  * Words with capitals inside (pH, mRNA, HbA1c) are never changed, and US and
  * UK spellings are both left alone: only plain mistakes are corrected.
+ *
+ * Beyond the typo list, any word the dictionary does not know is replaced by
+ * the closest one it does (see speller.ts), so a slip onto the next key is
+ * fixed without going back. Backspace straight after such a correction puts
+ * the word back and teaches it, so it is never corrected again. Capitalised
+ * words mid-sentence (names) and all-capital abbreviations are left alone.
  */
 
 declare module "@tiptap/core" {
   interface Storage {
-    autocorrect: { enabled: boolean };
+    autocorrect: {
+      enabled: boolean;
+      /** The last dictionary correction, for Backspace to undo and learn from. */
+      last: { typed: string; text: string; at: number } | null;
+    };
   }
   interface Commands<ReturnType> {
     autocorrect: {
@@ -137,6 +149,11 @@ export const TYPOS: Record<string, string> = {
   platlets: "platelets",
 };
 
+/** Little words typed twice by accident ("the the"); "had had" and "that that" are English. */
+const DOUBLES = new Set(
+  "the a an and of to in is it on for with as at by be are was or from this".split(" "),
+);
+
 /** Abbreviations whose full stop does not end a sentence. */
 const ABBREVIATIONS = new Set([
   "e.g.",
@@ -202,7 +219,7 @@ export const Autocorrect = Extension.create({
   name: "autocorrect",
 
   addStorage() {
-    return { enabled: true };
+    return { enabled: true, last: null };
   },
 
   addCommands() {
@@ -230,25 +247,63 @@ export const Autocorrect = Extension.create({
         const [, lead = "", typed = "", end = ""] = match;
         const index = (match.index ?? 0) + lead.length;
         let fixed = typed;
+        const before = (match.input ?? "").slice(0, index);
+        const sentenceStart = startsSentence(match.input ?? "", index);
         const typo = TYPOS[typed.toLowerCase()];
         // Mixed-case words (pH, mRNA) are names, never typos.
         const plain =
           typed === typed.toLowerCase() || typed.slice(1) === typed.slice(1).toLowerCase();
+        const start = range.from + lead.length;
+        editor.storage.autocorrect.last = null;
+
+        // "the the": the second one goes.
+        const previous = /(\p{L}+)\s+$/u.exec(before)?.[1];
+        if (
+          /\s/u.test(end) &&
+          previous?.toLowerCase() === typed.toLowerCase() &&
+          DOUBLES.has(typed.toLowerCase()) &&
+          range.to - range.from === lead.length + typed.length + end.length
+        ) {
+          state.tr.delete(start, range.to);
+          return;
+        }
+
+        let learnable = false;
         if (typo && plain) fixed = matchCase(typed, typo);
+        else if (
+          // Plain lowercase, or capitalised only because a sentence starts.
+          (typed === typed.toLowerCase() ||
+            (sentenceStart &&
+              typed.length > 1 &&
+              typed.slice(1) === typed.slice(1).toLowerCase())) &&
+          // "approx." and "resp." are abbreviations, not typos.
+          !(end === "." && typed.length <= 6)
+        ) {
+          const lexicon = currentLexicon();
+          const lower = typed.toLowerCase();
+          const correction = lexicon ? correctWord(lower, lexicon) : null;
+          if (correction) {
+            fixed = matchCase(typed, correction);
+            learnable = true;
+          }
+        }
         if (fixed.toLowerCase() === "i" || /^i['’]/i.test(fixed)) fixed = capitalise(fixed);
         if (
           end !== "." && // "e.g." is still being typed
           fixed === fixed.toLowerCase() &&
           /^\p{Ll}/u.test(fixed) &&
-          startsSentence(match.input ?? "", index)
+          sentenceStart
         ) {
           fixed = capitalise(fixed);
         }
         if (fixed === typed) return null;
         // The typed key is already in the document: the range is the whole match.
         if (range.to - range.from !== lead.length + typed.length + end.length) return null;
-        const start = range.from + lead.length;
         state.tr.insertText(fixed + end, start, range.to);
+        if (learnable) {
+          const text = fixed + end;
+          editor.storage.autocorrect.last = { typed, text, at: start + text.length };
+        }
       },
     });
 
@@ -276,5 +331,37 @@ export const Autocorrect = Extension.create({
 
     // Symbols first, so "(c)" becomes © before the word rule sees ")".
     return [...symbols, word, quote(/(^|.)"$/u, "“", "”"), quote(/(^|.)'$/u, "‘", "’")];
+  },
+});
+
+/**
+ * Backspace straight after a dictionary correction: the core keymap puts the
+ * typed word back (undoing the input rule); this remembers the word first, so
+ * it is not corrected again. Runs before the core keymap and never stops it.
+ */
+export const AutocorrectLearning = Extension.create({
+  name: "autocorrectLearning",
+  priority: 1000,
+
+  addKeyboardShortcuts() {
+    return {
+      Backspace: ({ editor }) => {
+        const storage = editor.storage.autocorrect;
+        const last = storage?.last;
+        if (!last) return false;
+        storage.last = null;
+        const { selection, doc } = editor.state;
+        const from = last.at - last.text.length;
+        if (
+          selection.empty &&
+          selection.from === last.at &&
+          from >= 0 &&
+          doc.textBetween(from, last.at, "\n") === last.text
+        ) {
+          teachWord(last.typed);
+        }
+        return false;
+      },
+    };
   },
 });

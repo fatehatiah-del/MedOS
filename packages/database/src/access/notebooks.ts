@@ -8,6 +8,7 @@ import {
   lectureNotebooks,
   lectures,
   notebookImages,
+  resourceContents,
   weeks,
 } from "../schema";
 
@@ -150,6 +151,27 @@ export function createNotebookAccess(db: Database, userId: string) {
               });
       if (row) return { status: "saved", revision: row.revision, updatedAt: row.updatedAt };
       return { status: "conflict", current: await read(lectureId) };
+    },
+
+    /**
+     * The words in the user's lectures and notebooks, lowercase, for the
+     * notebook's autocorrect: course vocabulary it must never "correct".
+     */
+    async vocabulary(): Promise<string[]> {
+      const statement = sql`
+        select distinct lower(word) as word from (
+          select regexp_split_to_table(${resourceContents.searchText}, '[^[:alpha:]]+') as word
+            from ${resourceContents} where ${resourceContents.userId} = ${userId}
+          union all
+          select regexp_split_to_table(${lectureNotebooks.plainText}, '[^[:alpha:]]+')
+            from ${lectureNotebooks} where ${lectureNotebooks.userId} = ${userId}
+        ) words
+        where char_length(word) between 2 and 40`;
+      const result = (await db.execute(statement)) as unknown;
+      const rows = (Array.isArray(result) ? result : (result as { rows: unknown[] }).rows) as {
+        word: string;
+      }[];
+      return rows.map((row) => row.word);
     },
 
     /** Every notebook with something in it, most recently edited first. */
