@@ -53,6 +53,54 @@ function backspace() {
   view.someProp("handleKeyDown", (handle) => handle(view, event));
 }
 
+describe("notebook autocorrect: punctuation", () => {
+  it("removes a space typed before punctuation", () => {
+    setup();
+    type("kidney , liver ; heart ? ");
+    expect(text()).toBe("Kidney, liver; heart? ");
+  });
+
+  it("adds the missing space after punctuation, but not inside numbers", () => {
+    setup();
+    type("kidney,liver and fever.Then 1,000 at 3:1 ");
+    expect(text()).toBe("Kidney, liver and fever. Then 1,000 at 3:1 ");
+  });
+
+  it("leaves file names and e.coli alone", () => {
+    setup();
+    type("see notes.docx and e.coli ");
+    expect(text()).toBe("See notes.docx and e.coli ");
+  });
+
+  it("drops doubled commas and full stops, keeping an ellipsis", () => {
+    setup();
+    type("kidney,, liver.. Then wait... ");
+    expect(text()).toBe("Kidney, liver. Then wait… ");
+  });
+
+  it("keeps one space where two were typed", () => {
+    setup();
+    type("kidney  liver ");
+    expect(text()).toBe("Kidney liver ");
+  });
+
+  it("adds apostrophes, but only where the word needs one", () => {
+    setup();
+    type("youre right, thats it. i cant and it wont. lets go, it lets you cant ");
+    expect(text()).toBe(
+      "You’re right, that’s it. I can’t and it won’t. Let’s go, it lets you can’t ",
+    );
+  });
+
+  it("is undone by Backspace", () => {
+    setup();
+    type("kidney ,");
+    expect(text()).toBe("Kidney,");
+    backspace();
+    expect(text()).toBe("Kidney ,");
+  });
+});
+
 describe("notebook autocorrect with the dictionary", () => {
   it("fixes any misspelt word, not only listed ones", () => {
     withDictionary();

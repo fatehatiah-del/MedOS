@@ -62,6 +62,20 @@ export const TYPOS: Record<string, string> = {
   untill: "until",
   thier: "their",
   theyre: "they’re",
+  youre: "you’re",
+  youve: "you’ve",
+  youll: "you’ll",
+  weve: "we’ve",
+  theyve: "they’ve",
+  theyll: "they’ll",
+  hes: "he’s",
+  thats: "that’s",
+  whats: "what’s",
+  hasnt: "hasn’t",
+  havent: "haven’t",
+  hadnt: "hadn’t",
+  arent: "aren’t",
+  werent: "weren’t",
   dont: "don’t",
   doesnt: "doesn’t",
   didnt: "didn’t",
@@ -192,6 +206,10 @@ const SYMBOLS: [RegExp, string][] = [
 
 const LETTER = "\\p{L}\\p{N}";
 
+/** "cant" and "wont" are words of their own: they lose their apostrophe only after one of these. */
+const PRONOUNS = new Set("i you we they he she it who that this there".split(" "));
+const AFTER_PRONOUN: Record<string, string> = { cant: "can’t", wont: "won’t" };
+
 /** True when the text before `index` ends a sentence (or there is no text before it). */
 function startsSentence(input: string, index: number): boolean {
   const before = input.slice(0, index);
@@ -269,7 +287,12 @@ export const Autocorrect = Extension.create({
         }
 
         let learnable = false;
-        if (typo && plain) fixed = matchCase(typed, typo);
+        const pronounBefore = PRONOUNS.has(previous?.toLowerCase() ?? "");
+        const contraction = pronounBefore ? AFTER_PRONOUN[typed.toLowerCase()] : undefined;
+        if (contraction && plain) fixed = matchCase(typed, contraction);
+        // "lets" is a word ("it lets you"); at the start of a sentence it is "Let’s".
+        else if (typed.toLowerCase() === "lets" && sentenceStart && plain) fixed = "Let’s";
+        else if (typo && plain) fixed = matchCase(typed, typo);
         else if (
           // Plain lowercase, or capitalised only because a sentence starts.
           (typed === typed.toLowerCase() ||
@@ -330,7 +353,40 @@ export const Autocorrect = Extension.create({
       });
 
     // Symbols first, so "(c)" becomes © before the word rule sees ")".
-    return [...symbols, word, quote(/(^|.)"$/u, "“", "”"), quote(/(^|.)'$/u, "‘", "’")];
+    /*
+     * Punctuation slips from typing fast. Each is an input rule, so Backspace
+     * straight after one puts back what was typed.
+     */
+    const rule = (find: RegExp, fix: (match: RegExpMatchArray) => string) =>
+      new InputRule({
+        find,
+        handler: ({ state, range, match }) => {
+          if (!on()) return null;
+          state.tr.insertText(fix(match), range.from, range.to);
+        },
+      });
+    const punctuation = [
+      // "kidney , liver" → "kidney, liver"
+      rule(/([\p{L}\p{N})\]”’])[ \u00a0]+([,.;:!?])$/u, (m) => m[1]! + m[2]!),
+      // ",," → ","  (not "!!" or "??", which are meant)
+      rule(/([,;:])\1$/u, (m) => m[1]!),
+      // "fever.. Then" → "fever. Then": two dots, once it is clear a third is not coming.
+      rule(/(^|[^.])\.\.([^.])$/u, (m) => m[1]! + "." + m[2]!),
+      // "kidney,liver" → "kidney, liver"; numbers (1,000 and 3:1) are left alone.
+      rule(/(\p{L}{2,})([,;:!?])(\p{L})$/u, (m) => m[1]! + m[2]! + " " + m[3]!),
+      // "fever.Then" → "fever. Then"; only before a capital, so file.docx and e.coli stay.
+      rule(/(\p{L}{2,})\.(\p{Lu})$/u, (m) => m[1]! + ". " + m[2]!),
+      // Two spaces → one.
+      rule(/(\S)[ \u00a0]{2}$/u, (m) => m[1]! + " "),
+    ];
+
+    return [
+      ...symbols,
+      ...punctuation,
+      word,
+      quote(/(^|.)"$/u, "“", "”"),
+      quote(/(^|.)'$/u, "‘", "’"),
+    ];
   },
 });
 
