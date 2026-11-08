@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 
 import { buildReaderAnnotations } from "./reader-model";
 import { segmentInlines, slideLabel } from "./segments";
-import { buildToc, layoutTable, nestListItems, tableColumnCount } from "./structure";
+import { buildToc, layoutTable, nestListItems, tableColumnCount, wordCount } from "./structure";
 import { syntheticGuide } from "./test-guide";
 
 const cell = (text: string) => ({
@@ -198,5 +198,35 @@ describe("reader annotations", () => {
     ]);
     expect(marks.get("1-first-part|0")).toEqual([{ id: "h", kind: "highlight", start: 0, end: 5 }]);
     expect(list[2]?.note).toBe("Mine");
+  });
+});
+
+describe("word count", () => {
+  it("counts the words of the title, headings and blocks, without slide references", () => {
+    expect(
+      wordCount({
+        format: "study-guide",
+        title: "Lupus guide",
+        subtitle: null,
+        preamble: [],
+        sections: [
+          {
+            id: "1-sle",
+            level: 1,
+            heading: [
+              { type: "text", text: "1 SLE basics " },
+              { type: "slide-ref", text: "S8", slides: [8] },
+            ],
+            semanticKind: null,
+            blocks: [
+              {
+                type: "paragraph",
+                inlines: [{ type: "text", text: "Anti-dsDNA is specific — see S9." }],
+              },
+            ],
+          },
+        ],
+      }),
+    ).toBe(2 + 3 + 4);
   });
 });

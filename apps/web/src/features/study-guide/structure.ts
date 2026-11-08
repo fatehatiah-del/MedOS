@@ -133,3 +133,29 @@ export function buildToc(document: StudyGuideDocument): TocEntry[] {
   }
   return roots;
 }
+
+/**
+ * How many words the guide holds: its title, preamble, headings and every
+ * block's text, tables and figure notes included. Slide references ("S8")
+ * are not words of the guide and are left out.
+ */
+export function wordCount(document: StudyGuideDocument): number {
+  const texts = [
+    document.title ?? "",
+    document.subtitle ?? "",
+    blocksText(document.preamble),
+    ...document.sections.flatMap((section) => [
+      plainText(section.heading.filter((inline) => inline.type !== "slide-ref")),
+      blocksText(section.blocks),
+    ]),
+  ];
+  return texts.reduce(
+    (sum, text) =>
+      sum +
+      text
+        .split(/\s+/)
+        .filter((word) => /[\p{L}\p{N}]/u.test(word))
+        .filter((word) => !/^S\d+$/.test(word.replace(/[^\p{L}\p{N}]/gu, ""))).length,
+    0,
+  );
+}

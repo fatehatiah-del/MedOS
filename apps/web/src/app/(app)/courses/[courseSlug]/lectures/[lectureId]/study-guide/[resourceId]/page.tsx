@@ -21,13 +21,15 @@ import { PREAMBLE_LABEL, buildReaderAnnotations } from "@/features/study-guide/r
 import { ReaderToc } from "@/features/study-guide/reader-toc";
 import { SectionActions } from "@/features/study-guide/section-actions";
 import { SelectionToolbar } from "@/features/study-guide/selection-toolbar";
-import { buildToc, headingLabel } from "@/features/study-guide/structure";
+import { buildToc, headingLabel, wordCount } from "@/features/study-guide/structure";
 import { StartTimerButton } from "@/features/timer/start-timer-button";
 import { getWorkspace } from "@/server/workspace";
 
 interface StudyGuidePageProps {
   params: Promise<{ courseSlug: string; lectureId: string; resourceId: string }>;
 }
+
+const WORDS = new Intl.NumberFormat("en-GB");
 
 const READ_ON = new Intl.DateTimeFormat("en-GB", {
   timeZone: CURRENT_SEMESTER.timeZone,
@@ -73,6 +75,7 @@ export default async function StudyGuidePage({ params }: StudyGuidePageProps) {
   if (!notebook) notFound();
   const reader = buildReaderAnnotations(document, annotations);
   const toc = buildToc(document);
+  const words = wordCount(document);
   const lecturePage = lectureHref(course.slug, lecture.id);
   const context = { resourceId, marks: reader.marks };
   const timer = (
@@ -110,6 +113,8 @@ export default async function StudyGuidePage({ params }: StudyGuidePageProps) {
               <span>{lecture.title}</span>
               <span aria-hidden="true">·</span>
               <span>Study Guide</span>
+              <span aria-hidden="true">·</span>
+              <span className="font-semibold text-fg-muted">{WORDS.format(words)} words</span>
             </p>
             <h1 className="max-w-[46rem] font-serif text-[1.9rem] leading-tight font-semibold text-balance text-fg sm:text-[2.2rem]">
               {document.title ?? "Study Guide"}
