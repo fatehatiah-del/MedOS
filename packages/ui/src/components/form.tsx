@@ -3,7 +3,7 @@ import type { ComponentProps, ReactNode } from "react";
 import { cn } from "../lib/cn";
 
 export function Label({ className, ...props }: ComponentProps<"label">) {
-  return <label className={cn("block text-sm font-medium text-fg", className)} {...props} />;
+  return <label className={cn("block text-[13px] font-medium text-fg", className)} {...props} />;
 }
 
 export function Input({ className, type = "text", ...props }: ComponentProps<"input">) {
@@ -11,9 +11,10 @@ export function Input({ className, type = "text", ...props }: ComponentProps<"in
     <input
       type={type}
       className={cn(
-        "h-9 w-full rounded-lg border border-border-strong bg-surface px-3 text-sm text-fg shadow-xs",
-        "transition-colors duration-150 placeholder:text-fg-subtle",
-        "focus-visible:border-accent focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-accent",
+        "h-9 w-full rounded-lg border border-border bg-surface px-3 text-sm text-fg shadow-xs",
+        "transition-[border-color,box-shadow] duration-150 placeholder:text-fg-subtle hover:border-border-strong",
+        "focus-visible:border-accent focus-visible:shadow-[0_0_0_3px_color-mix(in_srgb,var(--accent)_20%,transparent)] focus-visible:outline-none",
+        "aria-invalid:border-danger aria-invalid:focus-visible:shadow-[0_0_0_3px_color-mix(in_srgb,var(--danger)_18%,transparent)]",
         "disabled:cursor-not-allowed disabled:bg-subtle disabled:text-fg-muted disabled:shadow-none",
         className,
       )}

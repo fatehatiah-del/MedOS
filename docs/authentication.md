@@ -129,6 +129,20 @@ To give friends their own login with the same study material, add their addresse
 `AUTH_ALLOWED_EMAILS` and mirror your material into their accounts (`docs/sync.md`, "Sharing
 material with other accounts"). Their progress and notes stay their own.
 
+### Open sign-up with the course library
+
+To open MedOS to other students, leave `AUTH_ALLOWED_EMAILS` unset and set
+`MEDOS_LIBRARY_SOURCE_EMAIL` to the account whose material everyone should get. Right after an
+account is created (sign-up or first Google sign-in), MedOS mirrors that account's material into
+it, exactly as `medos-sync mirror` does: weeks, lectures, originals, study guides, quizzes and
+question banks, never study data (`apps/web/src/server/auth/library.ts`). The copy runs after
+the account exists, so a failure never blocks a sign-up: it is logged with `[library]`, and the
+owner can run the mirror by hand. Material published later reaches existing accounts only through
+a mirror run (`--to-all` once every account is a real student).
+
+The public welcome page at `/` and its screenshots under `/welcome/` are the only other public
+paths; a signed-in visitor at `/` goes straight to Today.
+
 ## Not implemented
 
 - **Email verification and password reset.** Both need an email provider, which MedOS does not

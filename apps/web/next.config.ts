@@ -17,6 +17,7 @@ const nextConfig: NextConfig = {
     "@medos/shared",
     "@medos/study-engine",
     "@medos/storage",
+    "@medos/sync",
     "@medos/ui",
   ],
   // Loaded by Node at runtime rather than bundled: PGlite reads its WebAssembly

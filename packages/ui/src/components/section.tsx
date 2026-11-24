@@ -2,14 +2,11 @@ import { type ComponentProps, type ReactNode, useId } from "react";
 
 import { cn } from "../lib/cn";
 
-/** Small uppercase label used as a section heading. */
+/** A section heading: sentence case, a step above body text. */
 export function SectionHeading({ className, ...props }: ComponentProps<"h2">) {
   return (
     <h2
-      className={cn(
-        "text-[11px] font-semibold tracking-[0.09em] text-fg-subtle uppercase",
-        className,
-      )}
+      className={cn("text-[15px] font-semibold tracking-[-0.011em] text-fg", className)}
       {...props}
     />
   );
@@ -27,10 +24,10 @@ export interface SectionProps {
 export function Section({ title, aside, children, className }: SectionProps) {
   const headingId = useId();
   return (
-    <section aria-labelledby={headingId} className={cn("space-y-3", className)}>
-      <div className="flex min-h-5 items-center justify-between gap-4">
+    <section aria-labelledby={headingId} className={cn("space-y-3.5", className)}>
+      <div className="flex min-h-6 items-center justify-between gap-4">
         <SectionHeading id={headingId}>{title}</SectionHeading>
-        {aside ? <div className="text-xs text-fg-subtle">{aside}</div> : null}
+        {aside ? <div className="text-[13px] text-fg-subtle">{aside}</div> : null}
       </div>
       {children}
     </section>

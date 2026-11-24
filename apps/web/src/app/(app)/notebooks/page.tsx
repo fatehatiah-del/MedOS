@@ -73,7 +73,7 @@ export default async function NotebooksPage() {
                         <p className="text-[12.5px] font-medium text-fg-subtle">
                           Week {notebook.weekNumber} · Lecture {notebook.lectureNumber}
                         </p>
-                        <h3 className="font-serif text-[1.075rem] leading-snug font-semibold text-fg">
+                        <h3 className="font-display text-[1.075rem] leading-snug font-semibold text-fg">
                           {notebook.lectureTitle}
                         </h3>
                         <p className="line-clamp-3 text-[13.5px] leading-relaxed text-fg-muted">

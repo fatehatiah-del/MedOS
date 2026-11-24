@@ -175,34 +175,32 @@ export function AuthForm({
         </div>
 
         <Button type="submit" variant="primary" className="h-10 w-full" disabled={pending !== null}>
+          {pending === "form" ? (
+            <span
+              aria-hidden="true"
+              className="size-4 animate-spin rounded-full border-2 border-accent-fg/35 border-t-accent-fg"
+            />
+          ) : null}
           {pending === "form" ? copy.pending : copy.submit}
         </Button>
       </form>
 
-      <div className="flex items-center gap-3" role="presentation">
-        <span className="h-px flex-1 bg-border" />
-        <span className="text-xs text-fg-subtle">or</span>
-        <span className="h-px flex-1 bg-border" />
-      </div>
+      {/* Offered only when it is configured: a disabled button on a public page reads as broken. */}
+      {googleEnabled ? (
+        <>
+          <div className="flex items-center gap-3" role="presentation">
+            <span className="h-px flex-1 bg-border" />
+            <span className="text-xs text-fg-subtle">or</span>
+            <span className="h-px flex-1 bg-border" />
+          </div>
+          <Button className="h-10 w-full" onClick={onGoogle} disabled={pending !== null}>
+            <GoogleMark />
+            {pending === "google" ? "Opening Google…" : "Continue with Google"}
+          </Button>
+        </>
+      ) : null}
 
-      <div className="space-y-2">
-        <Button
-          className="h-10 w-full"
-          onClick={onGoogle}
-          disabled={!googleEnabled || pending !== null}
-          aria-describedby={googleEnabled ? undefined : field("google-note")}
-        >
-          <GoogleMark />
-          {pending === "google" ? "Opening Google…" : "Continue with Google"}
-        </Button>
-        {googleEnabled ? null : (
-          <p id={field("google-note")} className="text-center text-xs text-fg-subtle">
-            Google sign-in has not been set up for this installation yet.
-          </p>
-        )}
-      </div>
-
-      <p className="text-center text-sm text-fg-muted">
+      <p className="text-sm text-fg-muted">
         {copy.alternatePrompt}{" "}
         <Link
           href={alternateHref}

@@ -14,10 +14,7 @@ describe("dictation text", () => {
 
   it("turns spoken punctuation into signs", () => {
     expect(
-      formatDictation(
-        "aspirin comma ibuprofen full stop what about paracetamol question mark",
-        "",
-      ),
+      formatDictation("aspirin comma ibuprofen full stop what about paracetamol question mark", ""),
     ).toEqual([{ text: "Aspirin, ibuprofen. What about paracetamol?" }]);
     expect(formatDictation("ANC open bracket absolute count close bracket", "")).toEqual([
       { text: "ANC (absolute count)" },

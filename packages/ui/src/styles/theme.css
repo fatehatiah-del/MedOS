@@ -17,100 +17,102 @@
 :root {
   color-scheme: light;
 
-  --canvas: #f6f5f1;
+  /* Cool, clinical neutrals: the app frame (canvas) sits a step below the white workspace. */
+  --canvas: #f4f5f8;
   --surface: #ffffff;
-  --subtle: #efede7;
-  --hover: #e9e7e0;
-  --border: #e4e1d9;
-  --border-strong: #cfcbc0;
+  --subtle: #f1f3f6;
+  --hover: #eaedf2;
+  --border: #e3e6ec;
+  --border-strong: #cbd0d9;
 
-  --fg: #1b1a17;
-  --fg-muted: #55534d;
-  --fg-subtle: #6b6862;
+  --fg: #0e1117;
+  --fg-muted: #474f5c;
+  --fg-subtle: #657080;
 
-  --accent: #2c56c4;
-  --accent-hover: #2449ab;
+  /* One action colour: links, primary buttons, focus and selection. */
+  --accent: #2563eb;
+  --accent-hover: #1d4fd7;
   --accent-fg: #ffffff;
-  --accent-soft: #e6ecfa;
+  --accent-soft: #ebf1fe;
   /* Single-series chart fill, validated for lightness and contrast on the surface. */
-  --chart-1: #2c56c4;
+  --chart-1: #2563eb;
 
-  --success: #276e4e;
-  --success-soft: #e2f1ea;
-  --warning: #8f5a12;
-  --warning-soft: #f8eedc;
-  --danger: #b23a34;
-  --danger-soft: #fbe9e7;
+  --success: #18794e;
+  --success-soft: #e3f4ea;
+  --warning: #935a0a;
+  --warning-soft: #fcf0d9;
+  --danger: #c0352b;
+  --danger-soft: #fdecea;
 
-  --violet: #6a4bb0;
-  --violet-soft: #f0ebfa;
-  --teal: #1d6f78;
-  --teal-soft: #e0f1f2;
+  --violet: #6845c9;
+  --violet-soft: #f1ecfc;
+  --teal: #0f7280;
+  --teal-soft: #e1f3f5;
   /* The user's own marks over source text in the Study Guide reader. */
-  --highlight: #fbe6a2;
-  --highlight-note: #f6dcc6;
+  --highlight: #fde9a1;
+  --highlight-note: #fadfca;
 
-  --overlay: rgb(27 26 23 / 0.32);
+  --overlay: rgb(14 17 23 / 0.36);
 
-  --course-pathology: #b4536a;
-  --course-pathophysiology: #b0742a;
-  --course-microbiology: #3f8f6b;
-  --course-pharmacology: #5b62c9;
-  --course-public-health: #2e8c9a;
-  --course-communication-skills: #8e5aa8;
+  --course-pathology: #c2416a;
+  --course-pathophysiology: #c26b12;
+  --course-microbiology: #1f9363;
+  --course-pharmacology: #5450d6;
+  --course-public-health: #0f8aa0;
+  --course-communication-skills: #9147b8;
 
-  --elevation-xs: 0 1px 2px rgb(27 26 23 / 0.04);
-  --elevation-sm: 0 1px 2px rgb(27 26 23 / 0.04), 0 2px 8px -2px rgb(27 26 23 / 0.05);
-  --elevation-lg: 0 2px 6px rgb(27 26 23 / 0.05), 0 16px 40px -12px rgb(27 26 23 / 0.18);
+  --elevation-xs: 0 1px 2px rgb(14 17 23 / 0.05);
+  --elevation-sm: 0 1px 2px rgb(14 17 23 / 0.04), 0 3px 10px -3px rgb(14 17 23 / 0.08);
+  --elevation-lg: 0 2px 6px rgb(14 17 23 / 0.05), 0 20px 44px -14px rgb(14 17 23 / 0.22);
 }
 
 [data-theme="dark"] {
   color-scheme: dark;
 
-  --canvas: #0d0d0f;
-  --surface: #161618;
-  --subtle: #1d1d20;
-  --hover: #232327;
-  --border: #252529;
-  --border-strong: #35353b;
+  --canvas: #08090c;
+  --surface: #101217;
+  --subtle: #171a21;
+  --hover: #1e222a;
+  --border: #22262f;
+  --border-strong: #333944;
 
-  --fg: #ecebe7;
-  --fg-muted: #a9a7a1;
-  --fg-subtle: #8e8c86;
+  --fg: #e9ecf1;
+  --fg-muted: #a6aebb;
+  --fg-subtle: #8892a1;
 
-  --accent: #8aaaf5;
-  --accent-hover: #a0baf8;
-  --accent-fg: #0d0d0f;
-  --accent-soft: #1a2238;
+  --accent: #7aa2ff;
+  --accent-hover: #97b6ff;
+  --accent-fg: #08090c;
+  --accent-soft: #15213d;
   /* Its own dark step (the dark accent is too light for a fill). */
-  --chart-1: #6489ea;
+  --chart-1: #5b87f5;
 
-  --success: #6cc39b;
-  --success-soft: #12261d;
-  --warning: #e0ae62;
-  --warning-soft: #2a2011;
-  --danger: #ee8a82;
-  --danger-soft: #2e1614;
+  --success: #5fcf98;
+  --success-soft: #0f2519;
+  --warning: #e8b35e;
+  --warning-soft: #2a1f0e;
+  --danger: #f2897f;
+  --danger-soft: #2e1513;
 
-  --violet: #bba6f2;
-  --violet-soft: #211b33;
-  --teal: #6fc6cf;
-  --teal-soft: #0f2628;
-  --highlight: #4b3d0f;
-  --highlight-note: #4a2c1a;
+  --violet: #b9a3f7;
+  --violet-soft: #1f1934;
+  --teal: #62c8d6;
+  --teal-soft: #0c2529;
+  --highlight: #4d3f0c;
+  --highlight-note: #4a2c19;
 
-  --overlay: rgb(0 0 0 / 0.6);
+  --overlay: rgb(0 0 0 / 0.62);
 
-  --course-pathology: #e08aa0;
-  --course-pathophysiology: #e0a95c;
-  --course-microbiology: #6fc49c;
-  --course-pharmacology: #969cf0;
-  --course-public-health: #62c0ce;
-  --course-communication-skills: #c192da;
+  --course-pathology: #ef8aab;
+  --course-pathophysiology: #f0a958;
+  --course-microbiology: #5fd0a0;
+  --course-pharmacology: #9d9bf6;
+  --course-public-health: #5cc6d8;
+  --course-communication-skills: #cf98ea;
 
-  --elevation-xs: 0 1px 2px rgb(0 0 0 / 0.3);
-  --elevation-sm: 0 1px 2px rgb(0 0 0 / 0.3), 0 2px 8px -2px rgb(0 0 0 / 0.4);
-  --elevation-lg: 0 2px 6px rgb(0 0 0 / 0.4), 0 16px 40px -12px rgb(0 0 0 / 0.7);
+  --elevation-xs: 0 1px 2px rgb(0 0 0 / 0.4);
+  --elevation-sm: 0 1px 2px rgb(0 0 0 / 0.4), 0 3px 10px -3px rgb(0 0 0 / 0.5);
+  --elevation-lg: 0 2px 6px rgb(0 0 0 / 0.45), 0 20px 44px -14px rgb(0 0 0 / 0.75);
 }
 
 @theme inline {
@@ -169,10 +171,11 @@
   --font-mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, monospace;
 
   /* Motion is short and quiet; it is disabled entirely under reduced motion. */
-  --animate-fade-in: fade-in 140ms ease-out;
-  --animate-pop-in: pop-in 160ms cubic-bezier(0.2, 0.8, 0.2, 1);
-  --animate-slide-in-left: slide-in-left 200ms cubic-bezier(0.2, 0.8, 0.2, 1);
-  --animate-slide-in-right: slide-in-right 200ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  --animate-fade-in: fade-in 150ms cubic-bezier(0.23, 1, 0.32, 1);
+  --animate-pop-in: pop-in 180ms cubic-bezier(0.23, 1, 0.32, 1);
+  --animate-slide-in-left: slide-in-left 240ms cubic-bezier(0.32, 0.72, 0, 1);
+  --animate-slide-in-right: slide-in-right 240ms cubic-bezier(0.32, 0.72, 0, 1);
+  --animate-rise-in: rise-in 420ms cubic-bezier(0.23, 1, 0.32, 1) both;
 
   @keyframes fade-in {
     from {
@@ -183,7 +186,14 @@
   @keyframes pop-in {
     from {
       opacity: 0;
-      transform: translateY(4px) scale(0.985);
+      transform: translateY(4px) scale(0.97);
+    }
+  }
+
+  @keyframes rise-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
     }
   }
 
@@ -200,6 +210,13 @@
   }
 }
 
+/* Headings: Inter, set tight. Replaces the old serif display voice. */
+@utility font-display {
+  font-family: var(--font-sans);
+  letter-spacing: -0.022em;
+  font-feature-settings: "cv11", "ss03", "calt";
+}
+
 @layer base {
   html {
     background-color: var(--canvas);
@@ -210,14 +227,29 @@
     background-color: var(--canvas);
     color: var(--fg);
     font-family: var(--font-sans);
-    font-feature-settings: "cv11", "calt";
+    font-feature-settings: "cv11", "ss03", "calt";
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
   }
 
   ::selection {
-    background-color: color-mix(in srgb, var(--accent) 22%, transparent);
+    background-color: color-mix(in srgb, var(--accent) 24%, transparent);
+  }
+
+  /* Browser surfaces carry the palette too. */
+  html {
+    accent-color: var(--accent);
+    caret-color: var(--accent);
+    scrollbar-color: var(--border-strong) transparent;
+  }
+
+  a {
+    text-underline-offset: 3px;
+  }
+
+  :where(table, time, [data-numeric]) {
+    font-variant-numeric: tabular-nums;
   }
 
   :focus-visible {

@@ -19,9 +19,9 @@ export function DesktopSidebar({ courses }: { courses: readonly NavCourse[] }) {
     <aside
       id={SIDEBAR_ID}
       data-collapsible
-      className="sticky top-0 hidden h-dvh w-60 shrink-0 flex-col border-r border-border transition-[width] duration-200 lg:flex rail:w-[68px]"
+      className="sticky top-0 hidden h-dvh w-[244px] shrink-0 flex-col transition-[width] duration-200 ease-out lg:flex rail:w-[64px]"
     >
-      <div className="flex h-14 shrink-0 items-center px-5 rail:justify-center rail:px-0">
+      <div className="flex h-14 shrink-0 items-center px-5 pt-1 rail:justify-center rail:px-0">
         <Brand />
       </div>
 

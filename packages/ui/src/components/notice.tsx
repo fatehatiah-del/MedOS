@@ -24,7 +24,7 @@ export function Notice({ title, children, icon, tone = "neutral", className }: N
     <div
       role="note"
       className={cn(
-        "flex gap-3 rounded-lg border px-4 py-3 text-sm leading-relaxed",
+        "flex gap-3 rounded-xl border px-4 py-3 text-sm leading-relaxed",
         tones[tone],
         className,
       )}

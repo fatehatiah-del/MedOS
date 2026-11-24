@@ -100,7 +100,7 @@ export function ReviewRunner({
         aria-labelledby="review-done"
         className="space-y-3 rounded-xl border border-border bg-surface p-6"
       >
-        <h2 id="review-done" className="font-serif text-[1.3rem] font-semibold text-fg">
+        <h2 id="review-done" className="font-display text-[1.3rem] font-semibold text-fg">
           {reviewed > 0 ? "Done for now" : "Nothing to review"}
         </h2>
         <p className="text-sm text-fg-muted">

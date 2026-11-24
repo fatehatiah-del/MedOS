@@ -81,7 +81,7 @@ export default async function OriginalLecturePage({
             <span aria-hidden="true">·</span>
             <span>Original Lecture</span>
           </p>
-          <h1 className="font-serif text-[1.2rem] leading-snug font-semibold break-words text-fg sm:text-[1.6rem] lg:text-[1.85rem]">
+          <h1 className="font-display text-[1.2rem] leading-snug font-semibold break-words text-fg sm:text-[1.6rem] lg:text-[1.85rem]">
             {original.originalFilename}
           </h1>
           <p className="flex items-center gap-1.5 text-[12.5px] text-fg-subtle">

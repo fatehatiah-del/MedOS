@@ -26,6 +26,7 @@ const baseConfig: AuthConfig = {
   baseURL: "http://localhost:3000",
   google: null,
   allowedEmails: null,
+  librarySourceEmail: null,
   production: false,
 };
 
@@ -277,6 +278,21 @@ describe("account allow-list", () => {
       [],
     );
     expect(await status(() => signUp("owner@example.test", "Owner", restricted))).toBe("succeeded");
+  });
+});
+
+describe("after an account is created", () => {
+  it("hands the new user to the post-sign-up hook once", async () => {
+    const created: { id: string; email: string }[] = [];
+    const hooked = createAuth(db, baseConfig, {
+      onUserCreated: async (user) => {
+        created.push(user);
+      },
+    });
+    const email = uniqueEmail();
+    expect(await status(() => signUp(email, "Hooked", hooked))).toBe("succeeded");
+    const [row] = await db.select().from(users).where(eq(users.email, email));
+    expect(created).toEqual([{ id: row?.id, email }]);
   });
 });
 

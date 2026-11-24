@@ -30,7 +30,7 @@ export function MobileNav({ courses }: { courses: readonly NavCourse[] }) {
         placement="left"
         closeLabel="Close navigation"
         aria-describedby={undefined}
-        className="flex flex-col bg-canvas"
+        className="flex flex-col border-border bg-canvas"
       >
         <DialogTitle className="sr-only">Navigation</DialogTitle>
         <div className="flex h-14 shrink-0 items-center px-5">

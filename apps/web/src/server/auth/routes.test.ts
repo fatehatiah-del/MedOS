@@ -3,7 +3,9 @@ import { describe, expect, it } from "vitest";
 import { isPublicPath, loginPathFor, safeRedirectPath } from "./routes";
 
 describe("isPublicPath", () => {
-  it("allows only the authentication pages and endpoints", () => {
+  it("allows only the welcome page, its images, and the authentication pages and endpoints", () => {
+    expect(isPublicPath("/")).toBe(true);
+    expect(isPublicPath("/welcome/today-light.webp")).toBe(true);
     expect(isPublicPath("/login")).toBe(true);
     expect(isPublicPath("/signup")).toBe(true);
     expect(isPublicPath("/api/auth/sign-in/email")).toBe(true);
@@ -12,7 +14,6 @@ describe("isPublicPath", () => {
 
   it("treats every workspace and data route as private", () => {
     for (const path of [
-      "/",
       "/today",
       "/courses",
       "/courses/pharmacology",
@@ -35,6 +36,8 @@ describe("isPublicPath", () => {
     expect(isPublicPath("/login-help")).toBe(false);
     expect(isPublicPath("/api/authentication")).toBe(false);
     expect(isPublicPath("/login/extra")).toBe(false);
+    expect(isPublicPath("/welcome")).toBe(false);
+    expect(isPublicPath("/welcomed/page")).toBe(false);
   });
 });
 

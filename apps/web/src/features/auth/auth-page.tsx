@@ -13,11 +13,11 @@ export type AuthSearchParams = Promise<Record<string, string | string[] | undefi
 const HEADINGS: Record<AuthMode, { title: string; description: string }> = {
   "sign-in": {
     title: "Sign in",
-    description: "Your private study workspace.",
+    description: "Welcome back. Your semester is where you left it.",
   },
   "sign-up": {
     title: "Create your account",
-    description: "Your study data stays private to you.",
+    description: "Start your free trial. Your courses are ready the moment you sign up.",
   },
 };
 
@@ -46,11 +46,13 @@ export async function AuthPage({
 
   return (
     <>
-      <header className="mb-8 space-y-2 text-center">
-        <h1 className="font-serif text-[28px] leading-tight font-medium tracking-[-0.01em] text-fg">
+      <header className="mb-8 space-y-2">
+        <h1 className="font-display text-[30px] leading-tight font-semibold text-fg">
           {heading.title}
         </h1>
-        <p className="text-[15px] text-fg-muted">{heading.description}</p>
+        <p className="text-[15px] leading-relaxed text-pretty text-fg-muted">
+          {heading.description}
+        </p>
       </header>
 
       <AuthForm

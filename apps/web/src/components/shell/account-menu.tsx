@@ -26,7 +26,7 @@ export function AccountMenu({ displayName, email }: AccountMenuProps) {
     <DropdownMenu>
       <DropdownMenuTrigger
         aria-label="Account"
-        className="flex size-8 items-center justify-center rounded-full bg-subtle text-[13px] font-medium text-fg-muted transition-colors duration-150 hover:bg-hover hover:text-fg"
+        className="flex size-8 items-center justify-center rounded-full bg-accent-soft text-[13px] font-semibold text-accent ring-1 ring-accent/15 transition-colors duration-150 hover:bg-accent hover:text-accent-fg"
       >
         <span aria-hidden="true">{userInitial(displayName, email)}</span>
       </DropdownMenuTrigger>

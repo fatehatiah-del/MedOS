@@ -176,9 +176,7 @@ export function FeedbackPanel({
       </p>
       {feedback.explanation ? (
         <div className="space-y-1">
-          <h3 className="text-[12px] font-semibold tracking-wide text-fg-subtle uppercase">
-            Explanation
-          </h3>
+          <h3 className="text-[12.5px] font-semibold text-fg-subtle">Explanation</h3>
           <p className="text-[15px] leading-relaxed text-fg">
             <InlineContent inlines={feedback.explanation} />
           </p>
@@ -186,7 +184,7 @@ export function FeedbackPanel({
       ) : null}
       {wrongNotes.length > 0 ? (
         <div className="space-y-1.5">
-          <h3 className="text-[12px] font-semibold tracking-wide text-fg-subtle uppercase">
+          <h3 className="text-[12.5px] font-semibold text-fg-subtle">
             Why the other options are wrong
           </h3>
           <ul className="space-y-1.5">

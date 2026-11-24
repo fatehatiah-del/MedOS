@@ -1,8 +1,8 @@
 import type { MetadataRoute } from "next";
 
-// MedOS is private: disallow all crawling.
+// Only the welcome page may be crawled; everything else in MedOS is private.
 export default function robots(): MetadataRoute.Robots {
   return {
-    rules: { userAgent: "*", disallow: "/" },
+    rules: { userAgent: "*", allow: ["/$", "/welcome/"], disallow: "/" },
   };
 }

@@ -1,0 +1,195 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-25T00:00:00Z",
+  "title": "Design System: MedOS",
+  "extensions": {
+    "colorMeta": {
+      "accent": { "role": "primary", "displayName": "Action Blue", "canonical": "#2563eb", "dark": "#7aa2ff", "tonalRamp": ["#172554", "#1e3a8a", "#1d4ed8", "#2563eb", "#3b82f6", "#7aa2ff", "#bfd3fe", "#ebf1fe"] },
+      "accent-hover": { "role": "primary", "displayName": "Pressed Blue", "canonical": "#1d4fd7", "dark": "#97b6ff", "tonalRamp": ["#172554", "#1e3a8a", "#1d4fd7", "#2563eb", "#3b82f6", "#97b6ff", "#c7d8ff", "#ebf1fe"] },
+      "accent-fg": { "role": "primary", "displayName": "On Blue", "canonical": "#ffffff", "dark": "#08090c" },
+      "accent-soft": { "role": "primary", "displayName": "Blue Wash", "canonical": "#ebf1fe", "dark": "#15213d", "tonalRamp": ["#15213d", "#1e3a8a", "#1d4ed8", "#2563eb", "#7aa2ff", "#bfd3fe", "#dde8fe", "#ebf1fe"] },
+      "canvas": { "role": "neutral", "displayName": "Frame Grey", "canonical": "#f4f5f8", "dark": "#08090c", "tonalRamp": ["#08090c", "#101217", "#22262f", "#474f5c", "#657080", "#cbd0d9", "#e3e6ec", "#f4f5f8"] },
+      "surface": { "role": "neutral", "displayName": "Paper White", "canonical": "#ffffff", "dark": "#101217" },
+      "subtle": { "role": "neutral", "displayName": "Well Grey", "canonical": "#f1f3f6", "dark": "#171a21" },
+      "hover": { "role": "neutral", "displayName": "Hover Grey", "canonical": "#eaedf2", "dark": "#1e222a" },
+      "border": { "role": "neutral", "displayName": "Hairline", "canonical": "#e3e6ec", "dark": "#22262f" },
+      "border-strong": { "role": "neutral", "displayName": "Firm Hairline", "canonical": "#cbd0d9", "dark": "#333944" },
+      "fg": { "role": "neutral", "displayName": "Ink", "canonical": "#0e1117", "dark": "#e9ecf1", "tonalRamp": ["#0e1117", "#272d37", "#474f5c", "#657080", "#8892a1", "#a6aebb", "#cbd0d9", "#e9ecf1"] },
+      "fg-muted": { "role": "neutral", "displayName": "Graphite", "canonical": "#474f5c", "dark": "#a6aebb" },
+      "fg-subtle": { "role": "neutral", "displayName": "Slate", "canonical": "#657080", "dark": "#8892a1" },
+      "success": { "role": "status", "displayName": "Clinical Green", "canonical": "#18794e", "dark": "#5fcf98", "tonalRamp": ["#0f2519", "#0f4a30", "#18794e", "#239463", "#5fcf98", "#9fe2c0", "#c9f0db", "#e3f4ea"] },
+      "success-soft": { "role": "status", "displayName": "Green Wash", "canonical": "#e3f4ea", "dark": "#0f2519" },
+      "warning": { "role": "status", "displayName": "Amber Ink", "canonical": "#935a0a", "dark": "#e8b35e", "tonalRamp": ["#2a1f0e", "#5c3a08", "#935a0a", "#b87414", "#e8b35e", "#f2cf94", "#f8e2bb", "#fcf0d9"] },
+      "warning-soft": { "role": "status", "displayName": "Amber Wash", "canonical": "#fcf0d9", "dark": "#2a1f0e" },
+      "danger": { "role": "status", "displayName": "Alert Red", "canonical": "#c0352b", "dark": "#f2897f", "tonalRamp": ["#2e1513", "#6e1f19", "#c0352b", "#d9554a", "#f2897f", "#f7b5ae", "#fad6d2", "#fdecea"] },
+      "danger-soft": { "role": "status", "displayName": "Red Wash", "canonical": "#fdecea", "dark": "#2e1513" },
+      "violet": { "role": "tertiary", "displayName": "Callout Violet", "canonical": "#6845c9", "dark": "#b9a3f7", "soft": "#f1ecfc", "darkSoft": "#1f1934" },
+      "teal": { "role": "tertiary", "displayName": "Review Teal", "canonical": "#0f7280", "dark": "#62c8d6", "soft": "#e1f3f5", "darkSoft": "#0c2529" },
+      "highlight": { "role": "annotation", "displayName": "Marker Yellow", "canonical": "#fde9a1", "dark": "#4d3f0c" },
+      "highlight-note": { "role": "annotation", "displayName": "Note Peach", "canonical": "#fadfca", "dark": "#4a2c19" },
+      "course-pathology": { "role": "course", "displayName": "Pathology Rose", "canonical": "#c2416a", "dark": "#ef8aab" },
+      "course-pathophysiology": { "role": "course", "displayName": "Pathophysiology Orange", "canonical": "#c26b12", "dark": "#f0a958" },
+      "course-microbiology": { "role": "course", "displayName": "Microbiology Green", "canonical": "#1f9363", "dark": "#5fd0a0" },
+      "course-pharmacology": { "role": "course", "displayName": "Pharmacology Indigo", "canonical": "#5450d6", "dark": "#9d9bf6" },
+      "course-public-health": { "role": "course", "displayName": "Public Health Cyan", "canonical": "#0f8aa0", "dark": "#5cc6d8" },
+      "course-communication-skills": { "role": "course", "displayName": "Communication Purple", "canonical": "#9147b8", "dark": "#cf98ea" },
+      "dark-canvas": { "role": "neutral", "displayName": "Night Frame", "canonical": "#08090c" },
+      "dark-surface": { "role": "neutral", "displayName": "Night Paper", "canonical": "#101217" },
+      "dark-subtle": { "role": "neutral", "displayName": "Night Well", "canonical": "#171a21" },
+      "dark-border": { "role": "neutral", "displayName": "Night Hairline", "canonical": "#22262f" },
+      "dark-fg": { "role": "neutral", "displayName": "Night Ink", "canonical": "#e9ecf1" },
+      "dark-fg-muted": { "role": "neutral", "displayName": "Night Graphite", "canonical": "#a6aebb" },
+      "dark-accent": { "role": "primary", "displayName": "Night Blue", "canonical": "#7aa2ff" },
+      "dark-accent-fg": { "role": "primary", "displayName": "On Night Blue", "canonical": "#08090c" }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Welcome-page hero headline only. 38px / 60px / 72px across breakpoints." },
+      "headline": { "displayName": "Headline", "purpose": "Welcome-page section headings, 32px mobile / 40px desktop; closing heading 52px." },
+      "page-title": { "displayName": "Page title", "purpose": "The single h1 per app page via the page header, 26px / 30px; context line sits under it." },
+      "title": { "displayName": "Title", "purpose": "Section, dialog and empty-state titles; sentence case." },
+      "body": { "displayName": "Body", "purpose": "Descriptions and running UI text; 17-19px on the welcome page." },
+      "reading": { "displayName": "Reading", "purpose": "Study Guide and Notebook prose." },
+      "label": { "displayName": "Label", "purpose": "Buttons, nav items, tabs, form labels, menu items (13-13.5px)." },
+      "caption": { "displayName": "Caption", "purpose": "Metadata, hints, counts, course-group label (12-12.5px)." },
+      "mono": { "displayName": "Mono", "purpose": "Code and LaTeX source only." }
+    },
+    "shadows": [
+      { "name": "elevation-xs", "value": "0 1px 2px rgb(14 17 23 / 0.05)", "dark": "0 1px 2px rgb(0 0 0 / 0.4)", "purpose": "Rest: secondary buttons, inputs, active tab/segment, active nav pill, workspace panel." },
+      { "name": "elevation-sm", "value": "0 1px 2px rgb(14 17 23 / 0.04), 0 3px 10px -3px rgb(14 17 23 / 0.08)", "dark": "0 1px 2px rgb(0 0 0 / 0.4), 0 3px 10px -3px rgb(0 0 0 / 0.5)", "purpose": "Lifted: a card that must read as one object (pricing panel)." },
+      { "name": "elevation-lg", "value": "0 2px 6px rgb(14 17 23 / 0.05), 0 20px 44px -14px rgb(14 17 23 / 0.22)", "dark": "0 2px 6px rgb(0 0 0 / 0.45), 0 20px 44px -14px rgb(0 0 0 / 0.75)", "purpose": "Floating: dialogs, sheets, dropdown menus, framed product screenshots." },
+      { "name": "button-primary-bevel", "value": "inset 0 1px 0 rgb(255 255 255 / 0.16), 0 1px 2px rgb(14 17 23 / 0.12)", "purpose": "Faint physical edge on the filled primary button and the brand tile." },
+      { "name": "focus-ring-input", "value": "0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent)", "purpose": "Input focus, with the border turning accent." },
+      { "name": "focus-outline", "value": "outline: 2px solid var(--accent); outline-offset: 2px", "purpose": "Global :focus-visible on every interactive element." }
+    ],
+    "motion": [
+      { "name": "state", "value": "150ms ease-out", "purpose": "Colour, border, shadow and press transitions on controls." },
+      { "name": "press", "value": "transform: scale(0.97)", "purpose": "Button active state." },
+      { "name": "fade-in", "value": "fade-in 150ms cubic-bezier(0.23, 1, 0.32, 1)", "purpose": "Overlays and swapped tab copy." },
+      { "name": "pop-in", "value": "pop-in 180ms cubic-bezier(0.23, 1, 0.32, 1)", "purpose": "Centre dialogs and dropdown menus (4px rise, 0.97 scale)." },
+      { "name": "slide-in", "value": "slide-in-left / slide-in-right 240ms cubic-bezier(0.32, 0.72, 0, 1)", "purpose": "Navigation drawer and side sheets." },
+      { "name": "sidebar-rail", "value": "width 200ms ease-out", "purpose": "Sidebar collapse to icon rail." },
+      { "name": "rise-in", "value": "rise-in 420ms cubic-bezier(0.23, 1, 0.32, 1) both", "purpose": "One-time entrance on the welcome hero and auth form, staggered 60ms." },
+      { "name": "reduced-motion", "value": "all animation and transition durations 0.01ms", "purpose": "Global under prefers-reduced-motion: reduce." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one filled action per region: start trial, save, submit.",
+      "html": "<button class=\"ds-btn ds-btn-primary\">Start free trial <svg viewBox=\"0 0 24 24\" width=\"16\" height=\"16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/></svg></button>",
+      "css": ".ds-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 36px; padding: 0 14px; border-radius: 8px; border: 1px solid transparent; font: 500 13.5px/1 'Inter Variable', ui-sans-serif, system-ui, sans-serif; font-feature-settings: 'cv11', 'ss03', 'calt'; white-space: nowrap; cursor: pointer; transition: color 150ms ease-out, background-color 150ms ease-out, border-color 150ms ease-out, box-shadow 150ms ease-out, transform 150ms ease-out; } .ds-btn:active { transform: scale(0.97); } .ds-btn:focus-visible { outline: 2px solid var(--accent, #2563eb); outline-offset: 2px; } .ds-btn-primary { background: var(--accent, #2563eb); color: var(--accent-fg, #fff); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.16), 0 1px 2px rgb(14 17 23 / 0.12); } .ds-btn-primary:hover { background: var(--accent-hover, #1d4fd7); }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "The default button: every non-primary action.",
+      "html": "<button class=\"ds-btn2\">Sign in</button>",
+      "css": ".ds-btn2 { display: inline-flex; align-items: center; height: 36px; padding: 0 14px; border-radius: 8px; border: 1px solid var(--border, #e3e6ec); background: var(--surface, #fff); color: var(--fg, #0e1117); box-shadow: var(--elevation-xs, 0 1px 2px rgb(14 17 23 / 0.05)); font: 500 13.5px/1 'Inter Variable', ui-sans-serif, system-ui, sans-serif; cursor: pointer; transition: background-color 150ms ease-out, border-color 150ms ease-out, transform 150ms ease-out; } .ds-btn2:hover { border-color: var(--border-strong, #cbd0d9); background: var(--subtle, #f1f3f6); } .ds-btn2:active { transform: scale(0.97); } .ds-btn2:focus-visible { outline: 2px solid var(--accent, #2563eb); outline-offset: 2px; }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Low-emphasis actions in bars and toolbars.",
+      "html": "<button class=\"ds-btn-ghost\">Cancel</button>",
+      "css": ".ds-btn-ghost { display: inline-flex; align-items: center; height: 36px; padding: 0 14px; border-radius: 8px; border: 0; background: transparent; color: var(--fg-muted, #474f5c); font: 500 13.5px/1 'Inter Variable', ui-sans-serif, system-ui, sans-serif; cursor: pointer; transition: color 150ms ease-out, background-color 150ms ease-out; } .ds-btn-ghost:hover { background: var(--hover, #eaedf2); color: var(--fg, #0e1117); } .ds-btn-ghost:focus-visible { outline: 2px solid var(--accent, #2563eb); outline-offset: 2px; }"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Label, 36px input with accent focus ring, optional hint.",
+      "html": "<div class=\"ds-field\"><label class=\"ds-label\" for=\"ds-email\">Email</label><input class=\"ds-input\" id=\"ds-email\" placeholder=\"you@university.eu\"><p class=\"ds-hint\">We never share your address.</p></div>",
+      "css": ".ds-field { display: grid; gap: 6px; max-width: 320px; font-family: 'Inter Variable', ui-sans-serif, system-ui, sans-serif; } .ds-label { font-size: 13px; font-weight: 500; color: var(--fg, #0e1117); } .ds-input { height: 36px; padding: 0 12px; border-radius: 8px; border: 1px solid var(--border, #e3e6ec); background: var(--surface, #fff); color: var(--fg, #0e1117); font-size: 14px; box-shadow: var(--elevation-xs, 0 1px 2px rgb(14 17 23 / 0.05)); transition: border-color 150ms, box-shadow 150ms; } .ds-input::placeholder { color: var(--fg-subtle, #657080); } .ds-input:hover { border-color: var(--border-strong, #cbd0d9); } .ds-input:focus-visible { outline: none; border-color: var(--accent, #2563eb); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #2563eb) 20%, transparent); } .ds-hint { margin: 0; font-size: 12px; line-height: 1.6; color: var(--fg-subtle, #657080); }"
+    },
+    {
+      "name": "Sidebar Navigation",
+      "kind": "nav",
+      "refersTo": "nav-item",
+      "description": "Sidebar on the canvas: active item is a white pill with a blue icon; courses carry their colour dot.",
+      "html": "<nav class=\"ds-nav\"><a class=\"ds-nav-item is-active\" href=\"#\"><svg viewBox=\"0 0 24 24\" width=\"17\" height=\"17\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"4\"/><path d=\"M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41\"/></svg>Today</a><a class=\"ds-nav-item\" href=\"#\"><svg viewBox=\"0 0 24 24\" width=\"17\" height=\"17\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"2\"/><path d=\"M16 2v4M8 2v4M3 10h18\"/></svg>Calendar</a><p class=\"ds-nav-group\">Courses</p><a class=\"ds-nav-item\" href=\"#\"><span class=\"ds-dot\" style=\"background: var(--course-pathology, #c2416a)\"></span>Pathology</a><a class=\"ds-nav-item\" href=\"#\"><span class=\"ds-dot\" style=\"background: var(--course-pharmacology, #5450d6)\"></span>Pharmacology</a></nav>",
+      "css": ".ds-nav { display: grid; gap: 2px; width: 220px; padding: 12px; background: var(--canvas, #f4f5f8); font-family: 'Inter Variable', ui-sans-serif, system-ui, sans-serif; } .ds-nav-item { display: flex; align-items: center; gap: 10px; height: 32px; padding: 0 10px; border-radius: 8px; color: var(--fg-muted, #474f5c); font-size: 13.5px; font-weight: 500; text-decoration: none; transition: color 150ms, background-color 150ms; } .ds-nav-item:hover { background: var(--hover, #eaedf2); color: var(--fg, #0e1117); } .ds-nav-item.is-active { background: var(--surface, #fff); color: var(--fg, #0e1117); box-shadow: 0 0 0 1px var(--border, #e3e6ec), var(--elevation-xs, 0 1px 2px rgb(14 17 23 / 0.05)); } .ds-nav-item.is-active svg { color: var(--accent, #2563eb); } .ds-nav-item:focus-visible { outline: 2px solid var(--accent, #2563eb); outline-offset: 2px; } .ds-nav-group { margin: 16px 0 4px; padding: 0 10px; font-size: 12px; font-weight: 500; color: var(--fg-subtle, #657080); } .ds-dot { width: 10px; height: 10px; margin: 0 3.5px; border-radius: 9999px; flex-shrink: 0; }"
+    },
+    {
+      "name": "Badge",
+      "kind": "chip",
+      "refersTo": "badge-neutral",
+      "description": "Compact status or category label; soft fill with matching strong text.",
+      "html": "<span class=\"ds-badge\">Study Guide</span> <span class=\"ds-badge ds-badge-accent\">Due today</span> <span class=\"ds-badge ds-badge-success\">Complete</span>",
+      "css": ".ds-badge { display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: 6px; background: var(--subtle, #f1f3f6); color: var(--fg-muted, #474f5c); font: 500 12px/1 'Inter Variable', ui-sans-serif, system-ui, sans-serif; white-space: nowrap; } .ds-badge-accent { background: var(--accent-soft, #ebf1fe); color: var(--accent, #2563eb); } .ds-badge-success { background: var(--success-soft, #e3f4ea); color: var(--success, #18794e); }"
+    },
+    {
+      "name": "Surface List Card",
+      "kind": "card",
+      "refersTo": "surface",
+      "description": "White 12px surface with hairline row dividers: the schedule and study-plan pattern.",
+      "html": "<div class=\"ds-card\"><div class=\"ds-row\"><span class=\"ds-time\">09:50–12:20</span><span class=\"ds-dot2\" style=\"background: var(--course-pharmacology, #5450d6)\"></span><span class=\"ds-main\"><b>Pharmacology I</b><small>Lecture</small></span></div><div class=\"ds-row\"><span class=\"ds-time\">15:45–16:30</span><span class=\"ds-dot2\" style=\"background: var(--course-pathology, #c2416a)\"></span><span class=\"ds-main\"><b>Pathology I</b><small>Lab</small></span></div></div>",
+      "css": ".ds-card { max-width: 480px; border: 1px solid var(--border, #e3e6ec); border-radius: 12px; background: var(--surface, #fff); font-family: 'Inter Variable', ui-sans-serif, system-ui, sans-serif; } .ds-row { display: flex; align-items: flex-start; gap: 14px; padding: 16px 20px; } .ds-row + .ds-row { border-top: 1px solid var(--border, #e3e6ec); } .ds-time { width: 96px; font-size: 14px; font-weight: 500; color: var(--fg, #0e1117); font-variant-numeric: tabular-nums; } .ds-dot2 { width: 10px; height: 10px; margin-top: 5px; border-radius: 9999px; flex-shrink: 0; } .ds-main { display: grid; gap: 2px; } .ds-main b { font-size: 15px; font-weight: 500; color: var(--fg, #0e1117); } .ds-main small { font-size: 13px; color: var(--fg-muted, #474f5c); }"
+    },
+    {
+      "name": "Tabs",
+      "kind": "custom",
+      "refersTo": "tabs-list",
+      "description": "Well-grey track; the active tab is a white pill with the rest shadow. Also the segmented control.",
+      "html": "<div class=\"ds-tabs\" role=\"tablist\"><button class=\"ds-tab is-active\" role=\"tab\" aria-selected=\"true\">Learn</button><button class=\"ds-tab\" role=\"tab\" aria-selected=\"false\">Exam</button><button class=\"ds-tab\" role=\"tab\" aria-selected=\"false\">USMLE</button></div>",
+      "css": ".ds-tabs { display: inline-flex; padding: 2px; border: 1px solid var(--border, #e3e6ec); border-radius: 10px; background: var(--subtle, #f1f3f6); } .ds-tab { height: 30px; padding: 0 12px; border: 0; border-radius: 8px; background: transparent; color: var(--fg-muted, #474f5c); font: 500 13px/1 'Inter Variable', ui-sans-serif, system-ui, sans-serif; cursor: pointer; transition: color 150ms; } .ds-tab:hover { color: var(--fg, #0e1117); } .ds-tab.is-active { background: var(--surface, #fff); color: var(--fg, #0e1117); box-shadow: var(--elevation-xs, 0 1px 2px rgb(14 17 23 / 0.05)); } .ds-tab:focus-visible { outline: 2px solid var(--accent, #2563eb); outline-offset: 2px; }"
+    },
+    {
+      "name": "Screenshot Frame",
+      "kind": "custom",
+      "refersTo": "surface",
+      "description": "Signature: a real product capture in a 16px canvas bezel with the floating shadow.",
+      "html": "<div class=\"ds-shot\"><div class=\"ds-shot-img\">Today screen</div></div>",
+      "css": ".ds-shot { max-width: 520px; padding: 8px; border: 1px solid var(--border, #e3e6ec); border-radius: 16px; background: var(--canvas, #f4f5f8); box-shadow: var(--elevation-lg, 0 2px 6px rgb(14 17 23 / 0.05), 0 20px 44px -14px rgb(14 17 23 / 0.22)); } .ds-shot-img { display: grid; place-items: center; aspect-ratio: 16 / 10; border-radius: 10px; background: var(--surface, #fff); color: var(--fg-subtle, #657080); font: 500 13px 'Inter Variable', ui-sans-serif, system-ui, sans-serif; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Quiet Workbench",
+    "overview": "MedOS looks like the best tools in its category and makes no attempt to look like anything else. The owner chose the category standard on purpose, after two rounds of bolder directions: white and cool-grey neutrals, near-black ink, one confident blue, Inter set tight, hairline borders. The craft bar is Linear, Notion and Amboss. Convention is the commitment here, and the work goes into executing it exactly.\n\nThe app is a frame and a workspace. The cool-grey canvas is the frame, holding the sidebar. The white workspace panel sits one step above it with a hairline border and rounded top corners, and every page lives inside that panel. Structure comes from spacing, type weight and 1px borders. Shadows stay at a whisper while things are at rest, and only floating layers (dialogs, menus, framed product screenshots) get real depth. Density is set for long study sessions on a laptop: 13px controls, 15px body and section titles, generous gaps between sections.\n\nDark is a second palette in its own right, not an inversion. It gets its own near-black canvas, a lighter blue accent with ink-coloured text on top, and its own chart fill. Students study at night, so dark mode gets the same care as light.",
+    "keyCharacteristics": [
+      "One typeface (Inter Variable) for everything, with tight negative tracking on headings and the cv11/ss03 stylistic sets.",
+      "One blue accent for action, focus, selection and current state.",
+      "A cool-grey canvas frame around a white workspace panel; hairlines before shadows.",
+      "Course identity carried by small coloured dots, always next to the course name.",
+      "Short, quiet motion; all of it turns off under reduced motion.",
+      "Real product screenshots in a padded canvas frame stand in for illustration."
+    ],
+    "rules": [
+      { "name": "The One Blue Rule", "body": "The accent is the only saturated hue that carries action: buttons, links, focus, selection, progress, current state. Never use it for a decorative fill, a background band or a section tint.", "section": "colors" },
+      { "name": "The Semantic Token Rule", "body": "The default Tailwind palette is wiped (`--color-*: initial`). Components can reach only semantic tokens (canvas, surface, fg, accent, status, course), so the light and dark palettes stay in charge. Never hard-code a hex in a component.", "section": "colors" },
+      { "name": "The Course Dot Rule", "body": "A course colour appears as a 10px round dot next to the course's name, and never alone, as a fill, or as a text colour. Colour never identifies a course by itself.", "section": "colors" },
+      { "name": "The Two Palettes Rule", "body": "Every token has a dark value chosen for the dark theme, not computed from the light one. A new token ships with both.", "section": "colors" },
+      { "name": "The One Family Rule", "body": "Inter sets every heading and every word of UI. The serif (Source Serif 4) and mono stacks exist only as fonts a user can choose inside their Notebook, never as a system display voice.", "section": "typography" },
+      { "name": "The Sentence Case Rule", "body": "Headings, labels and buttons are sentence case at normal tracking. Nothing is uppercase, and no small tracked label sits above a heading.", "section": "typography" },
+      { "name": "The Hairline-First Rule", "body": "Separate with a 1px border or a canvas/surface step before reaching for a shadow. Nothing at rest goes above Rest except an intentionally lifted card; Floating is only for things that actually float.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do reach only for semantic tokens (canvas, surface, subtle, fg, fg-muted, accent, status, course); give every new token both a light and a dark value.",
+      "Do keep the accent for action, focus, selection and current state.",
+      "Do set headings in Inter at 600 with the font-display tracking (-0.022em), and 15px section titles at -0.011em.",
+      "Do separate with 1px hairlines and the canvas/surface step before adding a shadow; keep resting shadows at elevation-xs.",
+      "Do show course identity as a 10px dot next to the course name.",
+      "Do use real product screenshots in the canvas-bezel frame wherever the product needs to be shown.",
+      "Do keep state transitions to 150ms ease-out and overlays to 180-240ms, and make sure everything is still under reduced motion.",
+      "Do give every interactive element the 2px Action Blue focus outline at a 2px offset (inputs use the accent ring instead)."
+    ],
+    "donts": [
+      "Don't introduce a second typeface for headings or UI; serif and mono belong to Notebook content only.",
+      "Don't set labels in uppercase or put small tracked kickers above headings; context lines go under the title.",
+      "Don't use the accent as a decorative band, gradient or section background.",
+      "Don't use course colours as fills, text colours or the only way to tell courses apart.",
+      "Don't stand in for the product with abstract illustration, gradient blobs or feature-icon card grids; the welcome page lists features as hairline-divided text, not cards.",
+      "Don't use pure-black shadows in light mode or shadows heavier than elevation-lg.",
+      "Don't add badges, confetti or game-like reward visuals; progress is shown with plain bars and counts."
+    ]
+  }
+}

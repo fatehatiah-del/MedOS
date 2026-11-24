@@ -46,8 +46,7 @@ function recognitionConstructor(): RecognitionConstructor | null {
 const ERRORS: Record<string, string> = {
   "not-allowed":
     "MedOS may not use the microphone. Allow it with the icon at the left of the address bar, then press the microphone button again.",
-  "service-not-allowed":
-    "This browser does not allow dictation here. Try Chrome or Edge.",
+  "service-not-allowed": "This browser does not allow dictation here. Try Chrome or Edge.",
   "audio-capture": "No microphone was found. Check that one is connected and switched on.",
   network: "Dictation needs an internet connection.",
 };
@@ -117,7 +116,10 @@ export function useDictation(editor: Editor | null) {
       if (event.error === "no-speech" || event.error === "aborted") return;
       wanted.current = false;
       failed = true;
-      setError(ERRORS[event.error] ?? "Dictation stopped because of an error. Press the microphone button to try again.");
+      setError(
+        ERRORS[event.error] ??
+          "Dictation stopped because of an error. Press the microphone button to try again.",
+      );
     };
     r.onend = () => {
       // Ended before any sound came in, with no reason given: say so rather than go quiet.
@@ -178,5 +180,13 @@ export function useDictation(editor: Editor | null) {
     [editor],
   );
 
-  return { supported, listening, hearing, interim, error, clearError: () => setError(null), toggle };
+  return {
+    supported,
+    listening,
+    hearing,
+    interim,
+    error,
+    clearError: () => setError(null),
+    toggle,
+  };
 }

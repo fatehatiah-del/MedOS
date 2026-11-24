@@ -25,7 +25,15 @@ const DAY = 60 * 60 * 24;
  * MedOS only decides policy: which sign-in methods exist, how long sessions
  * last, who may create an account, and which tables hold the data.
  */
-export function createAuth(db: Database, config: AuthConfig) {
+export interface AuthHooks {
+  /**
+   * Runs once a new user exists (sign-up and first Google sign-in alike). It must not throw:
+   * the account is already created, so a failure here is logged, never shown to the user.
+   */
+  onUserCreated?: (user: { id: string; email: string }) => Promise<void>;
+}
+
+export function createAuth(db: Database, config: AuthConfig, hooks: AuthHooks = {}) {
   return betterAuth({
     appName: "MedOS",
     secret: config.secret,
@@ -96,6 +104,9 @@ export function createAuth(db: Database, config: AuthConfig) {
             if (!isEmailAllowed(config, user.email)) {
               throw new APIError("FORBIDDEN", { message: "This account cannot be created." });
             }
+          },
+          after: async (user) => {
+            await hooks.onUserCreated?.({ id: user.id, email: user.email });
           },
         },
       },

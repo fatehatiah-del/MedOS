@@ -4,7 +4,7 @@ import { cn } from "../lib/cn";
 
 export interface PageHeaderProps {
   title: ReactNode;
-  /** Short context line above the title. */
+  /** Short context line (a date, a semester). Shown under the title, never above it. */
   eyebrow?: ReactNode;
   description?: ReactNode;
   /** Controls aligned to the end of the header. */
@@ -20,13 +20,13 @@ export function PageHeader({ title, eyebrow, description, actions, className }: 
         className,
       )}
     >
-      <div className="min-w-0 space-y-2">
-        {eyebrow ? <p className="text-[13px] font-medium text-fg-subtle">{eyebrow}</p> : null}
-        <h1 className="font-serif text-[28px] leading-[1.15] font-medium tracking-[-0.01em] text-balance text-fg sm:text-[32px]">
+      <div className="min-w-0 space-y-1.5">
+        <h1 className="font-display text-[26px] leading-[1.15] font-semibold text-balance text-fg sm:text-[30px]">
           {title}
         </h1>
+        {eyebrow ? <p className="text-[13.5px] font-medium text-fg-subtle">{eyebrow}</p> : null}
         {description ? (
-          <p className="max-w-2xl text-[15px] leading-relaxed text-pretty text-fg-muted">
+          <p className="max-w-2xl pt-0.5 text-[15px] leading-relaxed text-pretty text-fg-muted">
             {description}
           </p>
         ) : null}

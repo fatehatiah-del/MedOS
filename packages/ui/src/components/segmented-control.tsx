@@ -34,7 +34,7 @@ export function SegmentedControl<T extends string>({
   return (
     <fieldset className={cn("min-w-0", className)}>
       <legend className="sr-only">{legend}</legend>
-      <div className="inline-flex rounded-lg bg-subtle p-1">
+      <div className="inline-flex rounded-[10px] border border-border bg-subtle p-0.5">
         {options.map((option) => (
           <label key={option.value} className="relative cursor-pointer">
             <input
@@ -47,7 +47,7 @@ export function SegmentedControl<T extends string>({
             />
             <span
               className={cn(
-                "flex h-8 items-center gap-2 rounded-md px-3 text-[13px] font-medium text-fg-muted transition-colors duration-150",
+                "flex h-7.5 items-center gap-2 rounded-lg px-3 text-[13px] font-medium text-fg-muted transition-colors duration-150",
                 "peer-checked:bg-surface peer-checked:text-fg peer-checked:shadow-xs",
                 "peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-accent",
                 "[&_svg]:size-4",

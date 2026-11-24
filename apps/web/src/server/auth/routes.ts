@@ -4,6 +4,11 @@
  * it is deliberately named here.
  */
 
+/** The public welcome page, shown to visitors who are not signed in. */
+export const WELCOME_PATH = "/";
+/** Its screenshots, served from public/welcome. */
+export const WELCOME_ASSETS_PREFIX = "/welcome/";
+
 export const LOGIN_PATH = "/login";
 export const SIGNUP_PATH = "/signup";
 export const AFTER_SIGN_IN_PATH = "/today";
@@ -14,10 +19,11 @@ export const AUTH_API_PREFIX = "/api/auth";
 /** Session cookies are named `<prefix>.session_token` (with `__Secure-` in front over HTTPS). */
 export const AUTH_COOKIE_PREFIX = "medos";
 
-const PUBLIC_PAGES: readonly string[] = [LOGIN_PATH, SIGNUP_PATH];
+const PUBLIC_PAGES: readonly string[] = [WELCOME_PATH, LOGIN_PATH, SIGNUP_PATH];
 
 export function isPublicPath(pathname: string): boolean {
   if (PUBLIC_PAGES.includes(pathname)) return true;
+  if (pathname.startsWith(WELCOME_ASSETS_PREFIX)) return true;
   return pathname === AUTH_API_PREFIX || pathname.startsWith(`${AUTH_API_PREFIX}/`);
 }
 

@@ -38,7 +38,7 @@ export function SearchTrigger() {
       href={SEARCH_HREF}
       aria-label="Search"
       aria-keyshortcuts="Control+K"
-      className="flex h-9 items-center gap-2.5 rounded-lg border border-border bg-surface/70 px-3 text-[13px] text-fg-subtle transition-colors duration-150 hover:border-border-strong hover:text-fg-muted sm:w-64"
+      className="flex h-9 items-center gap-2.5 rounded-lg border border-border bg-subtle px-3 text-[13px] text-fg-subtle transition-colors duration-150 hover:border-border-strong hover:text-fg-muted sm:w-72"
     >
       <Search aria-hidden="true" className="size-4 shrink-0" />
       <span className="hidden sm:inline">Search</span>

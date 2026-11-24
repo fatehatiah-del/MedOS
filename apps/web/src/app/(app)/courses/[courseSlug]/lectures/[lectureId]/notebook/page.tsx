@@ -57,7 +57,7 @@ export default async function NotebookPage({ params }: NotebookPageProps) {
             <span aria-hidden="true">·</span>
             <span>{lecture.title}</span>
           </p>
-          <h1 className="font-serif text-[1.9rem] leading-tight font-semibold text-balance text-fg sm:text-[2.2rem]">
+          <h1 className="font-display text-[1.9rem] leading-tight font-semibold text-balance text-fg sm:text-[2.2rem]">
             Notebook
           </h1>
         </div>

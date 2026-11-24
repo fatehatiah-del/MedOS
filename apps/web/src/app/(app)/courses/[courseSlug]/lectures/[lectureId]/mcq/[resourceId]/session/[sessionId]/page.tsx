@@ -77,7 +77,7 @@ export default async function McqSessionPage({ params }: SessionPageProps) {
             { label: modeLabel },
           ]}
         />
-        <h1 className="font-serif text-[1.5rem] leading-tight font-semibold text-fg sm:text-[1.75rem]">
+        <h1 className="font-display text-[1.5rem] leading-tight font-semibold text-fg sm:text-[1.75rem]">
           {quiz.set.title ?? quiz.originalFilename} · {modeLabel}
         </h1>
         <StartTimerButton activities={["mcq"]} lectureId={lecture.id} courseId={course.id} />

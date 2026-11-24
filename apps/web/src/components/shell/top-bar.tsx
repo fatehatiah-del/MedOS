@@ -18,7 +18,7 @@ export async function TopBar({ courses }: { courses: readonly NavCourse[] }) {
   const ai = getAIProvider();
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-3 border-b border-border bg-canvas/85 px-4 backdrop-blur-md sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-3 border-b border-border bg-surface/90 px-4 backdrop-blur-md sm:px-6 lg:top-0 lg:rounded-t-xl lg:px-6">
       <MobileNav courses={courses} />
       <div className="lg:hidden">
         <Brand />
@@ -29,7 +29,7 @@ export async function TopBar({ courses }: { courses: readonly NavCourse[] }) {
         <div className="flex items-center gap-2">
           {user ? <AskAI configured={ai.configured} providerLabel={ai.label} /> : null}
           {user ? <TimerPill /> : null}
-          <p className="mr-1 hidden text-[13px] text-fg-subtle md:block">
+          <p className="mr-1 hidden text-[13px] text-fg-subtle xl:block">
             {CURRENT_SEMESTER.label} · {CURRENT_SEMESTER.name}
           </p>
           <ThemeMenu />

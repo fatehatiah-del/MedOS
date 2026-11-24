@@ -5,7 +5,8 @@
   "description": "MedOS Sync: the local companion that reads the Semester 5 folder (read-only) and brings it into MedOS.",
   "type": "module",
   "exports": {
-    "./sync": "./src/sync.ts"
+    "./sync": "./src/sync.ts",
+    "./mirror": "./src/mirror.ts"
   },
   "scripts": {
     "cli": "tsx src/cli.ts",

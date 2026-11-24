@@ -26,6 +26,7 @@
     "@medos/parsers": "*",
     "@medos/shared": "*",
     "@medos/storage": "*",
+    "@medos/sync": "*",
     "@medos/study-engine": "*",
     "@medos/ui": "*",
     "@tiptap/core": "^3.32.0",
@@ -57,7 +58,6 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
-    "@medos/sync": "*",
     "@playwright/test": "^1.63.0",
     "@tailwindcss/postcss": "^4.3.3",
     "@testing-library/jest-dom": "^7.0.1",

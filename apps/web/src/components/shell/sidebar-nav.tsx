@@ -32,8 +32,10 @@ function NavLink({ href, label, icon, active, showTitle, onNavigate }: NavLinkPr
       aria-current={active ? "page" : undefined}
       title={showTitle ? label : undefined}
       className={cn(
-        "flex h-[30px] items-center gap-3 rounded-lg px-2.5 text-[13.5px] font-medium transition-colors duration-150 rail:justify-center rail:px-0",
-        active ? "bg-hover text-fg" : "text-fg-muted hover:bg-hover/60 hover:text-fg",
+        "flex h-8 items-center gap-2.5 rounded-lg px-2.5 text-[13.5px] font-medium transition-[color,background-color,box-shadow] duration-150 rail:justify-center rail:px-0",
+        active
+          ? "bg-surface text-fg shadow-xs ring-1 ring-border [&_svg]:text-accent"
+          : "text-fg-muted hover:bg-hover hover:text-fg",
       )}
     >
       <span className="flex size-5 shrink-0 items-center justify-center [&_svg]:size-[17px]">
@@ -97,7 +99,7 @@ export function SidebarNav({
         <div>
           <p
             id={coursesLabelId}
-            className="px-2.5 pb-1.5 text-[11px] font-semibold tracking-[0.09em] text-fg-subtle uppercase rail:sr-only"
+            className="px-2.5 pb-1.5 text-[12px] font-medium text-fg-subtle rail:sr-only"
           >
             Courses
           </p>
@@ -121,7 +123,7 @@ export function SidebarNav({
         </div>
       </div>
 
-      <div className="flex shrink-0 items-center gap-1 border-t border-border px-3 py-2 rail:flex-col rail:gap-0.5">
+      <div className="flex shrink-0 items-center gap-1 px-3 py-3 rail:flex-col rail:gap-0.5">
         <ul className="min-w-0 flex-1 rail:w-full">
           <li>
             <NavLink

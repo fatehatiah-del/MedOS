@@ -884,7 +884,9 @@ function Toolbar({
               }}
             >
               <item.icon aria-hidden="true" className="size-4 text-fg-muted" />
-              <span className={cn(item.level > 0 && "font-serif font-semibold")}>{item.label}</span>
+              <span className={cn(item.level > 0 && "font-display font-semibold")}>
+                {item.label}
+              </span>
             </MenuItem>
           ))
         }

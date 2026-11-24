@@ -11,8 +11,19 @@ describe("resolveAuthConfig", () => {
       baseURL: undefined,
       google: null,
       allowedEmails: null,
+      librarySourceEmail: null,
       production: false,
     });
+  });
+
+  it("reads the library source account, lower-cased, and rejects anything else", () => {
+    expect(
+      resolveAuthConfig({ AUTH_SECRET: secret, MEDOS_LIBRARY_SOURCE_EMAIL: " Owner@Example.test " })
+        .librarySourceEmail,
+    ).toBe("owner@example.test");
+    expect(() =>
+      resolveAuthConfig({ AUTH_SECRET: secret, MEDOS_LIBRARY_SOURCE_EMAIL: "not-an-email" }),
+    ).toThrow(/MEDOS_LIBRARY_SOURCE_EMAIL/);
   });
 
   it("requires a secret, and says how to create one", () => {

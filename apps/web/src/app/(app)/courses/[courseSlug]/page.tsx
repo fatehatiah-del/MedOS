@@ -93,7 +93,7 @@ export default async function CoursePage({ params }: CoursePageProps) {
               className="group flex min-w-0 items-center justify-between gap-4 rounded-xl border border-border bg-surface px-5 py-4 shadow-xs transition-colors duration-150 hover:border-border-strong"
             >
               <span className="min-w-0">
-                <span className="block text-xs font-medium tracking-[0.06em] text-fg-subtle uppercase">
+                <span className="block text-[12.5px] font-medium tracking-[0.06em] text-fg-subtle">
                   Continue with
                 </span>
                 <span className="mt-1 block truncate text-sm font-medium text-fg">

@@ -109,9 +109,7 @@ export function ReaderToc({
   };
   return (
     <nav aria-label="Study Guide contents" id={id}>
-      <p className="mb-2 px-2 text-[11.5px] font-semibold tracking-wider text-fg-subtle uppercase">
-        Contents
-      </p>
+      <p className="mb-2 px-2 text-[12.5px] font-semibold text-fg-subtle">Contents</p>
       <Entries entries={entries} current={current} onNavigate={navigate} depth={0} />
     </nav>
   );

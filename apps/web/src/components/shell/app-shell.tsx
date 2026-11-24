@@ -42,12 +42,13 @@ export async function AppShell({ children }: { children: ReactNode }) {
 
         <DesktopSidebar courses={courses} />
 
-        <div className="flex min-w-0 flex-1 flex-col">
+        {/* The workspace: a white panel set into the app frame on large screens. */}
+        <div className="flex min-w-0 flex-1 flex-col bg-surface lg:mt-2 lg:mr-2 lg:min-h-[calc(100dvh-0.5rem)] lg:rounded-t-xl lg:border lg:border-b-0 lg:border-border lg:shadow-xs">
           <TopBar courses={courses} />
           <main
             id={MAIN_ID}
             tabIndex={-1}
-            className="flex-1 px-5 pt-8 pb-20 focus:outline-none sm:px-8 lg:px-12 lg:pt-11"
+            className="flex-1 px-5 pt-8 pb-20 focus:outline-none sm:px-8 lg:px-12 lg:pt-10"
           >
             {/* A container, so pages respond to the workspace width rather than the viewport
               (the sidebar can be expanded, collapsed or absent). A page marked

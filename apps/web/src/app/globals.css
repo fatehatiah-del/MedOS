@@ -128,7 +128,7 @@
 
 /*
  * Lecture notebook. The user's own notes, set in the Study Guide's
- * typography: serif headings at the reader's sizes, the reader's body text,
+ * typography: tight sans headings at the reader's sizes, the reader's body text,
  * its tables and its callout boxes.
  */
 @layer components {
@@ -143,8 +143,9 @@
     margin-top: 0.75em;
   }
   .nb-prose :where(h1, h2, h3) {
-    font-family: var(--font-serif);
-    font-weight: 600;
+    font-family: var(--font-sans);
+    font-weight: 650;
+    letter-spacing: -0.018em;
     color: var(--fg);
     text-wrap: balance;
   }

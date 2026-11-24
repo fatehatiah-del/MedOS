@@ -116,7 +116,7 @@ export default async function StudyGuidePage({ params }: StudyGuidePageProps) {
               <span aria-hidden="true">·</span>
               <span className="font-semibold text-fg-muted">{WORDS.format(words)} words</span>
             </p>
-            <h1 className="max-w-[46rem] font-serif text-[1.9rem] leading-tight font-semibold text-balance text-fg sm:text-[2.2rem]">
+            <h1 className="max-w-[46rem] font-display text-[1.9rem] leading-tight font-semibold text-balance text-fg sm:text-[2.2rem]">
               {document.title ?? "Study Guide"}
             </h1>
             {document.subtitle ? (
@@ -190,7 +190,7 @@ export default async function StudyGuidePage({ params }: StudyGuidePageProps) {
                       data-sg-section=""
                       className="rounded-xl border border-border bg-surface px-4 py-4 sm:px-5"
                     >
-                      <p className="mb-2 text-[11.5px] font-semibold tracking-wider text-fg-subtle uppercase">
+                      <p className="mb-2 text-[12.5px] font-semibold text-fg-subtle">
                         From the document
                       </p>
                       <Blocks

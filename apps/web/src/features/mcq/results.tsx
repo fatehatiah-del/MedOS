@@ -123,7 +123,7 @@ export function ResultsView({
   return (
     <div className="space-y-8">
       <section aria-labelledby="results-heading" className="space-y-5">
-        <h2 id="results-heading" className="font-serif text-[1.35rem] font-semibold text-fg">
+        <h2 id="results-heading" className="font-display text-[1.35rem] font-semibold text-fg">
           {modeLabel} results
         </h2>
         <div className="grid gap-3 @xl:grid-cols-4">
@@ -157,7 +157,7 @@ export function ResultsView({
       </section>
 
       <section aria-labelledby="review-heading" className="space-y-4">
-        <h2 id="review-heading" className="font-serif text-[1.2rem] font-semibold text-fg">
+        <h2 id="review-heading" className="font-display text-[1.2rem] font-semibold text-fg">
           Review
         </h2>
         <ol className="space-y-4">

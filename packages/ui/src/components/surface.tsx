@@ -18,11 +18,7 @@ export interface SurfaceProps extends ComponentProps<"div"> {
 export function Surface({ padding = "none", className, ...props }: SurfaceProps) {
   return (
     <div
-      className={cn(
-        "rounded-xl border border-border bg-surface shadow-xs",
-        paddings[padding],
-        className,
-      )}
+      className={cn("rounded-xl border border-border bg-surface", paddings[padding], className)}
       {...props}
     />
   );

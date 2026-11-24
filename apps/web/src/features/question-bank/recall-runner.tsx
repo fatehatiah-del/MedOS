@@ -134,7 +134,7 @@ export function RecallRunner({
         aria-labelledby="recall-done"
         className="space-y-4 rounded-xl border border-border bg-surface p-6"
       >
-        <h2 id="recall-done" className="font-serif text-[1.3rem] font-semibold text-fg">
+        <h2 id="recall-done" className="font-display text-[1.3rem] font-semibold text-fg">
           Session finished
         </h2>
         <p className="text-sm text-fg-muted">
@@ -261,7 +261,7 @@ export function RecallRunner({
               <h3
                 ref={answerHeading}
                 tabIndex={-1}
-                className="text-[12px] font-semibold tracking-wide text-fg-subtle uppercase focus:outline-none"
+                className="text-[12.5px] font-semibold text-fg-subtle focus:outline-none"
               >
                 Model answer
               </h3>
@@ -289,9 +289,7 @@ export function RecallRunner({
               )}
             </div>
             <div className="space-y-1.5">
-              <h3 className="text-[12px] font-semibold tracking-wide text-fg-subtle uppercase">
-                Your answer
-              </h3>
+              <h3 className="text-[12.5px] font-semibold text-fg-subtle">Your answer</h3>
               <p className="rounded-lg border border-border px-4 py-3 text-[15px] leading-relaxed whitespace-pre-wrap text-fg">
                 {revealed.typed || (
                   <span className="text-fg-subtle">You answered in your head.</span>

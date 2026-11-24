@@ -43,14 +43,14 @@ export function EmptyState({
         <div
           aria-hidden="true"
           className={cn(
-            "mb-4 flex items-center justify-center rounded-full bg-subtle text-fg-subtle [&_svg]:size-[18px]",
+            "mb-4 flex items-center justify-center rounded-xl border border-border bg-surface text-fg-muted shadow-xs [&_svg]:size-[18px]",
             compact ? "size-9" : "size-11",
           )}
         >
           {icon}
         </div>
       ) : null}
-      <Heading className="text-[15px] font-medium text-fg">{title}</Heading>
+      <Heading className="text-[15px] font-semibold tracking-[-0.011em] text-fg">{title}</Heading>
       {description ? (
         <p className="mt-1.5 max-w-sm text-sm leading-relaxed text-pretty text-fg-muted">
           {description}

@@ -15,6 +15,11 @@ export interface AuthConfig {
   google: { clientId: string; clientSecret: string } | null;
   /** When set, only these addresses may have an account. */
   allowedEmails: readonly string[] | null;
+  /**
+   * The account whose course material every new account receives on sign-up (its
+   * material only, never its study data). Null when unset: new accounts start empty.
+   */
+  librarySourceEmail: string | null;
   production: boolean;
 }
 
@@ -80,6 +85,17 @@ export function resolveAuthConfig(source: EnvSource): AuthConfig {
     }
   }
 
+  let librarySourceEmail: string | null = null;
+  const rawSource = read(source, "MEDOS_LIBRARY_SOURCE_EMAIL");
+  if (rawSource) {
+    const parsed = z.email().safeParse(rawSource.toLowerCase());
+    if (parsed.success) {
+      librarySourceEmail = parsed.data;
+    } else {
+      problems.push("MEDOS_LIBRARY_SOURCE_EMAIL must be one email address.");
+    }
+  }
+
   if (problems.length > 0 || !secret) {
     throw new AuthConfigError(
       `Authentication is not configured correctly:\n${problems.map((problem) => `  - ${problem}`).join("\n")}`,
@@ -91,6 +107,7 @@ export function resolveAuthConfig(source: EnvSource): AuthConfig {
     baseURL,
     google: clientId && clientSecret ? { clientId, clientSecret } : null,
     allowedEmails,
+    librarySourceEmail,
     production,
   };
 }

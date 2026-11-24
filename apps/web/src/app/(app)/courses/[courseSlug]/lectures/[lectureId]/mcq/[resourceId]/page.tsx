@@ -87,7 +87,7 @@ export default async function McqPage({ params }: McqPageProps) {
           <span aria-hidden="true">·</span>
           <span>MCQ</span>
         </p>
-        <h1 className="font-serif text-[1.7rem] leading-tight font-semibold text-fg sm:text-[2rem]">
+        <h1 className="font-display text-[1.7rem] leading-tight font-semibold text-fg sm:text-[2rem]">
           {quiz.set.title ?? quiz.originalFilename}
         </h1>
         {quiz.set.subtitle ? (

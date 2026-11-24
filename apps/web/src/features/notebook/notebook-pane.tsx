@@ -133,7 +133,7 @@ export function NotebookShell({
           <header className="flex shrink-0 items-center gap-2 border-b border-border px-4 py-2.5">
             <NotebookPen aria-hidden="true" className="size-4 text-accent" />
             <div className="min-w-0">
-              <h2 className="font-serif text-[1.05rem] leading-tight font-semibold text-fg">
+              <h2 className="font-display text-[1.05rem] leading-tight font-semibold text-fg">
                 Notebook
               </h2>
               <p className="truncate text-[12px] text-fg-subtle">{lectureTitle}</p>

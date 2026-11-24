@@ -92,7 +92,7 @@ export default async function QuestionBankPracticePage({
           <span aria-hidden="true">·</span>
           <span>Question Bank</span>
         </p>
-        <h1 className="font-serif text-[1.7rem] leading-tight font-semibold text-fg sm:text-[2rem]">
+        <h1 className="font-display text-[1.7rem] leading-tight font-semibold text-fg sm:text-[2rem]">
           {bank.bank.title ?? bank.originalFilename}
         </h1>
         <p className="text-[12.5px] text-fg-subtle">

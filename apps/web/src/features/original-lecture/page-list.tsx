@@ -53,7 +53,7 @@ export function PageList({
           .sort((a, b) => a.page - b.page);
         return (
           <div key={kind} className="space-y-2">
-            <h2 className="flex items-center gap-1.5 text-[11.5px] font-semibold tracking-wider text-fg-subtle uppercase">
+            <h2 className="flex items-center gap-1.5 text-[12.5px] font-semibold text-fg-subtle">
               <Icon aria-hidden="true" className="size-3.5" />
               {title}
               <span className="font-normal tabular-nums">({items.length})</span>

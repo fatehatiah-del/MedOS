@@ -201,7 +201,7 @@ export function SearchPanel({ initialQuery = "" }: { initialQuery?: string }) {
                 <section key={kind} aria-labelledby={`search-group-${kind}`} className="space-y-2">
                   <h2
                     id={`search-group-${kind}`}
-                    className="text-[11px] font-semibold tracking-[0.09em] text-fg-subtle uppercase"
+                    className="text-[12.5px] font-semibold tracking-[0.09em] text-fg-subtle"
                   >
                     {GROUP_TITLES[kind]} <span className="tabular-nums">({group.length})</span>
                   </h2>

@@ -75,10 +75,8 @@ test.describe("without a session", () => {
     await expect(password).toHaveAttribute("autocomplete", "current-password");
     await expect(page.getByRole("button", { name: "Sign in", exact: true })).toBeVisible();
 
-    // Google needs credentials this environment does not have: visible, but honestly unavailable.
-    const google = page.getByRole("button", { name: "Continue with Google" });
-    await expect(google).toBeDisabled();
-    await expect(google).toHaveAccessibleDescription(/has not been set up/);
+    // Google needs credentials this environment does not have, so it is not offered at all.
+    await expect(page.getByRole("button", { name: "Continue with Google" })).toHaveCount(0);
 
     await email.focus();
     await page.keyboard.press("Tab");

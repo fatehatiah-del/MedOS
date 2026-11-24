@@ -481,7 +481,7 @@ export function SectionView({
             inlines={section.heading}
             context={sectionContext}
             className={cn(
-              "sg-heading scroll-mt-28 font-serif text-fg focus:outline-none",
+              "sg-heading scroll-mt-28 font-display text-fg focus:outline-none",
               section.level === 1
                 ? "text-[1.6rem] leading-tight font-semibold"
                 : section.level === 2

@@ -152,9 +152,7 @@ export function ContextPanel({
       </h2>
 
       <div className="space-y-2.5">
-        <h3 className="text-[11.5px] font-semibold tracking-wider text-fg-subtle uppercase">
-          Reading progress
-        </h3>
+        <h3 className="text-[12.5px] font-semibold text-fg-subtle">Reading progress</h3>
         <Progress
           value={progress.percent}
           label="Study Guide reading progress"
@@ -193,7 +191,7 @@ export function ContextPanel({
         const items = annotations.filter((annotation) => annotation.kind === kind);
         return (
           <div key={kind} className="space-y-2">
-            <h3 className="flex items-center gap-1.5 text-[11.5px] font-semibold tracking-wider text-fg-subtle uppercase">
+            <h3 className="flex items-center gap-1.5 text-[12.5px] font-semibold text-fg-subtle">
               <Icon aria-hidden="true" className="size-3.5" />
               {title}
               <span className="font-normal tabular-nums">({items.length})</span>
