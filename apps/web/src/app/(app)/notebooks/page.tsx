@@ -64,7 +64,7 @@ export default async function NotebooksPage() {
                   <li key={notebook.lectureId}>
                     <Link
                       href={notebookHref(course.slug, notebook.lectureId)}
-                      className="block h-full rounded-xl focus-visible:outline-2 focus-visible:outline-accent"
+                      className="block h-full rounded-xl focus-visible:outline-2 focus-visible:outline-focus-ring"
                     >
                       <Surface
                         padding="md"

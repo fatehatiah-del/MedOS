@@ -28,7 +28,7 @@ export function ShortcutsDialog() {
       </DialogTrigger>
       <DialogContent>
         <DialogTitle>Keyboard shortcuts</DialogTitle>
-        <DialogDescription>Available anywhere in MedOS.</DialogDescription>
+        <DialogDescription>Available anywhere in Med OS.</DialogDescription>
         <dl className="mt-5 divide-y divide-border border-t border-border">
           {SHORTCUTS.map((shortcut) => (
             <div key={shortcut.action} className="flex items-center justify-between gap-4 py-3">

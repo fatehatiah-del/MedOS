@@ -53,7 +53,7 @@ export function CompletionControl({ lectureId, completedOn }: CompletionControlP
             <p className="mt-0.5 text-[13px] leading-relaxed text-fg-muted">
               {complete
                 ? `You marked this lecture complete on ${completedOn}.`
-                : "Mark it complete when you consider it done. MedOS never does this for you."}
+                : "Mark it complete when you consider it done. Med OS never does this for you."}
             </p>
           </div>
         </div>

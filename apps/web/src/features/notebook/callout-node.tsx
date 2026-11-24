@@ -46,7 +46,7 @@ function CalloutView({ node, updateAttributes, editor }: ReactNodeViewProps) {
             aria-label="Kind of box"
             value={kind}
             onChange={(event) => updateAttributes({ kind: event.target.value })}
-            className="-ml-1 cursor-pointer appearance-none rounded bg-transparent px-1 text-[12.5px] font-semibold text-fg hover:bg-hover focus-visible:outline-2 focus-visible:outline-accent"
+            className="-ml-1 cursor-pointer appearance-none rounded bg-transparent px-1 text-[12.5px] font-semibold text-fg hover:bg-hover focus-visible:outline-2 focus-visible:outline-focus-ring"
           >
             {NOTEBOOK_CALLOUTS.map((option) => (
               <option key={option.kind} value={option.kind}>

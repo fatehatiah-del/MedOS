@@ -8,6 +8,8 @@
 export const WELCOME_PATH = "/";
 /** Its screenshots, served from public/welcome. */
 export const WELCOME_ASSETS_PREFIX = "/welcome/";
+/** The logo and icons (public/brand): shown before sign-in, and used as the favicon. */
+export const BRAND_ASSETS_PREFIX = "/brand/";
 
 export const LOGIN_PATH = "/login";
 export const SIGNUP_PATH = "/signup";
@@ -24,6 +26,7 @@ const PUBLIC_PAGES: readonly string[] = [WELCOME_PATH, LOGIN_PATH, SIGNUP_PATH];
 export function isPublicPath(pathname: string): boolean {
   if (PUBLIC_PAGES.includes(pathname)) return true;
   if (pathname.startsWith(WELCOME_ASSETS_PREFIX)) return true;
+  if (pathname.startsWith(BRAND_ASSETS_PREFIX)) return true;
   return pathname === AUTH_API_PREFIX || pathname.startsWith(`${AUTH_API_PREFIX}/`);
 }
 

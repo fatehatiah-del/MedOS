@@ -36,7 +36,7 @@ export interface AuthHooks {
 
 export function createAuth(db: Database, config: AuthConfig, hooks: AuthHooks = {}) {
   return betterAuth({
-    appName: "MedOS",
+    appName: "Med OS",
     secret: config.secret,
     baseURL: config.baseURL,
 
@@ -108,7 +108,7 @@ export function createAuth(db: Database, config: AuthConfig, hooks: AuthHooks = 
             // Only students in an open year of study may join (see features/auth/year.ts).
             if (!isOpenYear(declaredYear(context))) {
               throw new APIError("FORBIDDEN", {
-                message: "MedOS is not open to this year of study yet.",
+                message: "Med OS is not open to this year of study yet.",
                 code: YEAR_NOT_AVAILABLE,
               });
             }

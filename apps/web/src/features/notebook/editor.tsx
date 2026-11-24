@@ -849,7 +849,7 @@ function Toolbar({
       return;
     }
     if (!isSafeHref(href.trim())) {
-      window.alert("Links can go to web pages (https://…) or to a page in MedOS.");
+      window.alert("Links can go to web pages (https://…) or to a page in Med OS.");
       return;
     }
     chain().extendMarkRange("link").setLink({ href: href.trim() }).run();

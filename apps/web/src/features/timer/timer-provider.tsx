@@ -124,7 +124,7 @@ export function StudyTimerProvider({
           show(await currentTimer());
         }
       } catch {
-        setError("The timer could not reach MedOS. Check your connection and try again.");
+        setError("The timer could not reach Med OS. Check your connection and try again.");
       } finally {
         setPending(false);
       }
@@ -172,7 +172,7 @@ export function StudyTimerProvider({
           setAnnouncement("Timer started.");
           return { status: "started" };
         } catch {
-          setError("The timer could not reach MedOS. Check your connection and try again.");
+          setError("The timer could not reach Med OS. Check your connection and try again.");
           return { status: "error" };
         } finally {
           setPending(false);
@@ -204,7 +204,7 @@ export function StudyTimerProvider({
             show(await currentTimer());
           }
         } catch {
-          setError("The timer could not reach MedOS. Check your connection and try again.");
+          setError("The timer could not reach Med OS. Check your connection and try again.");
         } finally {
           setPending(false);
         }

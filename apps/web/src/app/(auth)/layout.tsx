@@ -17,7 +17,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
     <div className="grid min-h-dvh bg-surface lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
       <div className="flex min-h-dvh flex-col">
         <header className="flex h-16 shrink-0 items-center justify-between px-5 sm:px-8">
-          <Link href="/" aria-label="MedOS home" className="rounded-lg">
+          <Link href="/" aria-label="Med OS home" className="rounded-lg">
             <BrandMark />
           </Link>
           <ThemeMenu />
@@ -29,7 +29,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
       </div>
 
       <aside
-        aria-label="About MedOS"
+        aria-label="About Med OS"
         className="relative hidden overflow-hidden border-l border-border bg-canvas lg:flex lg:flex-col lg:justify-center lg:gap-10 lg:py-16 lg:pl-14"
       >
         <div className="max-w-md space-y-5 pr-14">
@@ -56,7 +56,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
         {/* Bleeds off the right edge, like a window behind the form. */}
         <Screenshot
           name="today"
-          alt="The MedOS Today screen."
+          alt="The Med OS Today screen."
           sizes="900px"
           className="w-[900px] max-w-none animate-rise-in [animation-delay:120ms]"
         />

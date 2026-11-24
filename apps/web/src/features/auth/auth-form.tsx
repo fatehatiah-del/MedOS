@@ -34,7 +34,7 @@ const COPY = {
   "sign-in": {
     submit: "Sign in",
     pending: "Signing in…",
-    alternatePrompt: "New to MedOS?",
+    alternatePrompt: "New to Med OS?",
     alternateLink: "Create an account",
   },
   "sign-up": {
@@ -148,7 +148,7 @@ export function AuthForm({
           <Field
             label="Year of study"
             htmlFor={field("year")}
-            hint="MedOS is open to Year 3 for now. Years 1 and 2 are coming later."
+            hint="Med OS is open to Year 3 for now. Years 1 and 2 are coming later."
           >
             <select
               id={field("year")}

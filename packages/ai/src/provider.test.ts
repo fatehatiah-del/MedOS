@@ -76,7 +76,7 @@ describe("AI features", () => {
       expect(typeof noneProvider[AI_FEATURES[id].capability]).toBe("function");
     }
     expect(AI_FEATURE_IDS.map((id) => AI_FEATURES[id].label)).toEqual([
-      "Ask MedOS",
+      "Ask Med OS",
       "Explain this",
       "Generate flashcards",
       "Generate USMLE questions",

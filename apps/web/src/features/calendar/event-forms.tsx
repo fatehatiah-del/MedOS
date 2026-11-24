@@ -39,7 +39,7 @@ function useSubmit(onDone: () => void) {
         if (result.ok) onDone();
         else setError(result.error ?? "This could not be saved.");
       } catch {
-        setError("MedOS could not be reached. Check your connection and try again.");
+        setError("Med OS could not be reached. Check your connection and try again.");
       }
     });
   return { pending, error, submit };

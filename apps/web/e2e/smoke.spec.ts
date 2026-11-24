@@ -6,7 +6,7 @@ test("the root redirects to Today", async ({ page }) => {
   const response = await page.goto("/");
   expect(response?.ok()).toBe(true);
   await expect(page).toHaveURL(/\/today$/);
-  await expect(page).toHaveTitle("Today · MedOS");
+  await expect(page).toHaveTitle("Today · Med OS");
 });
 
 for (const route of ROUTES) {

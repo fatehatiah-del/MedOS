@@ -81,7 +81,7 @@ export function PlanBoard({
         }
       } catch {
         undo?.();
-        setError("MedOS could not be reached. Check your connection and try again.");
+        setError("Med OS could not be reached. Check your connection and try again.");
       }
     });
 

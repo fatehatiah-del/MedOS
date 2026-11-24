@@ -193,7 +193,7 @@ export function FormulaDialog({
           rows={3}
           spellCheck={false}
           placeholder="e.g. \frac{a}{b}"
-          className="mt-3 w-full resize-y rounded-lg border border-border-strong bg-surface px-3 py-2 font-mono text-[13.5px] text-fg focus-visible:outline-2 focus-visible:outline-accent"
+          className="mt-3 w-full resize-y rounded-lg border border-border-strong bg-surface px-3 py-2 font-mono text-[13.5px] text-fg focus-visible:outline-2 focus-visible:outline-focus-ring"
         />
 
         <div

@@ -23,7 +23,7 @@ export default function GlobalError({
     <html lang="en">
       <body>
         <main className="flex min-h-dvh flex-col items-center justify-center gap-4 px-6 text-center">
-          <h1 className="font-display text-2xl font-medium">MedOS could not start</h1>
+          <h1 className="font-display text-2xl font-medium">Med OS could not start</h1>
           <p className="max-w-sm text-sm leading-relaxed text-fg-muted">
             An unexpected error stopped the application from loading. Your study data has not been
             changed.

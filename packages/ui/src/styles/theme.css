@@ -17,32 +17,43 @@
 :root {
   color-scheme: light;
 
-  /* Cool, clinical neutrals: the app frame (canvas) sits a step below the white workspace. */
-  --canvas: #f4f5f8;
+  /* Med OS brand (brand/BRAND.md). Logo colours: use for the logo and brand moments only. */
+  --brand-ink: #121638;
+  --brand-paper: #f4f5fb;
+  --brand-iris: linear-gradient(135deg, #3d7bff 0%, #7b5cff 100%);
+
+  /* Paper frame, white workspace. Values from brand/tokens.css, mapped by role. */
+  --canvas: #f4f5fb;
   --surface: #ffffff;
-  --subtle: #f1f3f6;
-  --hover: #eaedf2;
-  --border: #e3e6ec;
-  --border-strong: #cbd0d9;
+  --subtle: #ebedf7;
+  --hover: #e3e6f3;
+  --border: #dadce8;
+  --border-strong: #c4c7da;
 
-  --fg: #0e1117;
-  --fg-muted: #474f5c;
-  --fg-subtle: #657080;
+  --fg: #121638;
+  --fg-muted: #464b6e;
+  --fg-subtle: #5a5f80;
 
-  /* One action colour: links, primary buttons, focus and selection. */
-  --accent: #2563eb;
-  --accent-hover: #1d4fd7;
+  /* Primary: buttons, links, focus, selection. */
+  --accent: #4b5bf5;
+  --accent-hover: #3f4fe0;
   --accent-fg: #ffffff;
-  --accent-soft: #ebf1fe;
+  --accent-soft: #eceefe;
+  --focus-ring: #7b5cff;
   /* Single-series chart fill, validated for lightness and contrast on the surface. */
-  --chart-1: #2563eb;
+  --chart-1: #4b5bf5;
 
-  --success: #18794e;
-  --success-soft: #e3f4ea;
-  --warning: #935a0a;
-  --warning-soft: #fcf0d9;
-  --danger: #c0352b;
-  --danger-soft: #fdecea;
+  /* Pulse: the brand accent for badges, highlights and small decorations; never body text. */
+  --pulse: #ff4f82;
+  --pulse-text: #d6336a;
+  --pulse-soft: #ffe8ef;
+
+  --success: #047857;
+  --success-soft: #e2f5ed;
+  --warning: #b45309;
+  --warning-soft: #fdf1e1;
+  --danger: #dc2e3a;
+  --danger-soft: #fdecee;
 
   --violet: #6845c9;
   --violet-soft: #f1ecfc;
@@ -52,7 +63,7 @@
   --highlight: #fde9a1;
   --highlight-note: #fadfca;
 
-  --overlay: rgb(14 17 23 / 0.36);
+  --overlay: rgb(18 22 56 / 0.4);
 
   --course-pathology: #c2416a;
   --course-pathophysiology: #c26b12;
@@ -61,58 +72,63 @@
   --course-public-health: #0f8aa0;
   --course-communication-skills: #9147b8;
 
-  --elevation-xs: 0 1px 2px rgb(14 17 23 / 0.05);
-  --elevation-sm: 0 1px 2px rgb(14 17 23 / 0.04), 0 3px 10px -3px rgb(14 17 23 / 0.08);
-  --elevation-lg: 0 2px 6px rgb(14 17 23 / 0.05), 0 20px 44px -14px rgb(14 17 23 / 0.22);
+  --elevation-xs: 0 1px 2px rgb(18 22 56 / 0.05);
+  --elevation-sm: 0 1px 2px rgb(18 22 56 / 0.04), 0 3px 10px -3px rgb(18 22 56 / 0.09);
+  --elevation-lg: 0 2px 6px rgb(18 22 56 / 0.05), 0 20px 44px -14px rgb(18 22 56 / 0.24);
 }
 
 [data-theme="dark"] {
   color-scheme: dark;
 
-  --canvas: #08090c;
-  --surface: #101217;
-  --subtle: #171a21;
-  --hover: #1e222a;
-  --border: #22262f;
-  --border-strong: #333944;
+  --canvas: #0b0e24;
+  --surface: #121638;
+  --subtle: #1b2050;
+  --hover: #222862;
+  --border: #2a3068;
+  --border-strong: #3a4184;
 
-  --fg: #e9ecf1;
-  --fg-muted: #a6aebb;
-  --fg-subtle: #8892a1;
+  --fg: #f4f5fb;
+  --fg-muted: #c6c9e0;
+  --fg-subtle: #a3a8c7;
 
-  --accent: #7aa2ff;
-  --accent-hover: #97b6ff;
-  --accent-fg: #08090c;
-  --accent-soft: #15213d;
+  --accent: #7b8cff;
+  --accent-hover: #95a3ff;
+  --accent-fg: #0b0e24;
+  --accent-soft: #1e2458;
+  --focus-ring: #95a3ff;
   /* Its own dark step (the dark accent is too light for a fill). */
-  --chart-1: #5b87f5;
+  --chart-1: #6878ff;
 
-  --success: #5fcf98;
-  --success-soft: #0f2519;
-  --warning: #e8b35e;
-  --warning-soft: #2a1f0e;
-  --danger: #f2897f;
-  --danger-soft: #2e1513;
+  --pulse: #ff6f98;
+  --pulse-text: #ff6f98;
+  --pulse-soft: #3a1a33;
+
+  --success: #34d399;
+  --success-soft: #0c2a26;
+  --warning: #fbbf24;
+  --warning-soft: #2c240f;
+  --danger: #f87171;
+  --danger-soft: #34162a;
 
   --violet: #b9a3f7;
-  --violet-soft: #1f1934;
+  --violet-soft: #241c4a;
   --teal: #62c8d6;
-  --teal-soft: #0c2529;
+  --teal-soft: #0f2a3a;
   --highlight: #4d3f0c;
   --highlight-note: #4a2c19;
 
-  --overlay: rgb(0 0 0 / 0.62);
+  --overlay: rgb(5 6 18 / 0.66);
 
   --course-pathology: #ef8aab;
   --course-pathophysiology: #f0a958;
   --course-microbiology: #5fd0a0;
-  --course-pharmacology: #9d9bf6;
+  --course-pharmacology: #a3a1ff;
   --course-public-health: #5cc6d8;
   --course-communication-skills: #cf98ea;
 
-  --elevation-xs: 0 1px 2px rgb(0 0 0 / 0.4);
-  --elevation-sm: 0 1px 2px rgb(0 0 0 / 0.4), 0 3px 10px -3px rgb(0 0 0 / 0.5);
-  --elevation-lg: 0 2px 6px rgb(0 0 0 / 0.45), 0 20px 44px -14px rgb(0 0 0 / 0.75);
+  --elevation-xs: 0 1px 2px rgb(0 0 0 / 0.35);
+  --elevation-sm: 0 1px 2px rgb(0 0 0 / 0.35), 0 3px 10px -3px rgb(0 0 0 / 0.45);
+  --elevation-lg: 0 2px 6px rgb(0 0 0 / 0.4), 0 20px 44px -14px rgb(0 0 0 / 0.7);
 }
 
 @theme inline {
@@ -137,6 +153,11 @@
   --color-accent-fg: var(--accent-fg);
   --color-accent-soft: var(--accent-soft);
   --color-chart-1: var(--chart-1);
+  --color-focus-ring: var(--focus-ring);
+  --color-pulse: var(--pulse);
+  --color-pulse-text: var(--pulse-text);
+  --color-pulse-soft: var(--pulse-soft);
+  --color-brand-ink: var(--brand-ink);
 
   --color-success: var(--success);
   --color-success-soft: var(--success-soft);
@@ -166,7 +187,8 @@
   --shadow-sm: var(--elevation-sm);
   --shadow-lg: var(--elevation-lg);
 
-  --font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-sans:
+    "Instrument Sans Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-serif: "Source Serif 4 Variable", ui-serif, Georgia, "Times New Roman", serif;
   --font-mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, monospace;
 
@@ -210,11 +232,10 @@
   }
 }
 
-/* Headings: Inter, set tight. Replaces the old serif display voice. */
+/* Headings: Instrument Sans (the brand face), set tight. */
 @utility font-display {
   font-family: var(--font-sans);
-  letter-spacing: -0.022em;
-  font-feature-settings: "cv11", "ss03", "calt";
+  letter-spacing: -0.018em;
 }
 
 @layer base {
@@ -227,7 +248,6 @@
     background-color: var(--canvas);
     color: var(--fg);
     font-family: var(--font-sans);
-    font-feature-settings: "cv11", "ss03", "calt";
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
@@ -253,7 +273,7 @@
   }
 
   :focus-visible {
-    outline: 2px solid var(--accent);
+    outline: 2px solid var(--focus-ring);
     outline-offset: 2px;
   }
 

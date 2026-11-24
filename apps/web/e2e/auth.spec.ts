@@ -66,7 +66,7 @@ test.describe("without a session", () => {
 
   test("the login screen offers both methods and is keyboard usable", async ({ page }) => {
     await page.goto("/login");
-    await expect(page).toHaveTitle("Sign in · MedOS");
+    await expect(page).toHaveTitle("Sign in · Med OS");
 
     const email = page.getByLabel("Email");
     const password = page.getByLabel("Password");

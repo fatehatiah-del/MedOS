@@ -45,7 +45,7 @@ export default async function QuestionBankPage() {
           icon={<MessageCircleQuestionMark />}
           headingLevel={2}
           title="No question banks yet"
-          description="Question banks appear here once they have been synced from your study folder. MedOS does not invent medical questions."
+          description="Question banks appear here once they have been synced from your study folder. Med OS does not invent medical questions."
         />
       ) : (
         <div className="space-y-8">

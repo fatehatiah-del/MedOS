@@ -49,7 +49,7 @@ export function SegmentedControl<T extends string>({
               className={cn(
                 "flex h-7.5 items-center gap-2 rounded-lg px-3 text-[13px] font-medium text-fg-muted transition-colors duration-150",
                 "peer-checked:bg-surface peer-checked:text-fg peer-checked:shadow-xs",
-                "peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-accent",
+                "peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-focus-ring",
                 "[&_svg]:size-4",
               )}
             >

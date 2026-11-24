@@ -32,7 +32,7 @@ export function authErrorMessage(mode: AuthMode, failure: AuthFailure): string {
   }
 
   if (code === "YEAR_NOT_AVAILABLE") {
-    return "MedOS is open to Year 3 students for now. Years 1 and 2 are coming later.";
+    return "Med OS is open to Year 3 students for now. Years 1 and 2 are coming later.";
   }
 
   if (mode === "sign-in") {

@@ -45,7 +45,7 @@ function recognitionConstructor(): RecognitionConstructor | null {
 
 const ERRORS: Record<string, string> = {
   "not-allowed":
-    "MedOS may not use the microphone. Allow it with the icon at the left of the address bar, then press the microphone button again.",
+    "Med OS may not use the microphone. Allow it with the icon at the left of the address bar, then press the microphone button again.",
   "service-not-allowed": "This browser does not allow dictation here. Try Chrome or Edge.",
   "audio-capture": "No microphone was found. Check that one is connected and switched on.",
   network: "Dictation needs an internet connection.",
@@ -126,7 +126,7 @@ export function useDictation(editor: Editor | null) {
       if (!gotAudio && !failed && wanted.current) {
         wanted.current = false;
         setError(
-          "The microphone did not start. Check that MedOS may use it (the icon at the left of the address bar) and that no other app is using it, then try again.",
+          "The microphone did not start. Check that Med OS may use it (the icon at the left of the address bar) and that no other app is using it, then try again.",
         );
       }
       // The browser ends a session after a silence: carry on until asked to stop.

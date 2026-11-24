@@ -44,7 +44,7 @@ test("lecture AI features are shown as unavailable", async ({ page, baseURL }) =
   const external = watchExternalRequests(page, baseURL);
   await page.goto(`/courses/pharmacology/lectures/${fixture.lectureId}`);
   await expect(page.getByRole("region", { name: "AI assistance" })).toBeVisible();
-  await expectUnavailable(page, "Ask MedOS");
+  await expectUnavailable(page, "Ask Med OS");
   await expectUnavailable(page, "Generate Study Guide");
   expect(external).toEqual([]);
 });

@@ -57,7 +57,8 @@ export function materialState(resource: ResourceSummary): MaterialState {
       return {
         tone: "danger",
         label: "Could not be read",
-        detail: resource.processingError ?? "MedOS could not read this file. The original is kept.",
+        detail:
+          resource.processingError ?? "Med OS could not read this file. The original is kept.",
       };
     case "unsupported":
       return {
@@ -65,7 +66,7 @@ export function materialState(resource: ResourceSummary): MaterialState {
         label: "Not read yet",
         detail:
           resource.processingError ??
-          "MedOS does not read this kind of file yet. The original is kept.",
+          "Med OS does not read this kind of file yet. The original is kept.",
       };
     case "pending":
     case "stored":

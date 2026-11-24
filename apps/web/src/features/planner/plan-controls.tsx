@@ -35,7 +35,7 @@ function useAction() {
         if (result.ok) onOk?.();
         else setError(result.error ?? "That change could not be saved.");
       } catch {
-        setError("MedOS could not be reached. Check your connection and try again.");
+        setError("Med OS could not be reached. Check your connection and try again.");
       }
     });
   return { pending, error, run };

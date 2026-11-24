@@ -71,7 +71,7 @@ function pageText(): string {
 const noSubscription = () => () => {};
 
 function pageTitle(): string {
-  return document.title.replace(/\s*·\s*MedOS\s*$/, "");
+  return document.title.replace(/\s*·\s*Med ?OS\s*$/, "");
 }
 
 export function AskAI({

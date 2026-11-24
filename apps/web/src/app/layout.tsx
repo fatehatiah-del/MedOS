@@ -1,4 +1,4 @@
-import "@fontsource-variable/inter";
+import "@fontsource-variable/instrument-sans";
 import "@fontsource-variable/source-serif-4";
 import "./globals.css";
 
@@ -12,10 +12,17 @@ import { env } from "@/env";
 
 export const metadata: Metadata = {
   title: {
-    default: "MedOS",
-    template: "%s · MedOS",
+    default: "Med OS",
+    template: "%s · Med OS",
   },
   description: "A personal medical-school study operating system.",
+  icons: {
+    icon: [
+      { url: "/brand/favicon.svg", type: "image/svg+xml" },
+      { url: "/brand/favicon-32.png", sizes: "32x32", type: "image/png" },
+    ],
+    apple: { url: "/brand/apple-touch-icon.png", sizes: "180x180" },
+  },
   ...(env.APP_URL ? { metadataBase: new URL(env.APP_URL) } : {}),
   // Study data is private and must never be indexed.
   robots: { index: false, follow: false },
@@ -23,8 +30,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f4f5f8" },
-    { media: "(prefers-color-scheme: dark)", color: "#08090c" },
+    { media: "(prefers-color-scheme: light)", color: "#F4F5FB" },
+    { media: "(prefers-color-scheme: dark)", color: "#0B0E24" },
   ],
 };
 

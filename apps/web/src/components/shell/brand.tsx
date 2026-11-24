@@ -9,7 +9,7 @@ export function Brand({ onNavigate }: { onNavigate?: () => void }) {
     <Link
       href={HOME_HREF}
       onClick={onNavigate}
-      aria-label="MedOS, go to Today"
+      aria-label="Med OS, go to Today"
       className="flex items-center rounded-lg"
     >
       <BrandMark wordmarkClassName="rail:hidden" />

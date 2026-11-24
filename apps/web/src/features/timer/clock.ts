@@ -19,7 +19,7 @@ export const ACTIVITY_LABELS: Record<StudyActivity, string> = {
 export const PAUSE_LABELS: Record<StudyPauseReason, string> = {
   manual: "Paused",
   idle: "Paused after 5 minutes without activity",
-  hidden: "Paused while MedOS was in the background",
+  hidden: "Paused while Med OS was in the background",
 };
 
 type TimerPolicy = Pick<

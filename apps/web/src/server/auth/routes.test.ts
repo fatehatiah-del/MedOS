@@ -6,6 +6,7 @@ describe("isPublicPath", () => {
   it("allows only the welcome page, its images, and the authentication pages and endpoints", () => {
     expect(isPublicPath("/")).toBe(true);
     expect(isPublicPath("/welcome/today-light.webp")).toBe(true);
+    expect(isPublicPath("/brand/favicon.svg")).toBe(true);
     expect(isPublicPath("/login")).toBe(true);
     expect(isPublicPath("/signup")).toBe(true);
     expect(isPublicPath("/api/auth/sign-in/email")).toBe(true);

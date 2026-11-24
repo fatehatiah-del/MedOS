@@ -164,7 +164,7 @@ export default async function SettingsPage() {
 
         <SettingsSection
           title="AI provider"
-          description="Optional. MedOS works fully without AI, and AI content is always labelled as such."
+          description="Optional. Med OS works fully without AI, and AI content is always labelled as such."
           status={
             <Badge tone="outline">
               {aiConfigured() ? "AI provider configured" : "AI provider not configured"}
@@ -185,7 +185,8 @@ export default async function SettingsPage() {
           </ul>
           <p className="mt-3 text-xs text-fg-subtle">
             Not available: no AI provider is configured (AI_PROVIDER=none). Each feature appears
-            where it would be used, marked &ldquo;Not configured&rdquo;. MedOS makes no AI requests.
+            where it would be used, marked &ldquo;Not configured&rdquo;. Med OS makes no AI
+            requests.
           </p>
         </SettingsSection>
 
@@ -221,7 +222,7 @@ export default async function SettingsPage() {
 
         <SettingsSection
           title="Keyboard"
-          description="MedOS is designed to be used comfortably without a mouse."
+          description="Med OS is designed to be used comfortably without a mouse."
         >
           <ShortcutsDialog />
         </SettingsSection>

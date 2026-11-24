@@ -105,7 +105,7 @@ export interface AIProvider {
 }
 
 export const NOT_CONFIGURED_MESSAGE =
-  "AI provider not configured. MedOS does not generate content without one; your own material is unaffected.";
+  "AI provider not configured. Med OS does not generate content without one; your own material is unaffected.";
 
 const notConfigured = async (): Promise<AIFailure> => ({
   ok: false,
@@ -211,7 +211,7 @@ export function createAIProvider(config: AIProviderConfig | AIProviderName): AIP
  */
 export const AI_FEATURES = {
   "ask-medos": {
-    label: "Ask MedOS",
+    label: "Ask Med OS",
     capability: "answerFromLecture",
     description: "Ask a question and get an answer drawn from this lecture's own material.",
   },

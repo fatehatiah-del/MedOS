@@ -170,7 +170,7 @@ export function SearchPanel({ initialQuery = "" }: { initialQuery?: string }) {
       <div id="search-results" ref={listRef} onKeyDown={onListKeyDown}>
         {failed ? (
           <p role="alert" className="text-sm text-danger">
-            Search could not reach MedOS. Check your connection and try again.
+            Search could not reach Med OS. Check your connection and try again.
           </p>
         ) : !trimmed ? (
           <Surface>
@@ -189,7 +189,7 @@ export function SearchPanel({ initialQuery = "" }: { initialQuery?: string }) {
               headingLevel={2}
               icon={<Search />}
               title={`No results for “${searched}”`}
-              description="Try fewer or different words. Search covers synced material and everything you have written in MedOS."
+              description="Try fewer or different words. Search covers synced material and everything you have written in Med OS."
             />
           </Surface>
         ) : (

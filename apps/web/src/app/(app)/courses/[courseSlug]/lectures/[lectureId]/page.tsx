@@ -294,8 +294,8 @@ export default async function LecturePage({ params }: LecturePageProps) {
           })}
         </ul>
         <p className="pt-2 text-xs leading-relaxed text-fg-subtle">
-          Material appears here once it has been synced from your study folder, and is read into
-          MedOS content by the sync. Study Guides open in the reader, lecture PDFs in the viewer,
+          Material appears here once it has been synced from your study folder, and is read into Med
+          OS content by the sync. Study Guides open in the reader, lecture PDFs in the viewer,
           quizzes in MCQ practice and question banks in active recall. Reading and practising never
           mark the lecture complete.
         </p>

@@ -1,0 +1,64 @@
+/* Med OS brand tokens. Generated from the Figma file "Med OS — Logo". */
+:root {
+  /* Brand (logo colours) */
+  --medos-ink: #121638;
+  --medos-paper: #F4F5FB;
+  --medos-iris-blue: #3D7BFF;
+  --medos-iris-violet: #7B5CFF;
+  --medos-pulse: #FF4F82;
+  --medos-gradient-iris: linear-gradient(135deg, #3D7BFF 0%, #7B5CFF 100%);
+
+  /* Light theme (default) */
+  --color-bg: #F4F5FB;            /* page background (Paper) */
+  --color-surface: #FFFFFF;       /* cards, panels */
+  --color-surface-2: #EBEDF7;     /* subtle fills, hovers, table stripes */
+  --color-border: #DADCE8;
+  --color-text: #121638;          /* Ink, 16.1:1 on bg */
+  --color-text-muted: #5A5F80;    /* 5.7:1 on bg */
+  --color-primary: #4B5BF5;       /* buttons, links, focus (5.1:1 with white text) */
+  --color-primary-hover: #3F4FE0;
+  --color-on-primary: #FFFFFF;
+  --color-accent: #FF4F82;        /* Pulse: decorative highlights, badges, charts. Not for body text on light. */
+  --color-accent-text: #D6336A;   /* Pulse when used as text on light (4.6:1) */
+  --color-success: #047857;
+  --color-warning: #B45309;
+  --color-danger: #DC2E3A;
+  --color-focus-ring: #7B5CFF;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-bg: #0B0E24;
+    --color-surface: #121638;     /* Ink */
+    --color-surface-2: #1B2050;
+    --color-border: #2A3068;
+    --color-text: #F4F5FB;
+    --color-text-muted: #A3A8C7;  /* 8.2:1 */
+    --color-primary: #7B8CFF;     /* 6.4:1 on bg */
+    --color-primary-hover: #95A3FF;
+    --color-on-primary: #0B0E24;
+    --color-accent: #FF6F98;
+    --color-accent-text: #FF6F98;
+    --color-success: #34D399;
+    --color-warning: #FBBF24;
+    --color-danger: #F87171;
+    --color-focus-ring: #95A3FF;
+  }
+}
+:root[data-theme="dark"] {
+  --color-bg: #0B0E24;
+  --color-surface: #121638;
+  --color-surface-2: #1B2050;
+  --color-border: #2A3068;
+  --color-text: #F4F5FB;
+  --color-text-muted: #A3A8C7;
+  --color-primary: #7B8CFF;
+  --color-primary-hover: #95A3FF;
+  --color-on-primary: #0B0E24;
+  --color-accent: #FF6F98;
+  --color-accent-text: #FF6F98;
+  --color-success: #34D399;
+  --color-warning: #FBBF24;
+  --color-danger: #F87171;
+  --color-focus-ring: #95A3FF;
+}

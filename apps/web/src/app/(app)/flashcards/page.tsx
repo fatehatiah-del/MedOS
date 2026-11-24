@@ -32,7 +32,7 @@ export default async function FlashcardsPage() {
       />
 
       <Notice icon={<Layers />} title="One course per session.">
-        Review always stays within a single course. MedOS never mixes courses into one session.
+        Review always stays within a single course. Med OS never mixes courses into one session.
         {decks.length === 0 ? (
           <>
             {" "}

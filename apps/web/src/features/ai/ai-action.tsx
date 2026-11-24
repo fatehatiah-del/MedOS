@@ -72,8 +72,8 @@ export function AIAction({
           role="status"
           className="max-w-md text-[12.5px] leading-relaxed text-fg-muted"
         >
-          {description} AI provider not configured: MedOS works fully without AI and never generates
-          content without one. A provider can be set in a later version (see Settings).
+          {description} AI provider not configured: Med OS works fully without AI and never
+          generates content without one. A provider can be set in a later version (see Settings).
         </p>
       ) : null}
       {result ? (

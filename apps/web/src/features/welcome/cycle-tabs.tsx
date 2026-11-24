@@ -32,7 +32,7 @@ const STEPS: readonly Step[] = [
     title: "Understand it",
     body: "Each lecture arrives as a structured study guide: the big picture first, then mechanisms, tables and Golden Points. Bookmarks, highlights and notes stay pinned to the passage they belong to.",
     screen: "guide-v2",
-    alt: "The MedOS Study Guide reader open on an anaemia lecture, with its contents on the left and reading progress on the right.",
+    alt: "The Med OS Study Guide reader open on an anaemia lecture, with its contents on the left and reading progress on the right.",
   },
   {
     id: "mcq",

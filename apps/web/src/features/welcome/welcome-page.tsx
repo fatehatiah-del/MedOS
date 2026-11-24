@@ -49,16 +49,16 @@ const FEATURES: readonly { title: string; body: string }[] = [
 
 const FAQ: readonly { q: string; a: string }[] = [
   {
-    q: "What exactly is MedOS?",
-    a: "A study system for medical school. Instead of a folder of slides, every lecture comes with a study guide, practice MCQs, active-recall questions and a flashcard deck, and MedOS plans each day around your timetable and the topics you find hardest.",
+    q: "What exactly is Med OS?",
+    a: "A study system for medical school. Instead of a folder of slides, every lecture comes with a study guide, practice MCQs, active-recall questions and a flashcard deck, and Med OS plans each day around your timetable and the topics you find hardest.",
   },
   {
     q: "Which courses are included?",
-    a: `The included material follows Year 3, Semester 5 of the MD curriculum at the medical school where MedOS was built: ${COURSES.join(", ")}. It arrives already organised by week and lecture. If your programme is different, every study tool still works, but the included lectures follow this curriculum.`,
+    a: `The included material follows Year 3, Semester 5 of the MD curriculum at the medical school where Med OS was built: ${COURSES.join(", ")}. It arrives already organised by week and lecture. If your programme is different, every study tool still works, but the included lectures follow this curriculum.`,
   },
   {
     q: "Who can join?",
-    a: "MedOS is open to Year 3 medical students for now, because the included material follows the Year 3 curriculum. Years 1 and 2 are coming later.",
+    a: "Med OS is open to Year 3 medical students for now, because the included material follows the Year 3 curriculum. Years 1 and 2 are coming later.",
   },
   {
     q: "Is my study data private?",
@@ -66,15 +66,15 @@ const FAQ: readonly { q: string; a: string }[] = [
   },
   {
     q: `What happens after the ${TRIAL_DAYS}-day trial?`,
-    a: `MedOS costs ${PRICE} a month after the trial. Billing is not switched on yet, so nothing is charged while you try it.`,
+    a: `Med OS costs ${PRICE} a month after the trial. Billing is not switched on yet, so nothing is charged while you try it.`,
   },
   {
     q: "Does it work on my phone?",
-    a: "MedOS runs in the browser. It is designed for a laptop, and works on phones and tablets for reviewing on the go.",
+    a: "Med OS runs in the browser. It is designed for a laptop, and works on phones and tablets for reviewing on the go.",
   },
   {
     q: "Do I need to install anything?",
-    a: "No. MedOS runs in your browser: create an account and the included courses are already there.",
+    a: "No. Med OS runs in your browser: create an account and the included courses are already there.",
   },
 ];
 
@@ -122,7 +122,7 @@ export function WelcomePage() {
 
       <header className="sticky top-0 z-40 border-b border-border/70 bg-canvas/85 backdrop-blur-md">
         <div className={`${CONTAINER} flex h-16 items-center gap-6`}>
-          <Link href="/" aria-label="MedOS home" className="rounded-lg">
+          <Link href="/" aria-label="Med OS home" className="rounded-lg">
             <BrandMark />
           </Link>
           <nav aria-label="Welcome" className="hidden md:block">
@@ -168,7 +168,7 @@ export function WelcomePage() {
                 Every lecture, already turned into a study system.
               </h1>
               <p className="mt-6 max-w-[38rem] animate-rise-in text-[18px] leading-relaxed text-pretty text-fg-muted [animation-delay:60ms] sm:text-[19px]">
-                MedOS gives each lecture of your semester a study guide, practice MCQs,
+                Med OS gives each lecture of your semester a study guide, practice MCQs,
                 active-recall questions and spaced-repetition flashcards, then plans your day around
                 your real timetable.
               </p>
@@ -189,7 +189,7 @@ export function WelcomePage() {
                 name="today"
                 priority
                 mobileCrop
-                alt="The MedOS Today screen: the day's university schedule, a recommended study plan, today's progress and upcoming exams."
+                alt="The Med OS Today screen: the day's university schedule, a recommended study plan, today's progress and upcoming exams."
               />
               <p className="mt-3 text-center text-[12.5px] text-fg-muted">
                 Screens from a sample account.
@@ -241,7 +241,7 @@ export function WelcomePage() {
                 Built around your real timetable.
               </h2>
               <p className="text-[17px] leading-relaxed text-pretty text-fg-muted">
-                Lectures, labs and exam periods are already in your calendar. MedOS knows what was
+                Lectures, labs and exam periods are already in your calendar. Med OS knows what was
                 taught today and what is due, so Today always opens on the right lecture.
               </p>
               <ul className="space-y-2.5 pt-1 text-[15px] text-fg">
@@ -264,7 +264,7 @@ export function WelcomePage() {
             <Screenshot
               name="calendar"
               sizes="(min-width: 1280px) 720px, 100vw"
-              alt="The MedOS week calendar with colour-coded lectures and labs for each course."
+              alt="The Med OS week calendar with colour-coded lectures and labs for each course."
             />
           </div>
         </section>
@@ -297,12 +297,12 @@ export function WelcomePage() {
         <section aria-labelledby="pricing" className="scroll-mt-16 py-24 sm:py-32">
           <div className={`${CONTAINER} space-y-12`}>
             <SectionIntro id="pricing" title="One plan. Everything included.">
-              Try every part of MedOS free for {TRIAL_DAYS} days.
+              Try every part of Med OS free for {TRIAL_DAYS} days.
             </SectionIntro>
             <div className="grid overflow-hidden rounded-2xl border border-border bg-surface shadow-sm md:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)]">
               <div className="flex flex-col gap-6 border-b border-border p-8 sm:p-10 md:border-r md:border-b-0">
                 <div className="space-y-1">
-                  <h3 className="text-[15px] font-semibold text-fg">MedOS</h3>
+                  <h3 className="text-[15px] font-semibold text-fg">Med OS</h3>
                   <p className="text-[14px] text-fg-subtle">
                     One account, every included course and every tool.
                   </p>
@@ -322,7 +322,7 @@ export function WelcomePage() {
                 <div className="mt-auto space-y-3">
                   <StartButton>Start free trial</StartButton>
                   <p className="text-[13px] leading-relaxed text-fg-subtle">
-                    Billing is not switched on yet, so nothing is charged while you try MedOS.
+                    Billing is not switched on yet, so nothing is charged while you try Med OS.
                   </p>
                 </div>
               </div>
@@ -411,7 +411,7 @@ export function WelcomePage() {
         >
           <div className="flex items-center gap-4">
             <BrandMark size="sm" />
-            <span>© {new Date().getFullYear()} MedOS</span>
+            <span>© {new Date().getFullYear()} Med OS</span>
           </div>
           <nav aria-label="Footer">
             <ul className="flex flex-wrap gap-x-6 gap-y-2">
