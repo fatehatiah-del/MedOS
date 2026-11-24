@@ -58,9 +58,15 @@ function cookieHeader(headers: Headers): Headers {
   return new Headers({ cookie });
 }
 
-async function signUp(email: string, name = "Test Student", service: Auth = auth) {
+async function signUp(
+  email: string,
+  name = "Test Student",
+  service: Auth = auth,
+  yearOfStudy = "3",
+) {
+  const body = { email, password: PASSWORD, name, ...(yearOfStudy ? { yearOfStudy } : {}) };
   return service.api.signUpEmail({
-    body: { email, password: PASSWORD, name },
+    body: body as { email: string; password: string; name: string },
     returnHeaders: true,
   });
 }
@@ -278,6 +284,37 @@ describe("account allow-list", () => {
       [],
     );
     expect(await status(() => signUp("owner@example.test", "Owner", restricted))).toBe("succeeded");
+  });
+});
+
+describe("year of study", () => {
+  it("lets Year 3 students create an account", async () => {
+    expect(await status(() => signUp(uniqueEmail(), "Year Three"))).toBe("succeeded");
+  });
+
+  it("refuses years that are not open yet, and a sign-up that names no year", async () => {
+    for (const year of ["1", "2", "4", ""]) {
+      const email = uniqueEmail();
+      expect(await status(() => signUp(email, "Too early", auth, year)), String(year)).toBe(403);
+      expect(await db.select().from(users).where(eq(users.email, email))).toEqual([]);
+    }
+  });
+
+  it("says why, with a code the form turns into a message", async () => {
+    const response = await auth.handler(
+      new Request("http://localhost:3000/api/auth/sign-up/email", {
+        method: "POST",
+        headers: { "content-type": "application/json", origin: "http://localhost:3000" },
+        body: JSON.stringify({
+          email: uniqueEmail(),
+          password: PASSWORD,
+          name: "Year Two",
+          yearOfStudy: "2",
+        }),
+      }),
+    );
+    expect(response.status).toBe(403);
+    expect(await response.json()).toMatchObject({ code: "YEAR_NOT_AVAILABLE" });
   });
 });
 

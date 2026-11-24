@@ -186,7 +186,11 @@ export async function prepareReaderFixture(db: Database, e2eDir: string): Promis
 
   const auth = createAuth(db, resolveAuthConfig(process.env));
   await auth.api.signUpEmail({
-    body: { name: READER_USER.name, email: READER_USER.email, password: READER_USER.password },
+    body: yearThree({
+      name: READER_USER.name,
+      email: READER_USER.email,
+      password: READER_USER.password,
+    }),
   });
   const [user] = await db.select().from(users).where(eq(users.email, READER_USER.email));
   if (!user) throw new Error("The reader test account was not created.");
@@ -266,7 +270,7 @@ export async function prepareJourneyFixture(db: Database, e2eDir: string): Promi
     writeFileSync(path.join(week, "QuestionBank.docx"), sampleQuestionBank());
 
     const auth = createAuth(db, resolveAuthConfig(process.env));
-    await auth.api.signUpEmail({ body: account });
+    await auth.api.signUpEmail({ body: yearThree(account) });
     const [user] = await db.select().from(users).where(eq(users.email, account.email));
     if (!user) throw new Error(`The ${project} journey account was not created.`);
 
@@ -293,4 +297,9 @@ export async function prepareJourneyFixture(db: Database, e2eDir: string): Promi
     };
   }
   writeFileSync(path.join(e2eDir, "journey.json"), JSON.stringify(fixtures, null, 2));
+}
+
+/** Sign-up is open to Year 3 only (features/auth/year.ts); fixture accounts declare it too. */
+function yearThree<T extends { name: string; email: string; password: string }>(account: T): T {
+  return { ...account, yearOfStudy: "3" };
 }

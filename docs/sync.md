@@ -79,7 +79,7 @@ Friends can have their own MedOS login with the same study material:
 2. `npm run medos-sync -- mirror --from <your email> --to-all --dry-run`, read it, then run it
    without `--dry-run`. `--to <email>` (repeatable, or comma-separated) names accounts instead of `--to-all`;
    `--skip-missing` skips named accounts that have not signed up yet. Prefer naming accounts:
-   `--to-all` includes every account on the server.
+   `--to-all` includes every account on the server. `--except <email>` (repeatable, or comma-separated) leaves an account out of `--to-all`.
 
 Mirroring copies the source account's weeks, lectures, materials, parsed content, image records and
 sync manifest into each target account. Nothing is parsed or uploaded again: the copies point at the

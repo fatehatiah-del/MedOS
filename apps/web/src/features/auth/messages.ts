@@ -31,6 +31,10 @@ export function authErrorMessage(mode: AuthMode, failure: AuthFailure): string {
     return `Use a password of at most ${MAX_PASSWORD_LENGTH} characters.`;
   }
 
+  if (code === "YEAR_NOT_AVAILABLE") {
+    return "MedOS is open to Year 3 students for now. Years 1 and 2 are coming later.";
+  }
+
   if (mode === "sign-in") {
     // Wrong password and unknown account are indistinguishable on purpose.
     if (status === 401 || status === 403 || code === "INVALID_EMAIL_OR_PASSWORD") {

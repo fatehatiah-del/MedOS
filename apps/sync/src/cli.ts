@@ -69,6 +69,7 @@ Options:
   --to <email>         With mirror: an account to copy into. Repeat, or separate with commas.
   --to-all             With mirror: copy into every other account.
   --skip-missing       With mirror: skip --to accounts that have not signed up yet.
+  --except <email>     With mirror --to-all: leave this account out. Repeat, or separate with commas.
   --verbose            List every file, the structure, and skipped files.
   --help               Show this help.
 
@@ -104,6 +105,7 @@ async function main(argv: readonly string[]): Promise<void> {
       to: { type: "string", multiple: true },
       "to-all": { type: "boolean", default: false },
       "skip-missing": { type: "boolean", default: false },
+      except: { type: "string", multiple: true },
       "dry-run": { type: "boolean", default: false },
       all: { type: "boolean", default: false },
       "remove-placeholders": { type: "boolean", default: false },
@@ -219,9 +221,17 @@ async function main(argv: readonly string[]): Promise<void> {
       }
       await withDatabase(async ({ db }) => {
         const sourceId = await findUserId(db, from);
-        const targets = values["to-all"]
-          ? await otherAccounts(db, sourceId)
-          : named.map((email) => resolveUserEmail(email));
+        const excluded = new Set(
+          (values.except ?? [])
+            .flatMap((value) => value.split(","))
+            .map((email) => email.trim().toLowerCase())
+            .filter(Boolean),
+        );
+        const targets = (
+          values["to-all"]
+            ? await otherAccounts(db, sourceId)
+            : named.map((email) => resolveUserEmail(email))
+        ).filter((email) => !excluded.has(email.trim().toLowerCase()));
         // Resolve every account before changing anything.
         const resolved: [string, string][] = [];
         const notSignedUp: string[] = [];

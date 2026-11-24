@@ -40,7 +40,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
             {[
               "Study guides, MCQs, active recall and flashcards for every lecture",
               "A daily plan built around your real timetable",
-              `${TRIAL_DAYS} days free, then ${PRICE}/month`,
+              `Open to Year 3 · ${TRIAL_DAYS} days free, then ${PRICE}/month`,
             ].map((item) => (
               <li key={item} className="flex gap-3">
                 <Check

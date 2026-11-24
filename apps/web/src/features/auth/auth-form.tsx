@@ -9,6 +9,7 @@ import { type FormEvent, useId, useState } from "react";
 import { authClient } from "@/lib/auth-client";
 
 import { GoogleMark } from "./google-mark";
+import { STUDY_YEARS, YEAR_COOKIE, YEAR_FIELD } from "./year";
 import {
   type AuthMode,
   GENERIC_AUTH_ERROR,
@@ -69,12 +70,13 @@ export function AuthForm({
     const email = String(form.get("email") ?? "").trim();
     const password = String(form.get("password") ?? "");
     const name = String(form.get("name") ?? "").trim();
+    const year = String(form.get(YEAR_FIELD) ?? "");
 
     setError(null);
     setPending("form");
     try {
       const result = isSignUp
-        ? await authClient.signUp.email({ email, password, name })
+        ? await authClient.signUp.email(signUpBody(email, password, name, year))
         : await authClient.signIn.email({ email, password });
 
       if (result.error) {
@@ -95,6 +97,16 @@ export function AuthForm({
     if (pending) return;
     setError(null);
     setPending("google");
+    if (isSignUp) {
+      // Google cannot carry a form field, so the year travels as a short-lived cookie.
+      const select = document.getElementById(field("year")) as HTMLSelectElement | null;
+      if (!select?.value) {
+        select?.reportValidity();
+        setPending(null);
+        return;
+      }
+      document.cookie = `${YEAR_COOKIE}=${encodeURIComponent(select.value)}; path=/; max-age=600; samesite=lax`;
+    }
     try {
       const result = await authClient.signIn.social({
         provider: "google",
@@ -129,6 +141,32 @@ export function AuthForm({
               maxLength={80}
               className="h-10"
             />
+          </Field>
+        ) : null}
+
+        {isSignUp ? (
+          <Field
+            label="Year of study"
+            htmlFor={field("year")}
+            hint="MedOS is open to Year 3 for now. Years 1 and 2 are coming later."
+          >
+            <select
+              id={field("year")}
+              name={YEAR_FIELD}
+              required
+              defaultValue=""
+              aria-describedby={fieldHintId(field("year"))}
+              className="h-10 w-full rounded-lg border border-border bg-surface px-3 text-sm text-fg shadow-xs transition-[border-color,box-shadow] duration-150 hover:border-border-strong focus-visible:border-accent focus-visible:shadow-[0_0_0_3px_color-mix(in_srgb,var(--accent)_20%,transparent)] focus-visible:outline-none"
+            >
+              <option value="" disabled>
+                Choose your year
+              </option>
+              {STUDY_YEARS.map((year) => (
+                <option key={year.value} value={year.value} disabled={!year.available}>
+                  {year.available ? year.label : `${year.label} (coming later)`}
+                </option>
+              ))}
+            </select>
           </Field>
         ) : null}
 
@@ -211,4 +249,10 @@ export function AuthForm({
       </p>
     </div>
   );
+}
+
+/** The sign-up request, with the year the student chose (checked again by the server). */
+function signUpBody(email: string, password: string, name: string, year: string) {
+  const body = { email, password, name, [YEAR_FIELD]: year };
+  return body as { email: string; password: string; name: string };
 }

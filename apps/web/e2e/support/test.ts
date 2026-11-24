@@ -48,6 +48,7 @@ export function formError(page: Page) {
 export async function signUp(page: Page, user: TestUser): Promise<void> {
   await page.goto("/signup");
   await page.getByLabel("Name").fill(user.name);
+  await page.getByLabel("Year of study").selectOption("3");
   await page.getByLabel("Email").fill(user.email);
   await page.getByLabel("Password").fill(user.password);
   await page.getByRole("button", { name: "Create account" }).click();

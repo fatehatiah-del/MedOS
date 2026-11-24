@@ -159,6 +159,7 @@ test.describe("without a session", () => {
   test("an existing email cannot be registered again", async ({ page }) => {
     await page.goto("/signup");
     await page.getByLabel("Name").fill("Impostor");
+    await page.getByLabel("Year of study").selectOption("3");
     await page.getByLabel("Email").fill(TEST_USER.email);
     await page.getByLabel("Password").fill("a-completely-different-password");
     await page.getByRole("button", { name: "Create account" }).click();
@@ -171,9 +172,27 @@ test.describe("without a session", () => {
     await expect(formError(page)).toHaveText("Incorrect email or password.");
   });
 
+  test("only Year 3 can be chosen; Years 1 and 2 are listed as coming later", async ({ page }) => {
+    await page.goto("/signup");
+    const year = page.getByLabel("Year of study");
+    await expect(year).toHaveAccessibleDescription(/open to Year 3/);
+    await expect(year.getByRole("option", { name: "Year 1 (coming later)" })).toBeDisabled();
+    await expect(year.getByRole("option", { name: "Year 2 (coming later)" })).toBeDisabled();
+    await expect(year.getByRole("option", { name: "Year 3" })).toBeEnabled();
+
+    // Without a year the form does not submit.
+    await page.getByLabel("Name").fill("No year");
+    await page.getByLabel("Email").fill(uniqueUser("noyear").email);
+    await page.getByLabel("Password").fill("a-long-enough-password");
+    await page.getByRole("button", { name: "Create account" }).click();
+    await expect(year).toHaveJSProperty("validity.valueMissing", true);
+    await expect(page).toHaveURL(/\/signup$/);
+  });
+
   test("a short password is rejected by the form", async ({ page }) => {
     await page.goto("/signup");
     await page.getByLabel("Name").fill("Short");
+    await page.getByLabel("Year of study").selectOption("3");
     await page.getByLabel("Email").fill(uniqueUser("short").email);
     await page.getByLabel("Password").fill("short");
     await page.getByRole("button", { name: "Create account" }).click();

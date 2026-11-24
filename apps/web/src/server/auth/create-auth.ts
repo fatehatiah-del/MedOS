@@ -11,6 +11,7 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { APIError } from "better-auth/api";
 
 import { MAX_PASSWORD_LENGTH, MIN_PASSWORD_LENGTH } from "@/features/auth/messages";
+import { YEAR_NOT_AVAILABLE, declaredYear, isOpenYear } from "@/features/auth/year";
 
 import { type AuthConfig, isEmailAllowed } from "./config";
 import { AUTH_COOKIE_PREFIX } from "./routes";
@@ -100,9 +101,16 @@ export function createAuth(db: Database, config: AuthConfig, hooks: AuthHooks = 
       user: {
         create: {
           // Applies to every way of creating a user: sign-up and first Google sign-in alike.
-          before: async (user) => {
+          before: async (user, context) => {
             if (!isEmailAllowed(config, user.email)) {
               throw new APIError("FORBIDDEN", { message: "This account cannot be created." });
+            }
+            // Only students in an open year of study may join (see features/auth/year.ts).
+            if (!isOpenYear(declaredYear(context))) {
+              throw new APIError("FORBIDDEN", {
+                message: "MedOS is not open to this year of study yet.",
+                code: YEAR_NOT_AVAILABLE,
+              });
             }
           },
           after: async (user) => {

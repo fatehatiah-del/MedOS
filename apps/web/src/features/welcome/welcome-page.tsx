@@ -57,6 +57,10 @@ const FAQ: readonly { q: string; a: string }[] = [
     a: `The included material follows Year 3, Semester 5 of the MD curriculum at the medical school where MedOS was built: ${COURSES.join(", ")}. It arrives already organised by week and lecture. If your programme is different, every study tool still works, but the included lectures follow this curriculum.`,
   },
   {
+    q: "Who can join?",
+    a: "MedOS is open to Year 3 medical students for now, because the included material follows the Year 3 curriculum. Years 1 and 2 are coming later.",
+  },
+  {
     q: "Is my study data private?",
     a: "Yes. Your notes, highlights, answers, flashcards and progress belong to your account. Nobody else can see them.",
   },
@@ -175,7 +179,8 @@ export function WelcomePage() {
                 </Button>
               </div>
               <p className="mt-4 animate-rise-in text-[13.5px] text-fg-muted [animation-delay:160ms]">
-                {TRIAL_DAYS} days free, then {PRICE}/month. No card needed to start.
+                Open to Year 3 students. {TRIAL_DAYS} days free, then {PRICE}/month. No card needed
+                to start.
               </p>
             </div>
 
