@@ -115,6 +115,14 @@ export default async function LecturePage({ params }: LecturePageProps) {
             </span>
           }
           title={lecture.title}
+          actions={
+            <Link
+              href={`/podcasts/${lecture.id}`}
+              className="rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-fg hover:bg-subtle"
+            >
+              Lecture podcasts
+            </Link>
+          }
         />
       </div>
 

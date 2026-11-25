@@ -9,6 +9,7 @@ export const ROUTES: readonly { path: string; heading: string | RegExp; nav: str
   { path: "/review", heading: "Review", nav: "Review" },
   { path: "/question-bank", heading: "Question Bank", nav: "Question Bank" },
   { path: "/flashcards", heading: "Flashcards", nav: "Flashcards" },
+  { path: "/podcasts", heading: "Podcasts", nav: "Podcasts" },
   { path: "/search", heading: "Search", nav: "Search" },
   { path: "/statistics", heading: "Statistics", nav: "Statistics" },
   { path: "/settings", heading: "Settings", nav: "Settings" },

@@ -1,6 +1,7 @@
 import {
   CalendarDays,
   ChartNoAxesColumn,
+  Headphones,
   Layers,
   LibraryBig,
   ListChecks,
@@ -28,6 +29,7 @@ export const PRIMARY_NAV: readonly NavItem[] = [
   { href: "/question-bank", label: "Question Bank", icon: MessageCircleQuestionMark },
   { href: "/flashcards", label: "Flashcards", icon: Layers },
   { href: "/notebooks", label: "Notebooks", icon: NotebookPen },
+  { href: "/podcasts", label: "Podcasts", icon: Headphones },
   { href: "/search", label: "Search", icon: Search },
   { href: "/statistics", label: "Statistics", icon: ChartNoAxesColumn },
 ];

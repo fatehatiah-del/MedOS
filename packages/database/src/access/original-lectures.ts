@@ -122,6 +122,12 @@ export function createOriginalLectureAccess(db: Database, userId: string) {
   }
 
   return {
+    async podcastText(resourceId: string): Promise<PdfDocument["pages"] | null> {
+      const found = await load(resourceId);
+      if (!found || found.row.content?.sourceContentHash !== found.row.contentHash) return null;
+      return found.content.pages;
+    },
+
     async get(resourceId: string): Promise<OriginalLectureView | null> {
       const found = await load(resourceId);
       if (!found) return null;

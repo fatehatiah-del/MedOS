@@ -17,6 +17,7 @@ test.describe("desktop sidebar", () => {
       "Question Bank",
       "Flashcards",
       "Notebooks",
+      "Podcasts",
       "Search",
       "Statistics",
       ...COURSE_NAV_LABELS,
