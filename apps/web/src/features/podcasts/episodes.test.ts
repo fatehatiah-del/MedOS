@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { EPISODE_SOURCE_LIMIT, pairTopics, parseDialogue } from "./episodes";
+import { EPISODE_SOURCE_LIMIT, pairTopics, parseDialogue, plainText } from "./episodes";
 
 describe("lecture podcasts", () => {
   it("pairs consecutive topics and keeps the final unpaired topic", () => {
@@ -30,5 +30,17 @@ describe("lecture podcasts", () => {
     expect(parseDialogue(dialogue)?.map(({ host }) => host)).toEqual(["A", "B", "A", "B"]);
     expect(parseDialogue(dialogue.replace("B: Pressure rises.", "A: Pressure rises."))).toBeNull();
     expect(parseDialogue(dialogue.replace("Pressure rises.", "  "))).toBeNull();
+  });
+});
+
+describe("plainText", () => {
+  it("removes voice cues so they are never shown or read by device voices", () => {
+    expect(plainText("[curious] Wait, so ferritin falls first?")).toBe(
+      "Wait, so ferritin falls first?",
+    );
+    expect(plainText("Right. [laughs] That one catches everyone.")).toBe(
+      "Right. That one catches everyone.",
+    );
+    expect(plainText("Iron [Fe] stays as written.")).toBe("Iron [Fe] stays as written.");
   });
 });

@@ -1,12 +1,12 @@
 "use client";
 
 import { Button, Notice, Section, Surface } from "@medos/ui";
-import { Headphones, Play, Square } from "lucide-react";
+import { Headphones, LoaderCircle, Play, Square } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState, useSyncExternalStore, useTransition } from "react";
 
 import { generatePodcast } from "./actions";
-import type { PodcastScript } from "./episodes";
+import { type PodcastScript, plainText } from "./episodes";
 
 interface EpisodeRow {
   labels: string[];
@@ -37,11 +37,14 @@ export function PodcastPlayer({
   accountId,
   lectureId,
   configured,
+  naturalVoices,
   sources,
 }: {
   accountId: string;
   lectureId: string;
   configured: boolean;
+  /** ElevenLabs is configured: signed dialogues play as natural two-host audio. */
+  naturalVoices: boolean;
   sources: Source[];
 }) {
   const storageKey = "medos:podcasts:v1:" + accountId + ":" + lectureId;
@@ -64,21 +67,33 @@ export function PodcastPlayer({
   const [rate, setRate] = useState(1);
   const [pending, startTransition] = useTransition();
   const playback = useRef<symbol | null>(null);
+  const player = useRef<HTMLAudioElement | null>(null);
+  const audioUrls = useRef(new Map<string, string>());
+  const [loading, setLoading] = useState<string | null>(null);
   const speechSupported = useSyncExternalStore(
     subscribe,
     () => "speechSynthesis" in window,
     () => false,
   );
 
-  useEffect(
-    () => () => {
+  useEffect(() => {
+    const urls = audioUrls.current;
+    const audio = player.current;
+    return () => {
       if (playback.current) {
         playback.current = null;
-        window.speechSynthesis.cancel();
+        if ("speechSynthesis" in window) window.speechSynthesis.cancel();
       }
-    },
-    [],
-  );
+      audio?.pause();
+      for (const url of urls.values()) URL.revokeObjectURL(url);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (player.current) player.current.playbackRate = rate;
+  }, [rate]);
+
+  const natural = (script: PodcastScript) => naturalVoices && Boolean(script.signature);
 
   let saved: Record<string, PodcastScript> = {};
   try {
@@ -149,8 +164,55 @@ export function PodcastPlayer({
 
   function stop() {
     playback.current = null;
-    window.speechSynthesis.cancel();
+    if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+    player.current?.pause();
+    setLoading(null);
     setPlaying(null);
+  }
+
+  async function playNatural(key: string, script: PodcastScript, active: symbol) {
+    const audio = player.current;
+    if (!audio) return;
+    const cacheKey = script.signature ?? key;
+    let url = audioUrls.current.get(cacheKey);
+    if (!url) {
+      setLoading(key);
+      try {
+        const response = await fetch("/api/podcasts/audio", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ turns: script.turns, signature: script.signature }),
+        });
+        if (!response.ok) throw new Error(await response.text());
+        url = URL.createObjectURL(await response.blob());
+        audioUrls.current.set(cacheKey, url);
+      } catch (problem) {
+        if (playback.current !== active) return;
+        playback.current = null;
+        setLoading(null);
+        setError(
+          (problem instanceof Error && problem.message) ||
+            "The natural voices could not be loaded. Try again in a moment.",
+        );
+        return;
+      }
+      if (playback.current !== active) return;
+      setLoading(null);
+    }
+    audio.src = url;
+    audio.playbackRate = rate;
+    audio.onended = () => {
+      if (playback.current !== active) return;
+      playback.current = null;
+      setPlaying(null);
+    };
+    setPlaying({ key, turn: 0 });
+    await audio.play().catch(() => {
+      if (playback.current !== active) return;
+      playback.current = null;
+      setPlaying(null);
+      setError("The browser blocked playback. Press Play again.");
+    });
   }
 
   function play(key: string, script: PodcastScript) {
@@ -158,6 +220,10 @@ export function PodcastPlayer({
     setError("");
     const active = Symbol();
     playback.current = active;
+    if (natural(script)) {
+      void playNatural(key, script, active);
+      return;
+    }
     const voices = window.speechSynthesis
       .getVoices()
       .filter((voice) => voice.localService && /^en(?:-|$)/i.test(voice.lang));
@@ -172,7 +238,7 @@ export function PodcastPlayer({
         setPlaying(null);
         return;
       }
-      const remaining = turn.text.slice(offset);
+      const remaining = plainText(turn.text).slice(offset);
       const space = remaining.lastIndexOf(" ", 200);
       const length = remaining.length <= 200 ? remaining.length : space > 0 ? space : 200;
       const utterance = new SpeechSynthesisUtterance(remaining.slice(0, length));
@@ -198,10 +264,12 @@ export function PodcastPlayer({
 
   return (
     <div className="space-y-6">
+      <audio ref={player} preload="none" className="hidden" />
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-surface p-4">
         <p className="max-w-xl text-sm text-fg-muted">
-          Dialogues are AI-generated and saved in this browser. Playback uses your device’s
-          available voices.
+          {naturalVoices
+            ? "Dialogues are AI-generated and saved in this browser. Episodes play as a natural two-host conversation; the first play of an episode takes a little longer while it is voiced."
+            : "Dialogues are AI-generated and saved in this browser. Playback uses your device’s available voices."}
         </p>
         <div className="flex flex-wrap items-center gap-3">
           <label className="flex items-center gap-2 text-sm text-fg-muted">
@@ -209,7 +277,7 @@ export function PodcastPlayer({
             <select
               className="rounded-lg border border-border bg-surface p-1.5 text-fg"
               value={rate}
-              disabled={!speechSupported || playing !== null}
+              disabled={!(speechSupported || naturalVoices)}
               onChange={(event) => setRate(Number(event.target.value))}
             >
               {[0.8, 1, 1.2, 1.5].map((speed) => (
@@ -252,7 +320,8 @@ export function PodcastPlayer({
               {source.episodes.map(({ labels, version }, index) => {
                 const key = episodeKey(source, index);
                 const script = scripts[scriptKey(source, index, version)];
-                const active = playing?.key === key;
+                const active = playing?.key === key || loading === key;
+                const canPlay = script ? natural(script) || speechSupported : false;
                 const title = labels.join(" / ");
                 return (
                   <li key={key} className="space-y-3 px-4 py-4">
@@ -266,24 +335,48 @@ export function PodcastPlayer({
                           <h3 className="text-sm font-semibold break-words text-fg">{title}</h3>
                           <p className="text-xs text-fg-subtle">
                             Episode {index + 1}
-                            {active && script
-                              ? " · Turn " + playing.turn + " of " + script.turns.length
-                              : ""}
+                            {loading === key
+                              ? " · Preparing natural voices…"
+                              : active && script && playing?.turn
+                                ? " · Turn " + playing.turn + " of " + script.turns.length
+                                : active
+                                  ? " · Playing"
+                                  : ""}
                           </p>
                         </div>
                       </div>
                       {script ? (
-                        <Button
-                          type="button"
-                          variant="secondary"
-                          size="sm"
-                          disabled={!speechSupported}
-                          aria-label={(active ? "Stop " : "Play ") + title}
-                          onClick={() => (active ? stop() : play(key, script))}
-                        >
-                          {active ? <Square /> : <Play />}
-                          {active ? "Stop" : speechSupported ? "Play" : "Audio unavailable"}
-                        </Button>
+                        <div className="flex flex-wrap items-center gap-2">
+                          {naturalVoices && !script.signature && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              disabled={pending || working !== null || !configured}
+                              aria-label={"Regenerate " + title + " with natural voices"}
+                              onClick={() => generate([{ source, index, version }])}
+                            >
+                              {working === key ? "Generating…" : "Regenerate for natural voices"}
+                            </Button>
+                          )}
+                          <Button
+                            type="button"
+                            variant="secondary"
+                            size="sm"
+                            disabled={!canPlay}
+                            aria-label={(active ? "Stop " : "Play ") + title}
+                            onClick={() => (active ? stop() : play(key, script))}
+                          >
+                            {loading === key ? (
+                              <LoaderCircle className="animate-spin" />
+                            ) : active ? (
+                              <Square />
+                            ) : (
+                              <Play />
+                            )}
+                            {active ? "Stop" : canPlay ? "Play" : "Audio unavailable"}
+                          </Button>
+                        </div>
                       ) : (
                         <Button
                           type="button"
@@ -302,11 +395,13 @@ export function PodcastPlayer({
                         <summary className="w-fit cursor-pointer font-medium">Transcript</summary>
                         <p className="mt-2 text-xs text-fg-subtle">
                           AI-generated with {script.provider} · {script.model}
+                          {natural(script) ? " · voiced by ElevenLabs" : ""}
                         </p>
                         <ol className="my-3 max-w-prose space-y-2">
                           {script.turns.map((turn, turnIndex) => (
                             <li key={turnIndex}>
-                              <strong className="text-fg">Host {turn.host}.</strong> {turn.text}
+                              <strong className="text-fg">Host {turn.host}.</strong>{" "}
+                              {plainText(turn.text)}
                             </li>
                           ))}
                         </ol>

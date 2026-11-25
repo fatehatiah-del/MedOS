@@ -22,7 +22,14 @@ describe("parseEnv", () => {
       AI_PROVIDER: "none",
       APP_URL: "https://medos.example",
       DEV_FIXTURE_LECTURES: false,
+      ELEVENLABS_MODEL: "eleven_v3",
+      ELEVENLABS_VOICE_A: "EXAVITQu4vr4xnSDxMaL",
+      ELEVENLABS_VOICE_B: "JBFqnCBsd6RMkjVDRZzb",
     });
+  });
+
+  it("leaves natural podcast voices off without an ElevenLabs key", () => {
+    expect(parseEnv({}).ELEVENLABS_API_KEY).toBeUndefined();
   });
 
   it("keeps fixture lectures off unless explicitly enabled", () => {

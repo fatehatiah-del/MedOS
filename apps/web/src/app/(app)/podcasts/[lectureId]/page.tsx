@@ -9,6 +9,7 @@ import { lectureHref } from "@/features/courses/progress";
 import { PodcastPlayer } from "@/features/podcasts/player";
 import { podcastSource } from "@/features/podcasts/sources";
 import { aiConfigured } from "@/server/ai";
+import { voicesConfigured } from "@/server/podcast-voices";
 import { getWorkspace } from "@/server/workspace";
 
 export const metadata: Metadata = { title: "Lecture Podcasts" };
@@ -65,6 +66,7 @@ export default async function LecturePodcastsPage({
             lectureId={lecture.id}
             accountId={user.id}
             configured={configured}
+            naturalVoices={voicesConfigured()}
             sources={sources.map(({ id, title, episodes }) => ({
               id,
               title,

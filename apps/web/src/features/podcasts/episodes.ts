@@ -63,6 +63,23 @@ export interface PodcastScript {
   turns: PodcastTurn[];
   provider: string;
   model: string;
+  /** Present when the server can voice this dialogue with natural voices. */
+  signature?: string;
+}
+
+/** The voice cues natural voices may perform; never read aloud or shown. */
+export const VOICE_CUES = ["curious", "laughs", "thoughtful", "excited"] as const;
+const CUE_PATTERN = new RegExp(
+  String.raw`\s*\[(?:` + VOICE_CUES.join("|") + String.raw`)\]\s*`,
+  "giu",
+);
+
+/** The turn as plain words: voice cues removed (transcript and device voices). */
+export function plainText(text: string): string {
+  return text
+    .replace(CUE_PATTERN, " ")
+    .replace(/\s{2,}/gu, " ")
+    .trim();
 }
 
 export function parseDialogue(output: string): PodcastTurn[] | null {

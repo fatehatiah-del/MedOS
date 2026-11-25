@@ -22,6 +22,16 @@ const envSchema = z.object({
   AI_MODEL: z.string().optional(),
   /** The service's OpenAI-compatible address, for AI_PROVIDER=openai-compatible. */
   AI_BASE_URL: z.url().optional(),
+  /**
+   * Natural voices for lecture podcasts (optional). With an ElevenLabs key, episodes are voiced
+   * as a two-host conversation by ElevenLabs; without one, the browser's own voices read them.
+   */
+  ELEVENLABS_API_KEY: z.string().optional(),
+  /** The ElevenLabs Text to Dialogue model. */
+  ELEVENLABS_MODEL: z.string().default("eleven_v3"),
+  /** ElevenLabs voice IDs for the two hosts (defaults: the premade voices Sarah and George). */
+  ELEVENLABS_VOICE_A: z.string().default("EXAVITQu4vr4xnSDxMaL"),
+  ELEVENLABS_VOICE_B: z.string().default("JBFqnCBsd6RMkjVDRZzb"),
   /** Public base URL of the deployment. */
   APP_URL: z.url().optional(),
   /**
