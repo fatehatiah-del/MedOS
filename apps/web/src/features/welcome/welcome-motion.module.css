@@ -713,31 +713,83 @@
   font-weight: 500;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 1023px) {
   .headerShell {
     position: relative;
-    align-items: start;
-    height: 5.15rem;
-    padding-top: 0.22rem;
+    height: 3.5rem;
+    padding-inline: 0.85rem 0.4rem;
   }
-
   .headerNav {
-    position: absolute;
-    inset-inline: 0;
-    bottom: 0.32rem;
-  }
-
-  .headerLinks {
-    justify-content: center;
-    gap: 0.55rem;
-    font-size: 0.8rem;
-  }
-
-  .headerLinks li[data-primary="false"] {
     display: none;
   }
-  .headerLinks a {
-    display: block;
+}
+@media (min-width: 640px) and (max-width: 1023px) {
+  /* On a tablet the panel sits under the right end of the bar instead of spanning it. */
+  .headerPanel {
+    left: auto;
+    width: 18rem;
+  }
+}
+
+/* The phone menu panel: the same glass as the bar, dropped just beneath it. */
+.headerPanel {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  left: 0;
+  padding: 0.5rem;
+  border: 1px solid rgb(214 222 255 / 16%);
+  border-radius: 1.25rem;
+  /* Solid: a blur nested inside the blurred bar cannot sample the page, so translucency here
+     would let the headline show through the links. */
+  background: #121638;
+  box-shadow: 0 18px 40px -16px rgb(5 8 25 / 60%);
+}
+.headerPanel[hidden] {
+  display: none;
+}
+.glassHeader[data-past-hero="true"] .headerPanel {
+  border-color: rgb(18 22 56 / 9%);
+  background: #ffffff;
+  box-shadow: 0 18px 40px -18px rgb(18 22 56 / 35%);
+}
+:global([data-theme="dark"]) .glassHeader[data-past-hero="true"] .headerPanel {
+  border-color: rgb(196 204 255 / 14%);
+  background: #121638;
+}
+.headerPanel a {
+  display: flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding-inline: 0.75rem;
+  border-radius: 0.75rem;
+  color: var(--fg);
+  font-size: 1rem;
+  font-weight: 500;
+}
+.headerPanel a:hover,
+.headerPanel a:focus-visible {
+  background: var(--hover);
+}
+.headerPanelControls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.35rem;
+  padding: 0.35rem 0.35rem 0 0.75rem;
+  border-top: 1px solid var(--border);
+  color: var(--fg-muted);
+  font-size: 0.875rem;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .headerPanel:not([hidden]) {
+    animation: panel-drop 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+}
+@keyframes panel-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
   }
 }
 

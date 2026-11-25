@@ -47,6 +47,19 @@ test.describe("the welcome page", () => {
 
   test("has no accessibility violations", async ({ page }) => {
     await page.goto("/");
+    // Let the hero's entrance fade finish: mid-fade, axe samples half-transparent text.
+    await page.evaluate(() =>
+      Promise.all(
+        document
+          .getAnimations()
+          .filter(
+            (a) =>
+              a.timeline instanceof DocumentTimeline &&
+              a.effect?.getComputedTiming().iterations !== Infinity,
+          )
+          .map((a) => a.finished.catch(() => undefined)),
+      ),
+    );
     const results = await new AxeBuilder({ page }).analyze();
     expect(results.violations).toEqual([]);
   });

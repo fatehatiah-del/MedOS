@@ -14,6 +14,7 @@ import { StudyPulse } from "./study-pulse";
 import { StudyFlow } from "./study-flow";
 import { WelcomeHeader } from "./welcome-header";
 import { HeroAmbient } from "./hero-ambient";
+import { HeaderMenu } from "./header-menu";
 import { HeroDemo } from "./hero-demo";
 import { MotionToggle } from "./motion-toggle";
 import { PointerGlow } from "./pointer-glow";
@@ -153,7 +154,7 @@ export function WelcomePage() {
                 <li key={href} data-primary={href === "#how-it-works" || href === "#features"}>
                   <a
                     href={href}
-                    className="rounded-lg px-3 py-2 transition-colors duration-150 hover:bg-hover hover:text-fg"
+                    className="rounded-lg px-3 py-2 whitespace-nowrap transition-colors duration-150 hover:bg-hover hover:text-fg"
                   >
                     {label}
                   </a>
@@ -161,15 +162,26 @@ export function WelcomePage() {
               ))}
             </ul>
           </nav>
-          <div className="ml-auto flex items-center gap-2">
-            <MotionToggle />
-            <ThemeMenu />
-            <Button asChild variant="ghost" className="hidden sm:inline-flex">
-              <Link href={LOGIN_PATH}>Sign in</Link>
-            </Button>
-            <Button asChild variant="primary">
+          <div className="ml-auto flex items-center gap-1.5 lg:gap-2">
+            <div className="hidden items-center gap-2 lg:flex">
+              <MotionToggle />
+              <ThemeMenu />
+              <Button asChild variant="ghost">
+                <Link href={LOGIN_PATH}>Sign in</Link>
+              </Button>
+            </div>
+            <Button asChild variant="primary" className="h-9 px-3.5 text-[14px] lg:h-10 lg:px-4">
               <Link href={SIGNUP_PATH}>Start free trial</Link>
             </Button>
+            <HeaderMenu
+              loginHref={LOGIN_PATH}
+              controls={
+                <>
+                  <MotionToggle />
+                  <ThemeMenu />
+                </>
+              }
+            />
           </div>
         </div>
       </WelcomeHeader>
@@ -179,7 +191,7 @@ export function WelcomePage() {
         <section
           id="welcome-hero"
           aria-labelledby="hero-title"
-          className={`${styles.hero} overflow-clip pt-[7.5rem] pb-14 sm:pt-36 sm:pb-20 lg:pt-40 lg:pb-24`}
+          className={`${styles.hero} overflow-clip pt-24 pb-14 sm:pt-36 sm:pb-20 lg:pt-40 lg:pb-24`}
         >
           <HeroAmbient />
           <div
