@@ -18,10 +18,10 @@ export const metadata: Metadata = {
   description: "A personal medical-school study operating system.",
   icons: {
     icon: [
-      { url: "/brand/favicon.svg", type: "image/svg+xml" },
-      { url: "/brand/favicon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/brand/clinical-heart/favicon.svg", type: "image/svg+xml" },
+      { url: "/brand/clinical-heart/favicon-32.png", sizes: "32x32", type: "image/png" },
     ],
-    apple: { url: "/brand/apple-touch-icon.png", sizes: "180x180" },
+    apple: { url: "/brand/clinical-heart/apple-touch-icon.png", sizes: "180x180" },
   },
   ...(env.APP_URL ? { metadataBase: new URL(env.APP_URL) } : {}),
   // Study data is private and must never be indexed.

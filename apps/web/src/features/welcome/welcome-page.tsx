@@ -1,15 +1,26 @@
 import { Button } from "@medos/ui";
 import { ArrowRight, Check } from "lucide-react";
 import Link from "next/link";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 import { BrandMark } from "@/components/brand-mark";
+import { HeartWordmark } from "@/components/heart-wordmark";
 import { ThemeMenu } from "@/components/theme/theme-menu";
 import { LOGIN_PATH, SIGNUP_PATH } from "@/server/auth/routes";
 
-import { CycleTabs } from "./cycle-tabs";
+import { CalendarSample } from "./calendar-sample";
+import { ProductStories } from "./product-stories";
+import { StudyPulse } from "./study-pulse";
+import { StudyFlow } from "./study-flow";
+import { WelcomeHeader } from "./welcome-header";
+import { HeroAmbient } from "./hero-ambient";
+import { HeroDemo } from "./hero-demo";
+import { MotionToggle } from "./motion-toggle";
+import { PointerGlow } from "./pointer-glow";
 import { PRICE, TRIAL_DAYS } from "./pricing";
 import { Screenshot } from "./screenshot";
+import { StudySample } from "./study-sample";
+import styles from "./welcome-motion.module.css";
 
 const COURSES = [
   "Pathology",
@@ -28,10 +39,6 @@ const FEATURES: readonly { title: string; body: string }[] = [
   {
     title: "Search, from anywhere",
     body: "Press Ctrl K and search lectures, guides, questions, flashcards and your own notes at once.",
-  },
-  {
-    title: "Ask AI",
-    body: "Ask a question while you study, without leaving the page you are on.",
   },
   {
     title: "Study timer",
@@ -78,14 +85,19 @@ const FAQ: readonly { q: string; a: string }[] = [
   },
 ];
 
+/** Delay for the hero's staged entrance (see .heroEnter). */
+function enter(ms: number): CSSProperties {
+  return { "--enter-delay": `${ms}ms` } as CSSProperties;
+}
+
 const CONTAINER = "mx-auto w-full max-w-[1200px] px-5 sm:px-8";
 
 function SectionIntro({ id, title, children }: { id: string; title: string; children: ReactNode }) {
   return (
-    <div className="max-w-2xl space-y-3">
+    <div className={`${styles.sectionLead} max-w-2xl space-y-3`}>
       <h2
         id={id}
-        className="font-display text-[32px] leading-[1.1] font-semibold text-balance text-fg sm:text-[40px]"
+        className="scroll-mt-28 font-display text-[clamp(2rem,4.6vw,3.75rem)] leading-[1.04] font-semibold tracking-[-0.03em] text-balance text-fg"
       >
         {title}
       </h2>
@@ -100,7 +112,11 @@ function StartButton({
   children?: ReactNode;
 }) {
   return (
-    <Button asChild variant="primary" className="h-11 px-5 text-[15px] [&_svg]:size-[18px]">
+    <Button
+      asChild
+      variant="primary"
+      className={`${styles.ctaSheen} h-11 px-5 text-[15px] [&_svg]:size-[18px]`}
+    >
       <Link href={SIGNUP_PATH}>
         {children}
         <ArrowRight aria-hidden="true" />
@@ -120,20 +136,21 @@ export function WelcomePage() {
         Skip to content
       </a>
 
-      <header className="sticky top-0 z-40 border-b border-border/70 bg-canvas/85 backdrop-blur-md">
-        <div className={`${CONTAINER} flex h-16 items-center gap-6`}>
-          <Link href="/" aria-label="Med OS home" className="rounded-lg">
-            <BrandMark />
+      <PointerGlow />
+      <WelcomeHeader>
+        <div className={styles.headerShell}>
+          <Link href="/" aria-label="Med OS home" className={styles.headerBrand}>
+            <HeartWordmark />
           </Link>
-          <nav aria-label="Welcome" className="hidden md:block">
-            <ul className="flex items-center gap-1 text-[14px] font-medium text-fg-muted">
+          <nav aria-label="Welcome" className={styles.headerNav}>
+            <ul className={styles.headerLinks}>
               {[
                 ["#how-it-works", "How it works"],
                 ["#features", "Features"],
                 ["#pricing", "Pricing"],
                 ["#faq", "FAQ"],
               ].map(([href, label]) => (
-                <li key={href}>
+                <li key={href} data-primary={href === "#how-it-works" || href === "#features"}>
                   <a
                     href={href}
                     className="rounded-lg px-3 py-2 transition-colors duration-150 hover:bg-hover hover:text-fg"
@@ -145,6 +162,7 @@ export function WelcomePage() {
             </ul>
           </nav>
           <div className="ml-auto flex items-center gap-2">
+            <MotionToggle />
             <ThemeMenu />
             <Button asChild variant="ghost" className="hidden sm:inline-flex">
               <Link href={LOGIN_PATH}>Sign in</Link>
@@ -154,54 +172,83 @@ export function WelcomePage() {
             </Button>
           </div>
         </div>
-      </header>
+      </WelcomeHeader>
 
       <main id="welcome-main" tabIndex={-1} className="focus:outline-none">
         {/* Hero: the offer, the action, and the real Today screen breaking the fold. */}
-        <section aria-labelledby="hero-title" className="overflow-hidden pt-16 sm:pt-24">
-          <div className={CONTAINER}>
+        <section
+          id="welcome-hero"
+          aria-labelledby="hero-title"
+          className={`${styles.hero} overflow-clip pt-[7.5rem] pb-14 sm:pt-36 sm:pb-20 lg:pt-40 lg:pb-24`}
+        >
+          <HeroAmbient />
+          <div
+            className={`${CONTAINER} grid items-center gap-10 lg:grid-cols-[minmax(0,0.84fr)_minmax(0,1.16fr)] lg:gap-12`}
+          >
             <div className="max-w-[62rem]">
               <h1
                 id="hero-title"
-                className="max-w-[16ch] animate-rise-in font-display text-[38px] leading-[1.05] font-semibold text-fg sm:text-[60px] sm:leading-[1.02] lg:max-w-none lg:text-[72px]"
+                className="font-display text-[clamp(2.125rem,3.6vw,3.375rem)] leading-[1.04] font-semibold tracking-[-0.035em] text-fg"
               >
-                Every lecture, already turned into a study system.
+                <span className={`${styles.heroEnter} block`} style={enter(0)}>
+                  Every lecture,
+                </span>{" "}
+                <span className={`${styles.heroEnter} block`} style={enter(60)}>
+                  already turned into
+                </span>{" "}
+                <span className={`${styles.heroEnter} block`} style={enter(120)}>
+                  a study system.
+                </span>
               </h1>
-              <p className="mt-6 max-w-[38rem] animate-rise-in text-[18px] leading-relaxed text-pretty text-fg-muted [animation-delay:60ms] sm:text-[19px]">
+              <p
+                style={enter(180)}
+                className={`${styles.heroEnter} mt-6 max-w-[38rem] text-[18px] leading-relaxed text-pretty text-fg-muted sm:text-[19px]`}
+              >
                 Med OS gives each lecture of your semester a study guide, practice MCQs,
                 active-recall questions and spaced-repetition flashcards, then plans your day around
                 your real timetable.
               </p>
-              <div className="mt-9 flex animate-rise-in flex-wrap items-center gap-3 [animation-delay:120ms]">
+              <div
+                style={enter(240)}
+                className={`${styles.heroEnter} mt-7 flex flex-wrap items-center gap-3`}
+              >
                 <StartButton />
                 <Button asChild variant="secondary" className="h-11 px-5 text-[15px]">
                   <Link href={LOGIN_PATH}>Sign in</Link>
                 </Button>
               </div>
-              <p className="mt-4 animate-rise-in text-[13.5px] text-fg-muted [animation-delay:160ms]">
+              <p
+                style={enter(300)}
+                className={`${styles.heroEnter} mt-4 text-[13.5px] text-fg-muted`}
+              >
                 Open to Year 3 students. {TRIAL_DAYS} days free, then {PRICE}/month. No card needed
                 to start.
               </p>
             </div>
 
-            <div className="relative mt-14 animate-rise-in [animation-delay:220ms] sm:mt-16">
-              <Screenshot
-                name="today"
-                priority
-                mobileCrop
-                alt="The Med OS Today screen: the day's university schedule, a recommended study plan, today's progress and upcoming exams."
-              />
-              <p className="mt-3 text-center text-[12.5px] text-fg-muted">
+            <figure className={styles.heroPreview}>
+              <div className={styles.heroEnterWindow} style={enter(200)}>
+                <HeroDemo>
+                  <Screenshot
+                    name="today-v3"
+                    priority
+
+                    sizes="(min-width: 1024px) 620px, 100vw"
+                    alt="The Med OS Today screen: the day's university schedule, a recommended study plan, today's progress and upcoming exams."
+                  />
+                </HeroDemo>
+              </div>
+              <figcaption className="mt-3 px-1 text-right text-[12px] text-fg-muted">
                 Screens from a sample account.
-              </p>
-            </div>
+              </figcaption>
+            </figure>
           </div>
         </section>
 
         {/* What is included, stated plainly. */}
         <section aria-labelledby="courses-title" className="border-y border-border bg-surface">
           <div
-            className={`${CONTAINER} flex flex-col gap-4 py-8 md:flex-row md:items-center md:gap-10`}
+            className={`${CONTAINER} grid gap-3 py-7 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-center lg:gap-8`}
           >
             <h2 id="courses-title" className="shrink-0 text-[14px] font-semibold text-fg">
               Follows one medical school&rsquo;s Year 3 MD curriculum · Semester 5
@@ -218,25 +265,35 @@ export function WelcomePage() {
         </section>
 
         {/* The learning cycle: the product's mechanism, step by step. */}
-        <section aria-labelledby="how-it-works" className="scroll-mt-16 bg-surface py-24 sm:py-32">
+        <section
+          aria-labelledby="how-it-works"
+          className="scroll-mt-16 bg-surface py-16 sm:py-24 lg:py-28"
+        >
           <div className={`${CONTAINER} space-y-12`}>
-            <SectionIntro id="how-it-works" title="One lecture, the whole learning cycle.">
-              Documents are inputs; learning is the product. Every lecture moves from first read to
-              exam-ready through the same steps, each with its own tool.
-            </SectionIntro>
-            <CycleTabs />
+            <div className={styles.workflowIntro}>
+              <h2 id="how-it-works" className={`${styles.workflowTitle} scroll-mt-24`}>
+                <span>One lecture.</span> <span>The whole learning cycle.</span>
+              </h2>
+              <p className="max-w-[34ch] text-[17px] leading-relaxed text-pretty text-fg-muted">
+                Read the guide, practise what you remember, and use your results to decide what to
+                study next.
+              </p>
+            </div>
+            <StudyFlow />
+            <ProductStories />
           </div>
         </section>
 
         {/* Timetable. */}
-        <section aria-labelledby="timetable-title" className="py-24 sm:py-32">
-          <div
-            className={`${CONTAINER} grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.7fr)] lg:items-center lg:gap-16`}
-          >
-            <div className="space-y-5">
+        <section
+          aria-labelledby="timetable-title"
+          className={`${styles.timetableSection} py-16 sm:py-24 lg:py-28`}
+        >
+          <div className={`${CONTAINER} grid gap-9`}>
+            <div className={styles.calendarIntro}>
               <h2
                 id="timetable-title"
-                className="font-display text-[32px] leading-[1.1] font-semibold text-balance text-fg sm:text-[40px]"
+                className="scroll-mt-28 font-display text-[clamp(2rem,4.6vw,3.75rem)] leading-[1.04] font-semibold tracking-[-0.03em] text-balance text-fg"
               >
                 Built around your real timetable.
               </h2>
@@ -262,26 +319,42 @@ export function WelcomePage() {
               </ul>
             </div>
             <Screenshot
+              className={`${styles.timetablePreview} hidden md:block`}
               name="calendar"
-              sizes="(min-width: 1280px) 720px, 100vw"
+              sizes="(min-width: 1280px) 1136px, 100vw"
               alt="The Med OS week calendar with colour-coded lectures and labs for each course."
             />
+            <CalendarSample />
+          </div>
+        </section>
+
+        <section
+          aria-labelledby="study-sample-title"
+          className="border-t border-border bg-subtle py-16 sm:py-24"
+        >
+          <div className={`${CONTAINER} space-y-10`}>
+            <SectionIntro id="study-sample-title" title="Try it yourself.">
+              Answer a practice question and reveal a flashcard from a sample study session.
+            </SectionIntro>
+            <StudySample />
           </div>
         </section>
 
         {/* Everything else, as a list rather than a wall of cards. */}
         <section
           aria-labelledby="features"
-          className="scroll-mt-16 border-t border-border bg-surface py-24 sm:py-32"
+          className="scroll-mt-16 border-t border-border bg-surface py-16 sm:py-24 lg:py-28"
         >
-          <div className={`${CONTAINER} space-y-14`}>
+          <div
+            className={`${CONTAINER} grid gap-9 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-14`}
+          >
             <SectionIntro id="features" title="Everything else a semester needs.">
               The small tools that make long study days work, all in one place.
             </SectionIntro>
-            <ul className="grid gap-x-12 gap-y-0 sm:grid-cols-2">
+            <ul className="divide-y divide-border border-y border-border">
               {FEATURES.map((feature) => (
-                <li key={feature.title} className="border-t border-border py-6">
-                  <div className="space-y-1.5">
+                <li key={feature.title} className="py-5">
+                  <div className="grid gap-2 sm:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] sm:gap-5">
                     <h3 className="text-[15.5px] font-semibold text-fg">{feature.title}</h3>
                     <p className="text-[15px] leading-relaxed text-pretty text-fg-muted">
                       {feature.body}
@@ -294,12 +367,15 @@ export function WelcomePage() {
         </section>
 
         {/* Pricing: the owner's real price, and the honest state of billing. */}
-        <section aria-labelledby="pricing" className="scroll-mt-16 py-24 sm:py-32">
+        <section aria-labelledby="pricing" className="scroll-mt-16 py-16 sm:py-24 lg:py-28">
           <div className={`${CONTAINER} space-y-12`}>
             <SectionIntro id="pricing" title="One plan. Everything included.">
               Try every part of Med OS free for {TRIAL_DAYS} days.
             </SectionIntro>
-            <div className="grid overflow-hidden rounded-2xl border border-border bg-surface shadow-sm md:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)]">
+            <div
+              data-spotlight
+              className={`${styles.spotlight} grid overflow-hidden rounded-2xl border border-border bg-surface shadow-sm md:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)]`}
+            >
               <div className="flex flex-col gap-6 border-b border-border p-8 sm:p-10 md:border-r md:border-b-0">
                 <div className="space-y-1">
                   <h3 className="text-[15px] font-semibold text-fg">Med OS</h3>
@@ -353,7 +429,7 @@ export function WelcomePage() {
         {/* Questions. */}
         <section
           aria-labelledby="faq"
-          className="scroll-mt-16 border-t border-border bg-surface py-24 sm:py-32"
+          className="scroll-mt-16 border-t border-border bg-surface py-16 sm:py-24 lg:py-28"
         >
           <div className={`${CONTAINER} grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)]`}>
             <div className="space-y-3">
@@ -385,16 +461,15 @@ export function WelcomePage() {
         </section>
 
         {/* Close. */}
-        <section aria-labelledby="close-title" className="py-24 sm:py-32">
-          <div
-            className={`${CONTAINER} flex flex-col items-start gap-8 md:flex-row md:items-end md:justify-between`}
-          >
-            <div className="max-w-2xl space-y-4">
-              <h2
-                id="close-title"
-                className="font-display text-[36px] leading-[1.06] font-semibold text-balance text-fg sm:text-[52px]"
-              >
-                Your semester is ready when you are.
+        <section
+          aria-labelledby="close-title"
+          className={`${styles.hero} ${styles.closingScene} py-16 sm:py-24 lg:py-28`}
+        >
+          <StudyPulse />
+          <div className={`${CONTAINER} ${styles.closingCopy}`}>
+            <div className={`${styles.sectionLead} max-w-2xl space-y-4`}>
+              <h2 id="close-title" className={styles.closingTitle}>
+                <span>From lecture notes</span> <span>to clinical thinking.</span>
               </h2>
               <p className="text-[17px] text-fg-muted">
                 {TRIAL_DAYS} days free, then {PRICE}/month.

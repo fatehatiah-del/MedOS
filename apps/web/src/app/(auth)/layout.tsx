@@ -55,7 +55,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
         </div>
         {/* Bleeds off the right edge, like a window behind the form. */}
         <Screenshot
-          name="today"
+          name="today-v3"
           alt="The Med OS Today screen."
           sizes="900px"
           className="w-[900px] max-w-none animate-rise-in [animation-delay:120ms]"

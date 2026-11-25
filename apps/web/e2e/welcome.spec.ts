@@ -27,17 +27,21 @@ test.describe("the welcome page", () => {
     ).toBeVisible();
   });
 
-  test("walks through the learning cycle with the keyboard", async ({ page }) => {
+  test("presents the learning flow and its product examples in reading order", async ({ page }) => {
     await page.goto("/");
-    const steps = page.getByRole("tablist", { name: "Steps of the learning cycle" });
-    await steps.getByRole("tab", { name: "Study guide" }).focus();
-    await page.keyboard.press("ArrowRight");
-    await expect(steps.getByRole("tab", { name: "MCQs" })).toHaveAttribute("aria-selected", "true");
-    await expect(page.getByRole("heading", { level: 3, name: "Test it" })).toBeVisible();
+    const steps = page.getByRole("list", { name: "The Med OS learning cycle" });
+    await expect(steps.getByRole("listitem")).toHaveCount(5);
+    await expect(steps.getByRole("listitem").last()).toContainText("Build confidence");
+    await expect(
+      page.getByRole("heading", { name: "Retake the questions you got wrong." }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Ask Gemini Flash while you study." }),
+    ).toBeVisible();
   });
 
   test("serves its screenshots without a session", async ({ request }) => {
-    const response = await request.get("/welcome/today-light.webp", { maxRedirects: 0 });
+    const response = await request.get("/welcome/today-v3-light.webp", { maxRedirects: 0 });
     expect(response.status()).toBe(200);
   });
 

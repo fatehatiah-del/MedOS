@@ -1,0 +1,1003 @@
+.hero {
+  --canvas: #101431;
+  --surface: #1b2050;
+  --hover: #252c61;
+  --border: #343d73;
+  --border-strong: #506092;
+  --fg: #f4f5fb;
+  --fg-muted: #c6cbe5;
+  --accent: #a1adff;
+  --accent-hover: #bbc3ff;
+  --accent-fg: #111632;
+  --focus-ring: #a1adff;
+
+  /* A deep, nearly flat navy: the blue arrives with the aurora (HeroAmbient). */
+  background: radial-gradient(ellipse at 76% 32%, #141a42, #0b0e27 62%);
+}
+
+/* The closing scene keeps its own flat ground. */
+.closingScene.hero {
+  background: #070b20;
+}
+
+.heroPreview {
+  min-width: 0;
+}
+
+@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: scroll()) {
+    .heroPreview {
+      animation: straighten linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0 320px;
+    }
+  }
+}
+
+@keyframes straighten {
+  from {
+    transform: perspective(1400px) rotateY(-9deg) rotateX(4deg);
+  }
+
+  to {
+    transform: perspective(1400px) rotateY(0) rotateX(0);
+  }
+}
+
+@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .timetablePreview {
+      animation: show-timetable linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 85%;
+    }
+  }
+}
+
+@keyframes show-timetable {
+  from {
+    opacity: 0.78;
+    transform: translateY(1rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.workflowIntro {
+  display: grid;
+  gap: 1.25rem;
+  padding-block: clamp(1.25rem, 3vw, 3rem);
+  border-block: 1px solid var(--border);
+}
+
+.workflowTitle {
+  font-family: var(--font-display);
+  font-size: clamp(2.375rem, 6vw, 5.25rem);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  text-wrap: balance;
+}
+
+.workflowTitle span {
+  display: block;
+}
+
+.workflowTitle span:last-child {
+  color: var(--fg-muted);
+  margin-block-start: 0.15em;
+}
+
+@media (min-width: 768px) {
+  .workflowIntro {
+    grid-template-columns: minmax(0, 2.5fr) minmax(0, 1fr);
+    align-items: end;
+    column-gap: clamp(1.5rem, 4vw, 4rem);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .workflowIntro {
+      view-timeline-name: --workflow-intro;
+    }
+
+    .workflowTitle span:last-child {
+      animation: workflow-emphasis linear both;
+      animation-timeline: --workflow-intro;
+      animation-range: entry 18% entry 90%;
+      transform-origin: left bottom;
+    }
+  }
+}
+
+@keyframes workflow-emphasis {
+  from {
+    transform: translateY(0.14em);
+  }
+  to {
+    color: var(--fg);
+    transform: none;
+  }
+}
+
+/*
+ * Floating glass header. Over the dark hero it is a thin tint so the aurora shows through;
+ * past the hero it becomes frosted glass in the page's own theme (paper in light, ink in dark).
+ * One modest blur, no animated size: only colour, border and shadow transition.
+ */
+.glassHeader {
+  --fg: #f4f5fb;
+  --fg-muted: #d3d8f2;
+  --accent: #a1adff;
+  --accent-fg: #111632;
+  --accent-hover: #bbc3ff;
+  --hover: rgb(255 255 255 / 10%);
+  --border: rgb(255 255 255 / 18%);
+  --border-strong: rgb(255 255 255 / 28%);
+  --surface: rgb(255 255 255 / 8%);
+  --subtle: rgb(255 255 255 / 8%);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  height: 0;
+  color: var(--fg);
+  pointer-events: none;
+}
+
+.headerShell {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.35rem, 1.6vw, 1.5rem);
+  width: min(calc(100% - 1rem), 75rem);
+  height: 3.75rem;
+  margin-inline: auto;
+  transform: translateY(0.65rem);
+  padding-inline: clamp(0.65rem, 2.2vw, 1.8rem);
+  border: 1px solid rgb(214 222 255 / 16%);
+  border-radius: 999px;
+  background: rgb(16 20 49 / 38%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 10%),
+    0 10px 30px -12px rgb(5 8 25 / 45%);
+  -webkit-backdrop-filter: blur(14px) saturate(150%);
+  backdrop-filter: blur(14px) saturate(150%);
+  pointer-events: auto;
+  transition:
+    background-color 300ms ease,
+    border-color 300ms ease,
+    box-shadow 300ms ease,
+    color 300ms ease;
+}
+
+/* Past the hero, light theme: paper glass with ink text. */
+.glassHeader[data-past-hero="true"] {
+  --fg: #121638;
+  --fg-muted: #464b6e;
+  --accent: #4b5bf5;
+  --accent-fg: #ffffff;
+  --accent-hover: #3f4fe0;
+  --hover: rgb(18 22 56 / 6%);
+  --border: rgb(18 22 56 / 12%);
+  --border-strong: rgb(18 22 56 / 20%);
+  --surface: rgb(255 255 255 / 70%);
+  --subtle: rgb(18 22 56 / 5%);
+}
+
+.glassHeader[data-past-hero="true"] .headerShell {
+  border-color: rgb(18 22 56 / 9%);
+  background: rgb(255 255 255 / 72%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 70%),
+    0 10px 30px -14px rgb(18 22 56 / 28%);
+}
+
+/* Past the hero, dark theme: ink glass with paper text. */
+:global([data-theme="dark"]) .glassHeader[data-past-hero="true"] {
+  --fg: #f4f5fb;
+  --fg-muted: #c6c9e0;
+  --accent: #7b8cff;
+  --accent-fg: #0b0e24;
+  --accent-hover: #95a3ff;
+  --hover: rgb(255 255 255 / 8%);
+  --border: rgb(255 255 255 / 14%);
+  --border-strong: rgb(255 255 255 / 24%);
+  --surface: rgb(255 255 255 / 6%);
+  --subtle: rgb(255 255 255 / 6%);
+}
+
+:global([data-theme="dark"]) .glassHeader[data-past-hero="true"] .headerShell {
+  border-color: rgb(196 204 255 / 14%);
+  background: rgb(18 22 56 / 70%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 8%),
+    0 12px 32px -14px rgb(0 0 0 / 60%);
+}
+
+/* Without backdrop blur, a translucent bar over text is unreadable: make it solid. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .headerShell {
+    background: rgb(16 20 49 / 96%);
+  }
+  .glassHeader[data-past-hero="true"] .headerShell {
+    background: rgb(255 255 255 / 97%);
+  }
+  :global([data-theme="dark"]) .glassHeader[data-past-hero="true"] .headerShell {
+    background: rgb(18 22 56 / 97%);
+  }
+}
+
+.headerBrand {
+  flex: none;
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+.headerBrand svg {
+  width: clamp(6.1rem, 20vw, 8.45rem);
+  color: var(--fg);
+  transition: color 300ms ease;
+}
+
+.studyFlow {
+  display: grid;
+  gap: 2.35rem;
+}
+
+.flowStage {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 0.35rem;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  --stage-bg: var(--canvas);
+  background: var(--stage-bg);
+}
+
+.flowStage:last-child {
+  --stage-bg: var(--accent-soft);
+}
+
+.flowIcon {
+  color: var(--accent);
+  margin-bottom: 0.35rem;
+}
+
+.flowArrow {
+  position: absolute;
+  width: 2.1rem;
+  left: calc(50% - 1.05rem);
+  bottom: -1.65rem;
+  color: var(--accent);
+  rotate: 90deg;
+  overflow: visible;
+}
+
+.flowSignal {
+  stroke: #27a5ff;
+  stroke-dasharray: 0.29 1.1;
+  stroke-dashoffset: 0.36;
+  opacity: 0;
+  filter: drop-shadow(0 0 4px #1e9eff);
+}
+
+@media (min-width: 768px) {
+  .studyFlow {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 2rem;
+  }
+  .flowStage {
+    padding: 1rem 0.7rem;
+  }
+  .flowArrow {
+    left: auto;
+    right: -2.1rem;
+    bottom: calc(50% - 0.5rem);
+    rotate: 0deg;
+  }
+}
+
+/*
+ * The ECG signal travels the learning flow on a 4.2 s loop for as long as the flow is on screen:
+ * each stage lights in turn (left to right, or top to bottom on phones), then the row rests
+ * before the next beat. Leaving the viewport removes the state, so it restarts on return.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .studyFlow[data-active="true"] .flowStage {
+    animation: stage-signal 4.2s ease-out var(--step-delay, 0ms) infinite both;
+  }
+  .studyFlow[data-active="true"] .flowSignal {
+    animation: ecg-signal 4.2s linear calc(var(--step-delay, 0ms) + 220ms) infinite both;
+  }
+  .flowStage:nth-child(2) {
+    --step-delay: 590ms;
+  }
+  .flowStage:nth-child(3) {
+    --step-delay: 1180ms;
+  }
+  .flowStage:nth-child(4) {
+    --step-delay: 1770ms;
+  }
+  .flowStage:nth-child(5) {
+    --step-delay: 2360ms;
+  }
+}
+
+/* Keyframes are written as fractions of the loop: a short beat, then rest. */
+@keyframes stage-signal {
+  0%,
+  26%,
+  100% {
+    border-color: var(--border);
+    background: var(--stage-bg);
+    box-shadow: none;
+  }
+  7% {
+    border-color: #2387ed;
+    background: color-mix(in srgb, var(--stage-bg) 82%, #449fff);
+    box-shadow: 0 0 1.3rem rgb(36 151 255 / 25%);
+  }
+}
+
+@keyframes ecg-signal {
+  0% {
+    opacity: 0;
+    stroke-dashoffset: 0.36;
+  }
+  2%,
+  13% {
+    opacity: 1;
+  }
+  16%,
+  100% {
+    opacity: 0;
+    stroke-dashoffset: -1;
+  }
+}
+.stories {
+  display: grid;
+}
+.story {
+  display: grid;
+  align-items: center;
+  gap: clamp(1.1rem, 4vw, 4rem);
+  padding-block: clamp(2rem, 6vw, 5rem);
+  border-top: 1px solid var(--border);
+}
+.storyTitle {
+  color: var(--fg);
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 3vw, 2.7rem);
+  font-weight: 600;
+  line-height: 1.06;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+.storyPreview {
+  overflow: hidden;
+}
+
+.aiExample {
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  padding: clamp(1rem, 3vw, 2rem);
+  background: var(--canvas);
+  box-shadow: var(--elevation-sm);
+}
+
+.timetableSection {
+  background: linear-gradient(180deg, var(--surface), var(--accent-soft) 57%, var(--subtle));
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .storyPreview,
+    .aiExample {
+      animation: story-reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 5% entry 75%;
+    }
+  }
+}
+
+@keyframes story-reveal {
+  from {
+    opacity: 0.78;
+    transform: translateY(0.9rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .headerShell,
+  .headerBrand svg {
+    transition: none;
+  }
+}
+
+.closingScene {
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+}
+.previewLoading {
+  position: absolute;
+  z-index: 1;
+  top: 0.9rem;
+  right: 0.9rem;
+  width: 1.7rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 2px solid #bbc3ff;
+  border-right-color: transparent;
+  background: #121638;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .previewLoading {
+    animation: preview-spin 800ms linear infinite;
+  }
+}
+@keyframes preview-spin {
+  to {
+    rotate: 1turn;
+  }
+}
+@media (max-width: 767px) {
+  .flowStage {
+    grid-template-columns: 1.4rem minmax(0, 1fr);
+    align-items: center;
+    gap: 0.15rem 0.75rem;
+    padding: 0.8rem 1rem;
+  }
+  .flowIcon {
+    grid-row: span 2;
+    margin: 0;
+  }
+}
+
+.closingScene {
+  display: grid;
+  align-items: center;
+  min-height: clamp(30rem, 53vw, 49rem);
+  background: #070b20;
+}
+
+.closingCopy {
+  display: grid;
+  justify-items: start;
+  gap: 1.8rem;
+}
+
+.closingTitle {
+  display: grid;
+  gap: 0.12em;
+  font-family: var(--font-display);
+  color: var(--fg);
+  font-size: clamp(2.7rem, 5.25vw, 5.25rem);
+  font-weight: 600;
+  line-height: 0.98;
+  letter-spacing: -0.042em;
+}
+
+.closingTitle span:last-child {
+  color: #c7d1ff;
+  transform-origin: left bottom;
+}
+
+.clinicalArt {
+  position: absolute;
+  z-index: -1;
+  inset: 0 0 0 12%;
+}
+
+.clinicalArt::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, #070b20, transparent 52%),
+    linear-gradient(0deg, #070b20, transparent 17%);
+}
+
+.clinicalHeart {
+  object-fit: cover;
+  object-position: 72% 43%;
+}
+
+.clinicalTrace {
+  position: absolute;
+  z-index: 1;
+  width: min(80%, 56rem);
+  bottom: 12%;
+  left: 1%;
+  color: #55baff;
+  opacity: 0.57;
+  filter: drop-shadow(0 0 8px #2e92ff);
+}
+
+@media (max-width: 767px) {
+  .closingScene {
+    min-height: 39rem;
+    align-items: end;
+  }
+  .closingCopy {
+    gap: 1.25rem;
+  }
+  .closingTitle {
+    font-size: clamp(2.35rem, 8vw, 4rem);
+  }
+  .clinicalArt {
+    inset: 0;
+  }
+  .clinicalArt::after {
+    background: linear-gradient(0deg, #070b20 12%, rgb(7 11 32 / 85%) 29%, transparent 65%);
+  }
+  .clinicalHeart {
+    object-position: 70% top;
+    height: 81% !important;
+  }
+  .clinicalTrace {
+    bottom: 35%;
+    width: 92%;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .closingScene {
+      view-timeline-name: --clinical;
+    }
+    .clinicalHeart {
+      animation: heart-arrival linear both;
+      animation-timeline: --clinical;
+      animation-range: entry 0% cover 48%;
+    }
+    .clinicalTrace path {
+      animation: trace-arrival linear both;
+      animation-timeline: --clinical;
+      animation-range: entry 8% cover 46%;
+    }
+    .closingTitle span:last-child {
+      animation: clinical-emphasis linear both;
+      animation-timeline: --clinical;
+      animation-range: entry 55% cover 48%;
+    }
+  }
+}
+
+@keyframes heart-arrival {
+  from {
+    transform: translate3d(2%, 5%, 0) scale(1.13);
+    filter: brightness(0.76);
+  }
+  to {
+    transform: none;
+    filter: brightness(1);
+  }
+}
+@keyframes trace-arrival {
+  from {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes clinical-emphasis {
+  from {
+    transform: translateY(0.45em) scale(0.88);
+  }
+  to {
+    transform: none;
+  }
+}
+
+@media (min-width: 1024px) {
+  .headerShell nav {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+.stories {
+  gap: 1rem;
+}
+
+.story {
+  padding: clamp(1.15rem, 3vw, 2.25rem);
+  border: 1px solid var(--border);
+  border-radius: clamp(1.15rem, 3vw, 2rem);
+  background: var(--canvas);
+}
+
+.story[data-lead="true"] {
+  --fg: #f4f5fb;
+  --fg-muted: #c6cbe5;
+  --border: #3a4379;
+  --canvas: #151a38;
+  background: radial-gradient(ellipse at 72% 10%, #272e64, #10142e 70%);
+  border-color: #313862;
+  padding: clamp(1.25rem, 4vw, 3.25rem);
+  overflow: hidden;
+}
+
+.story[data-lead="true"] .storyTitle {
+  color: var(--fg);
+  max-width: 18ch;
+  font-size: clamp(2rem, 4.25vw, 4rem);
+}
+
+.story[data-lead="true"] .storyPreview {
+  box-shadow: 0 18px 50px rgb(4 7 25 / 42%);
+}
+
+.story[data-lead="true"] .story .storyPreview {
+  align-self: end;
+}
+
+.aiStory {
+  background: var(--accent-soft);
+}
+
+.aiExample {
+  width: 100%;
+  min-width: 0;
+  background: var(--surface);
+}
+
+.calendarIntro {
+  display: grid;
+  gap: 1rem 2rem;
+}
+
+.calendarIntro > p {
+  max-width: 43ch;
+}
+
+.calendarIntro > ul {
+  margin-top: 0.2rem;
+}
+
+@media (min-width: 768px) {
+  .stories {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .story[data-lead="true"],
+  .aiStory {
+    grid-column: 1 / -1;
+  }
+  .story[data-lead="true"] > div:first-child {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+    align-items: end;
+    gap: 2rem;
+  }
+  .aiStory {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  }
+  .calendarIntro {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    align-items: start;
+  }
+  .calendarIntro > h2 {
+    grid-row: span 2;
+    max-width: 16ch;
+  }
+}
+
+.headerLinks {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--fg-muted);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+@media (max-width: 767px) {
+  .headerShell {
+    position: relative;
+    align-items: start;
+    height: 5.15rem;
+    padding-top: 0.22rem;
+  }
+
+  .headerNav {
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0.32rem;
+  }
+
+  .headerLinks {
+    justify-content: center;
+    gap: 0.55rem;
+    font-size: 0.8rem;
+  }
+
+  .headerLinks li[data-primary="false"] {
+    display: none;
+  }
+  .headerLinks a {
+    display: block;
+  }
+}
+
+/*
+ * The heart in the wordmark beats for as long as the page is open: a lub-dub, then rest,
+ * about 70 beats a minute. Only the heart moves; the letters stay still.
+ */
+.headerBrand [data-heart] {
+  transform-box: fill-box;
+  transform-origin: 50% 55%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .headerBrand [data-heart] {
+    animation: heart-beat 1.7s cubic-bezier(0.3, 0, 0.3, 1) 0.6s infinite;
+  }
+}
+
+@keyframes heart-beat {
+  0%,
+  44%,
+  100% {
+    transform: scale(1);
+  }
+  9% {
+    transform: scale(1.12);
+  }
+  18% {
+    transform: scale(0.98);
+  }
+  27% {
+    transform: scale(1.07);
+  }
+}
+
+/* ---------------------------------------------------------------------------------------------
+ * Hero arrival: the aurora fades up behind the copy, then keeps drifting while in view.
+ * ------------------------------------------------------------------------------------------- */
+.hero {
+  position: relative;
+  isolation: isolate;
+}
+
+.heroAmbient {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.auroraA,
+.auroraB,
+.auroraC {
+  position: absolute;
+  border-radius: 50%;
+  will-change: transform;
+}
+
+.auroraA {
+  width: 62vmax;
+  aspect-ratio: 1;
+  top: -28vmax;
+  right: -14vmax;
+  background: radial-gradient(circle, rgb(61 123 255 / 55%), rgb(61 123 255 / 0) 62%);
+}
+
+.auroraB {
+  width: 52vmax;
+  aspect-ratio: 1;
+  bottom: -30vmax;
+  left: -16vmax;
+  background: radial-gradient(circle, rgb(123 92 255 / 45%), rgb(123 92 255 / 0) 62%);
+}
+
+.auroraC {
+  width: 30vmax;
+  aspect-ratio: 1;
+  top: 18%;
+  left: 38%;
+  background: radial-gradient(circle, rgb(41 170 255 / 26%), rgb(41 170 255 / 0) 64%);
+}
+
+/* Along the hero's bottom edge, clear of the copy, fading out on the text side. */
+.heroTrace {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -0.25rem;
+  width: 100%;
+  height: 4.5rem;
+  mask-image: linear-gradient(90deg, transparent 4%, black 42%, black 92%, transparent);
+}
+
+.heroTraceBase {
+  stroke: rgb(150 176 255 / 10%);
+  stroke-width: 1.2;
+}
+
+.heroTracePulse {
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-dasharray: 0.16 1;
+  stroke-dashoffset: 1.16;
+  opacity: 0;
+  filter: drop-shadow(0 0 6px rgb(98 150 255 / 70%));
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .heroAmbient {
+    animation: aurora-arrive 2.1s cubic-bezier(0.25, 0.1, 0.25, 1) both;
+  }
+  .auroraA {
+    animation: drift-a 19s ease-in-out infinite alternate;
+  }
+  .auroraB {
+    animation: drift-b 23s ease-in-out infinite alternate;
+  }
+  .auroraC {
+    animation: drift-c 15s ease-in-out infinite alternate;
+  }
+  .heroTracePulse {
+    animation: trace-sweep 5.5s cubic-bezier(0.45, 0, 0.25, 1) 1.2s infinite;
+  }
+  .heroAmbient[data-running="false"],
+  .heroAmbient[data-running="false"] * {
+    animation-play-state: paused;
+  }
+
+  /* One staged entrance for the copy and the product window. */
+  .heroEnter {
+    animation: hero-enter 900ms cubic-bezier(0.16, 1, 0.3, 1) var(--enter-delay, 0ms) both;
+  }
+  /* The product window rises without blur: a large filtered layer drops frames. */
+  .heroEnterWindow {
+    animation: hero-enter-window 900ms cubic-bezier(0.16, 1, 0.3, 1) var(--enter-delay, 0ms) both;
+  }
+}
+
+@keyframes aurora-arrive {
+  from {
+    opacity: 0;
+    transform: scale(1.12);
+  }
+  35% {
+    opacity: 0.35;
+  }
+}
+
+@keyframes drift-a {
+  to {
+    transform: translate3d(-9vmax, 7vmax, 0) scale(1.12);
+  }
+}
+
+@keyframes drift-b {
+  to {
+    transform: translate3d(11vmax, -6vmax, 0) scale(0.92);
+  }
+}
+
+@keyframes drift-c {
+  to {
+    transform: translate3d(-12vmax, 8vmax, 0) scale(1.25);
+  }
+}
+
+@keyframes trace-sweep {
+  0% {
+    opacity: 0;
+    stroke-dashoffset: 1.16;
+  }
+  8%,
+  70% {
+    opacity: 0.9;
+  }
+  85%,
+  100% {
+    opacity: 0;
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes hero-enter-window {
+  from {
+    opacity: 0.35;
+    transform: translate3d(0, 20px, 0);
+  }
+}
+
+@keyframes hero-enter {
+  from {
+    opacity: 0.45;
+    transform: translate3d(0, 14px, 0);
+    filter: blur(4px);
+  }
+}
+
+/* ---------------------------------------------------------------------------------------------
+ * Pointer spotlight: the card's border catches light where the cursor is (PointerGlow).
+ * ------------------------------------------------------------------------------------------- */
+.spotlight {
+  position: relative;
+}
+
+.spotlight::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: radial-gradient(
+    420px circle at var(--mx, 50%) var(--my, 0%),
+    rgb(123 140 255 / 85%),
+    rgb(255 79 130 / 35%) 30%,
+    transparent 60%
+  );
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 300ms ease;
+  pointer-events: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .spotlight:hover::after {
+    opacity: 1;
+  }
+}
+
+/* ---------------------------------------------------------------------------------------------
+ * Primary call to action: a soft glow and a light sheen that crosses it on hover.
+ * ------------------------------------------------------------------------------------------- */
+.ctaSheen {
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 22%),
+    0 8px 24px -8px rgb(75 91 245 / 60%);
+}
+
+.ctaSheen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 30%, rgb(255 255 255 / 32%) 48%, transparent 66%);
+  transform: translateX(-120%);
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) and (hover: hover) {
+  .ctaSheen::after {
+    transition: transform 750ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .ctaSheen:hover::after {
+    transform: translateX(120%);
+  }
+}
+
+/* "Pause animations" (MotionToggle): stops every endless loop on the page, as WCAG 2.2.2 asks. */
+:global(html[data-motion="paused"]) .headerBrand [data-heart],
+:global(html[data-motion="paused"]) .heroAmbient,
+:global(html[data-motion="paused"]) .heroAmbient *,
+:global(html[data-motion="paused"]) .flowStage,
+:global(html[data-motion="paused"]) .flowSignal {
+  animation-play-state: paused !important;
+}

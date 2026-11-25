@@ -1,26 +1,26 @@
 ---
-name: MedOS
+name: Med OS
 description: A medical-school study operating system, built to the category standard at Linear / Notion / Amboss craft.
 colors:
-  accent: "#2563eb"
-  accent-hover: "#1d4fd7"
+  accent: "#454fdb"
+  accent-hover: "#3641bc"
   accent-fg: "#ffffff"
-  accent-soft: "#ebf1fe"
-  canvas: "#f4f5f8"
+  accent-soft: "#eceefe"
+  canvas: "#f4f5fb"
   surface: "#ffffff"
-  subtle: "#f1f3f6"
-  hover: "#eaedf2"
-  border: "#e3e6ec"
-  border-strong: "#cbd0d9"
-  fg: "#0e1117"
-  fg-muted: "#474f5c"
-  fg-subtle: "#657080"
-  success: "#18794e"
-  success-soft: "#e3f4ea"
-  warning: "#935a0a"
-  warning-soft: "#fcf0d9"
-  danger: "#c0352b"
-  danger-soft: "#fdecea"
+  subtle: "#ebedf7"
+  hover: "#e3e6f3"
+  border: "#dadce8"
+  border-strong: "#c4c7da"
+  fg: "#121638"
+  fg-muted: "#464b6e"
+  fg-subtle: "#5a5f80"
+  success: "#047857"
+  success-soft: "#e2f5ed"
+  warning: "#b45309"
+  warning-soft: "#fdf1e1"
+  danger: "#dc2e3a"
+  danger-soft: "#fdecee"
   violet: "#6845c9"
   teal: "#0f7280"
   highlight: "#fde9a1"
@@ -31,60 +31,56 @@ colors:
   course-pharmacology: "#5450d6"
   course-public-health: "#0f8aa0"
   course-communication-skills: "#9147b8"
-  dark-canvas: "#08090c"
-  dark-surface: "#101217"
-  dark-subtle: "#171a21"
-  dark-border: "#22262f"
-  dark-fg: "#e9ecf1"
-  dark-fg-muted: "#a6aebb"
-  dark-accent: "#7aa2ff"
-  dark-accent-fg: "#08090c"
+  dark-canvas: "#0b0e24"
+  dark-surface: "#121638"
+  dark-subtle: "#1b2050"
+  dark-border: "#2a3068"
+  dark-fg: "#f4f5fb"
+  dark-fg-muted: "#c6c9e0"
+  dark-accent: "#a1adff"
+  dark-accent-fg: "#0b0e24"
 typography:
   display:
-    fontFamily: "Inter Variable, ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif"
+    fontFamily: "Instrument Sans Variable, ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif"
     fontSize: "72px"
     fontWeight: 600
     lineHeight: 1.02
     letterSpacing: "-0.022em"
-    fontFeature: '"cv11", "ss03", "calt"'
   headline:
-    fontFamily: "Inter Variable, ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "Instrument Sans Variable, ui-sans-serif, system-ui, sans-serif"
     fontSize: "40px"
     fontWeight: 600
     lineHeight: 1.1
     letterSpacing: "-0.022em"
-    fontFeature: '"cv11", "ss03", "calt"'
   page-title:
-    fontFamily: "Inter Variable, ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "Instrument Sans Variable, ui-sans-serif, system-ui, sans-serif"
     fontSize: "30px"
     fontWeight: 600
     lineHeight: 1.15
     letterSpacing: "-0.022em"
-    fontFeature: '"cv11", "ss03", "calt"'
   title:
-    fontFamily: "Inter Variable, ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "Instrument Sans Variable, ui-sans-serif, system-ui, sans-serif"
     fontSize: "15px"
     fontWeight: 600
     lineHeight: 1.4
     letterSpacing: "-0.011em"
   body:
-    fontFamily: "Inter Variable, ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "Instrument Sans Variable, ui-sans-serif, system-ui, sans-serif"
     fontSize: "15px"
     fontWeight: 400
     lineHeight: 1.625
-    fontFeature: '"cv11", "ss03", "calt"'
   reading:
-    fontFamily: "Inter Variable, ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "Instrument Sans Variable, ui-sans-serif, system-ui, sans-serif"
     fontSize: "16px"
     fontWeight: 400
     lineHeight: 1.7
   label:
-    fontFamily: "Inter Variable, ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "Instrument Sans Variable, ui-sans-serif, system-ui, sans-serif"
     fontSize: "13px"
     fontWeight: 500
     lineHeight: 1.4
   caption:
-    fontFamily: "Inter Variable, ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "Instrument Sans Variable, ui-sans-serif, system-ui, sans-serif"
     fontSize: "12.5px"
     fontWeight: 400
     lineHeight: 1.4
@@ -187,7 +183,7 @@ components:
 
 **Creative North Star: "The Quiet Workbench"**
 
-MedOS looks like the best tools in its category and makes no attempt to look like anything else. The owner chose the category standard on purpose, after two rounds of bolder directions: white and cool-grey neutrals, near-black ink, one confident blue, Inter set tight, hairline borders. The craft bar is Linear, Notion and Amboss. Convention is the commitment here, and the work goes into executing it exactly.
+MedOS looks like the best tools in its category and makes no attempt to look like anything else. The owner chose the category standard on purpose, after two rounds of bolder directions: paper and white surfaces, navy ink, and iris actions, Instrument Sans set tight, hairline borders. The craft bar is Linear, Notion and Amboss. Convention is the commitment here, and the work goes into executing it exactly.
 
 The app is a frame and a workspace. The cool-grey canvas is the frame, holding the sidebar. The white workspace panel sits one step above it with a hairline border and rounded top corners, and every page lives inside that panel. Structure comes from spacing, type weight and 1px borders. Shadows stay at a whisper while things are at rest, and only floating layers (dialogs, menus, framed product screenshots) get real depth. Density is set for long study sessions on a laptop: 13px controls, 15px body and section titles, generous gaps between sections.
 
@@ -195,7 +191,7 @@ Dark is a second palette in its own right, not an inversion. It gets its own nea
 
 **Key Characteristics:**
 
-- One typeface (Inter Variable) for everything, with tight negative tracking on headings and the cv11/ss03 stylistic sets.
+- One typeface (Instrument Sans Variable) for everything, with tight negative tracking on headings.
 - One blue accent for action, focus, selection and current state.
 - A cool-grey canvas frame around a white workspace panel; hairlines before shadows.
 - Course identity carried by small coloured dots, always next to the course name.
@@ -243,11 +239,11 @@ A cool, clinical neutral ladder carrying a single saturated blue, plus muted sta
 
 ## Typography
 
-**Display Font:** Inter Variable (with ui-sans-serif, system-ui, -apple-system, Segoe UI)
-**Body Font:** Inter Variable
+**Display Font:** Instrument Sans Variable (with ui-sans-serif, system-ui, -apple-system, Segoe UI)
+**Body Font:** Instrument Sans Variable
 **Label/Mono Font:** ui-monospace / Cascadia Code / SF Mono / Consolas, only for code and LaTeX source
 
-**Character:** One sans family at several weights does all the work. Headings get confidence from 600 weight and tight tracking, not from a second face. The cv11 (single-storey a) and ss03 stylistic sets give Inter a slightly softer, more legible texture.
+**Character:** One sans family at several weights does all the work. Headings get confidence from 600 weight and tight tracking, not from a second face.
 
 ### Hierarchy
 
@@ -264,7 +260,7 @@ Tables, times and anything marked numeric use tabular figures.
 
 ### Named Rules
 
-**The One Family Rule.** Inter sets every heading and every word of UI. The serif (Source Serif 4) and mono stacks exist only as fonts a user can choose inside their Notebook, never as a system display voice.
+**The One Family Rule.** Instrument Sans sets every heading and every word of UI. The serif (Source Serif 4) and mono stacks exist only as fonts a user can choose inside their Notebook, never as a system display voice.
 
 **The Sentence Case Rule.** Headings, labels and buttons are sentence case at normal tracking. Nothing is uppercase, and no small tracked label sits above a heading.
 
@@ -295,7 +291,7 @@ The system is a hybrid that leans flat. Depth comes mostly from tone, a white su
 
 ## Shapes
 
-Corners are gently rounded and step up with the size of the object: 4px for keycaps, 6px for badges and menu items, 8px for buttons, inputs, nav items and tabs, 10px for tab tracks, 12px for surfaces, cards, notices, dialogs and menus, 16px for framed screenshots and the pricing panel. Course marks, progress bars and avatars are fully round. The brand tile is a rounded square (7-10px depending on size) holding a bold "M".
+Corners are gently rounded and step up with the size of the object: 4px for keycaps, 6px for badges and menu items, 8px for buttons, inputs, nav items and tabs, 10px for tab tracks, 12px for surfaces, cards, notices, dialogs and menus, 16px for framed screenshots and the pricing panel. Course marks, progress bars and avatars are fully round. The Med OS wordmark uses an anatomical heart as its O. Use the standalone heart where the wordmark does not fit. The current asset kit is in brand/clinical-heart.
 
 Borders are always 1px hairlines; the only thicker strokes are the 2px focus outline and the 3px blockquote rule in reader prose.
 
@@ -360,7 +356,7 @@ Real captures of real screens, never illustrations, in a 16px-radius Frame Grey 
 
 - **Do** reach only for semantic tokens (canvas, surface, subtle, fg, fg-muted, accent, status, course); give every new token both a light and a dark value.
 - **Do** keep the accent for action, focus, selection and current state.
-- **Do** set headings in Inter at 600 with the font-display tracking (-0.022em), and 15px section titles at -0.011em.
+- **Do** set headings in Instrument Sans at 600 with the font-display tracking (-0.022em), and 15px section titles at -0.011em.
 - **Do** separate with 1px hairlines and the canvas/surface step before adding a shadow; keep resting shadows at elevation-xs.
 - **Do** show course identity as a 10px dot next to the course name.
 - **Do** use real product screenshots in the canvas-bezel frame wherever the product needs to be shown.
@@ -376,3 +372,7 @@ Real captures of real screens, never illustrations, in a 16px-radius Frame Grey 
 - **Don't** stand in for the product with abstract illustration, gradient blobs or feature-icon card grids; the welcome page lists features as hairline-divided text, not cards.
 - **Don't** use pure-black shadows in light mode or shadows heavier than elevation-lg.
 - **Don't** add badges, confetti or game-like reward visuals; progress is shown with plain bars and counts.
+
+## Welcome-page motion
+
+The sticky masthead floats as a glass capsule over the canvas and gains opacity after the hero while keeping its width and alignment. The hero walkthrough begins muted in view, with a small buffering indicator and a pause control. A blue ECG signal crosses the learning-flow connectors in order, and each stage responds as the signal reaches it. Product examples use scroll-linked image reveals, with a full-width lecture showcase, paired practice and statistics previews, and a broad timetable. The timetable grades from the light or dark surface into a tinted study area. The closing scene pairs a full-bleed anatomical heart with a traced ECG line and a two-beat headline. The page preserves reading order, and reduced motion keeps every scene readable without animation.

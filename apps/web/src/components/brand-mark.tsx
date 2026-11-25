@@ -2,8 +2,8 @@ import { cn } from "@medos/ui";
 import Image from "next/image";
 
 /*
- * The Med OS logo from the brand kit (brand/BRAND.md): the outlined wordmark, whose O is the
- * iris ring with the pulse, in an ink version for light surfaces and a paper version for dark
+ * The Med OS logo from the brand kit (brand/BRAND.md): the outlined wordmark, whose O is a
+ * stylised anatomical heart, in an ink version for light surfaces and a paper version for dark
  * ones. The files are used as they are: never recoloured or retyped in a live font.
  * Decorative here: whatever wraps it (a link, a heading) carries the accessible name.
  */
@@ -33,7 +33,7 @@ export function BrandMark({
       {wordmark ? (
         <span className={cn("flex items-center", wordmarkClassName)}>
           <Image
-            src="/brand/medos-wordmark.svg"
+            src="/brand/clinical-heart/medos-wordmark.svg"
             alt=""
             width={width}
             height={height}
@@ -43,7 +43,7 @@ export function BrandMark({
             style={{ height, width: "auto" }}
           />
           <Image
-            src="/brand/medos-wordmark-on-dark.svg"
+            src="/brand/clinical-heart/medos-wordmark-on-dark.svg"
             alt=""
             width={width}
             height={height}
@@ -55,7 +55,7 @@ export function BrandMark({
         </span>
       ) : null}
       <Image
-        src="/brand/medos-mark.svg"
+        src="/brand/clinical-heart/medos-mark.svg"
         alt=""
         width={mark}
         height={mark}

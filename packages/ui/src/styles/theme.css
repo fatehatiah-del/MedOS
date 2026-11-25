@@ -20,7 +20,7 @@
   /* Med OS brand (brand/BRAND.md). Logo colours: use for the logo and brand moments only. */
   --brand-ink: #121638;
   --brand-paper: #f4f5fb;
-  --brand-iris: linear-gradient(135deg, #3d7bff 0%, #7b5cff 100%);
+  --brand-iris: linear-gradient(135deg, #91bbff 0%, #655bff 52%, #4b3cd8 100%);
 
   /* Paper frame, white workspace. Values from brand/tokens.css, mapped by role. */
   --canvas: #f4f5fb;
@@ -35,13 +35,13 @@
   --fg-subtle: #5a5f80;
 
   /* Primary: buttons, links, focus, selection. */
-  --accent: #4b5bf5;
-  --accent-hover: #3f4fe0;
+  --accent: #454fdb;
+  --accent-hover: #3641bc;
   --accent-fg: #ffffff;
   --accent-soft: #eceefe;
   --focus-ring: #7b5cff;
   /* Single-series chart fill, validated for lightness and contrast on the surface. */
-  --chart-1: #4b5bf5;
+  --chart-1: #454fdb;
 
   /* Pulse: the brand accent for badges, highlights and small decorations; never body text. */
   --pulse: #ff4f82;
@@ -91,13 +91,13 @@
   --fg-muted: #c6c9e0;
   --fg-subtle: #a3a8c7;
 
-  --accent: #7b8cff;
-  --accent-hover: #95a3ff;
+  --accent: #a1adff;
+  --accent-hover: #bbc5ff;
   --accent-fg: #0b0e24;
   --accent-soft: #1e2458;
-  --focus-ring: #95a3ff;
+  --focus-ring: #bbc5ff;
   /* Its own dark step (the dark accent is too light for a fill). */
-  --chart-1: #6878ff;
+  --chart-1: #7f91ff;
 
   --pulse: #ff6f98;
   --pulse-text: #ff6f98;

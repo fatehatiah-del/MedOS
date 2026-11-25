@@ -3,7 +3,7 @@ import Image from "next/image";
 
 /** The real screens shown on the welcome page, captured in both themes (public/welcome). */
 export type ScreenName =
-  "today" | "guide-v2" | "mcq" | "recall" | "cards" | "plan" | "stats" | "calendar";
+  "today-v3" | "guide-v2" | "mcq" | "recall" | "cards" | "plan" | "stats" | "calendar";
 
 const WIDTH = 2160;
 const HEIGHT = 1350;
@@ -50,6 +50,7 @@ export function Screenshot({
         alt={alt}
         width={WIDTH}
         height={HEIGHT}
+        unoptimized={name === "stats"}
         sizes={sizes}
         priority={priority}
         className={cn("h-auto w-full rounded-[10px]", mobileCrop && "hidden sm:block")}
