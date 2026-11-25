@@ -1,4 +1,4 @@
 {
-  "prompt": "Origin: first frame of public/welcome/demo-<theme>.webm (the real Med OS walkthrough recording of a synthetic demo account), so the poster matches the video exactly; -mobile- files are a crop of its main column. Extracted 2026-11-25 with ffmpeg; WebP. Not generated.",
+  "prompt": "Origin: first frame of public/welcome/demo-<theme>.mp4/.webm (the real Med OS walkthrough recording of a synthetic demo account), so the poster matches the video. The demo cursor dot in that frame was filled with the flat background around it (2026-11-25) so the still reads cleanly on the sign-in pages. WebP. Not generated.",
   "createdAt": "2026-11-25T01:14:51.275Z"
 }

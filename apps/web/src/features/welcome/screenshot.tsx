@@ -7,9 +7,11 @@ export type ScreenName =
 
 const WIDTH = 2160;
 const HEIGHT = 1350;
-/** The phone crop: the main column of the screen at a readable scale. */
-const CROP_WIDTH = 1180;
-const CROP_HEIGHT = 1250;
+/** Below 640px the page shows the same screen captured on a phone instead of a shrunk window. */
+const PHONE = {
+  crop: { suffix: "mobile", width: 1170, height: 1440 },
+  video: { suffix: "phone", width: 390, height: 640 },
+} as const;
 
 /**
  * A MedOS screen in a quiet frame. The light and dark captures are both
@@ -21,12 +23,15 @@ export function Screenshot({
   alt,
   priority = false,
   sizes = "(min-width: 1280px) 1152px, 100vw",
-  mobileCrop = false,
+  mobileCrop,
   className,
 }: {
   name: ScreenName;
-  /** Below 640px, show a readable crop of the main column instead of the whole window. */
-  mobileCrop?: boolean;
+  /**
+   * Below 640px, show the screen as it looks on a phone: "crop" is a still phone capture,
+   * "video" is the first frame of the phone walkthrough (the hero poster).
+   */
+  mobileCrop?: keyof typeof PHONE;
   alt: string;
   priority?: boolean;
   sizes?: string;
@@ -36,10 +41,11 @@ export function Screenshot({
     <>
       {mobileCrop ? (
         <Image
-          src={`/welcome/${name}-mobile-${theme}.webp`}
+          src={`/welcome/${name}-${PHONE[mobileCrop].suffix}-${theme}.webp`}
           alt={alt}
-          width={CROP_WIDTH}
-          height={CROP_HEIGHT}
+          width={PHONE[mobileCrop].width}
+          height={PHONE[mobileCrop].height}
+          unoptimized={mobileCrop === "video"}
           sizes="100vw"
           priority={priority}
           className="h-auto w-full rounded-[10px] sm:hidden"

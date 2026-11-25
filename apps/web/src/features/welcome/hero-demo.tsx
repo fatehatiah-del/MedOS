@@ -4,6 +4,17 @@ import { Pause, Play } from "lucide-react";
 import styles from "./welcome-motion.module.css";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 
+/**
+ * The walkthrough to play here. Phones get the phone recording. H.264 MP4 is what iPhone and
+ * iPad Safari can play; WebM (VP8) covers browsers built without H.264.
+ */
+function demoSource(video: HTMLVideoElement) {
+  const theme = document.documentElement.dataset.theme === "dark" ? "dark" : "light";
+  const phone = !window.matchMedia("(min-width: 640px)").matches;
+  const format = video.canPlayType('video/mp4; codecs="avc1.640028"') ? "mp4" : "webm";
+  return `/welcome/demo-${phone ? "phone-" : ""}${theme}.${format}`;
+}
+
 export function HeroDemo({ children }: { children: ReactNode }) {
   const player = useRef<HTMLVideoElement>(null);
   const playbackOverride = useRef<boolean | null>(null);
@@ -16,17 +27,17 @@ export function HeroDemo({ children }: { children: ReactNode }) {
     if (!video) return;
 
     const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
-    // Phones show the readable crop of Today instead: the desktop recording is too small there.
+    // Crossing the phone breakpoint swaps between the phone and desktop recordings.
     const wide = window.matchMedia("(min-width: 640px)");
     let inView = !("IntersectionObserver" in window);
     const updatePlayback = () => {
-      const shouldPlay = wide.matches && (playbackOverride.current ?? !preference.matches);
+      const shouldPlay = playbackOverride.current ?? !preference.matches;
       if (!inView || document.hidden || !shouldPlay) {
         video.pause();
         return;
       }
 
-      const source = `/welcome/demo-${document.documentElement.dataset.theme === "dark" ? "dark" : "light"}.webm`;
+      const source = demoSource(video);
       if (video.getAttribute("src") !== source) {
         video.setAttribute("src", source);
       }
@@ -76,8 +87,7 @@ export function HeroDemo({ children }: { children: ReactNode }) {
     }
 
     playbackOverride.current = true;
-    const theme = document.documentElement.dataset.theme === "dark" ? "dark" : "light";
-    const source = `/welcome/demo-${theme}.webm`;
+    const source = demoSource(video);
     if (video.getAttribute("src") !== source) video.setAttribute("src", source);
     else if (video.error) video.load();
     video.muted = true;
@@ -123,7 +133,7 @@ export function HeroDemo({ children }: { children: ReactNode }) {
         type="button"
         aria-label={playing ? "Pause walkthrough" : "Play walkthrough"}
         title={playing ? "Pause walkthrough" : "Play walkthrough"}
-        className="absolute right-3 bottom-3 hidden size-11 items-center justify-center rounded-full border border-white/25 bg-[#121638] text-white transition-colors hover:bg-[#252d69] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:flex"
+        className="absolute right-3 bottom-3 flex size-11 items-center justify-center rounded-full border border-white/25 bg-[#121638] text-white transition-colors hover:bg-[#252d69] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
         onClick={togglePlayback}
       >
         {playing ? (

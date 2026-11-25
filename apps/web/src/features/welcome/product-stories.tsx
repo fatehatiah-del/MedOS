@@ -41,6 +41,7 @@ export function ProductStories() {
           </div>
           <Screenshot
             name={screen}
+            mobileCrop="crop"
             alt={alt}
             sizes={
               index === 0 ? "(min-width: 1280px) 1100px, 100vw" : "(min-width: 768px) 50vw, 100vw"

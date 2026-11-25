@@ -468,7 +468,8 @@
 .closingScene {
   display: grid;
   align-items: center;
-  min-height: clamp(30rem, 53vw, 49rem);
+  /* Never taller than the screen minus the header, so a short laptop never tucks the title under it. */
+  min-height: min(clamp(30rem, 53vw, 49rem), calc(100svh - 4.5rem));
   background: #070b20;
 }
 
@@ -491,7 +492,6 @@
 
 .closingTitle span:last-child {
   color: #c7d1ff;
-  transform-origin: left bottom;
 }
 
 .clinicalArt {
@@ -567,10 +567,12 @@
       animation-timeline: --clinical;
       animation-range: entry 8% cover 46%;
     }
+    /* A wipe in step with the ECG trace. It never moves the line, so nothing can overlap, and
+       it completes once the scene has fully entered, which every viewport reaches. */
     .closingTitle span:last-child {
       animation: clinical-emphasis linear both;
       animation-timeline: --clinical;
-      animation-range: entry 55% cover 48%;
+      animation-range: entry 35% entry 100%;
     }
   }
 }
@@ -597,10 +599,10 @@
 }
 @keyframes clinical-emphasis {
   from {
-    transform: translateY(0.45em) scale(0.88);
+    clip-path: inset(-0.2em 100% -0.25em 0);
   }
   to {
-    transform: none;
+    clip-path: inset(-0.2em -0.1em -0.25em 0);
   }
 }
 
@@ -671,7 +673,8 @@
   margin-top: 0.2rem;
 }
 
-@media (min-width: 768px) {
+/* Side by side only from laptop width: on an iPad in portrait the half-width screens are too small to read. */
+@media (min-width: 1024px) {
   .stories {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -679,6 +682,9 @@
   .aiStory {
     grid-column: 1 / -1;
   }
+}
+
+@media (min-width: 768px) {
   .story[data-lead="true"] > div:first-child {
     display: grid;
     grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);

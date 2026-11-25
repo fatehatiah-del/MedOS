@@ -226,13 +226,13 @@ export function WelcomePage() {
               </p>
             </div>
 
-            <figure className={styles.heroPreview}>
+            <figure className={`${styles.heroPreview} mx-auto w-full max-w-[300px] sm:max-w-none`}>
               <div className={styles.heroEnterWindow} style={enter(200)}>
                 <HeroDemo>
                   <Screenshot
                     name="today-v3"
                     priority
-
+                    mobileCrop="video"
                     sizes="(min-width: 1024px) 620px, 100vw"
                     alt="The Med OS Today screen: the day's university schedule, a recommended study plan, today's progress and upcoming exams."
                   />
